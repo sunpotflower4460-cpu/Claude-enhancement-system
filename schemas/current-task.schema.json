@@ -7,15 +7,20 @@
     "stage",
     "run_id",
     "task_id",
+    "attempt_id",
     "attempt",
     "active",
     "failures",
     "fingerprint",
-    "history"
+    "owner",
+    "history",
+    "sprint_task_id",
+    "run_started_at",
+    "attempt_history"
   ],
   "properties": {
     "version": {
-      "const": 1
+      "const": 2
     },
     "stage": {
       "enum": [
@@ -30,16 +35,13 @@
       ]
     },
     "run_id": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "task_id": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
+    },
+    "attempt_id": {
+      "type": ["string", "null"]
     },
     "attempt": {
       "type": "integer",
@@ -53,22 +55,41 @@
       "minimum": 0
     },
     "fingerprint": {
-      "type": [
-        "string",
-        "null"
+      "type": ["string", "null"]
+    },
+    "owner": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pid", "host", "start"],
+          "properties": {
+            "pid": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "host": {
+              "type": "string",
+              "minLength": 1
+            },
+            "start": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
       ]
     },
     "history": {
       "type": "array",
+      "minItems": 0,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "stage",
-          "at",
-          "fingerprint",
-          "note"
-        ],
+        "required": ["stage", "at", "fingerprint", "note"],
         "properties": {
           "stage": {
             "type": "string",
@@ -83,6 +104,35 @@
             "minLength": 1
           },
           "note": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "sprint_task_id": {
+      "type": ["string", "null"]
+    },
+    "run_started_at": {
+      "type": ["string", "null"]
+    },
+    "attempt_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["run_id", "task_id", "attempt_id"],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "task_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attempt_id": {
             "type": "string",
             "minLength": 1
           }

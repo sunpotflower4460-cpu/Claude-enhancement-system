@@ -1,6 +1,6 @@
 # 01 — 構成と環境別ブートストラップ
 
-実装状況（2026-10-25）：この文書の役割分担を維持し、v0.1では`develop-sprint.js`へreview/fixを内包した。状態・証拠CLIは`bootstrap/state/record/context/doctor/verify.mjs`、共通処理は`scripts/lib/core.mjs`。実際のSchemaにはmission/backlog/current-task/contract/evidence/assessmentがある。実装上の判断と理由は[feasibility-report.md](feasibility-report.md)、実機未確認項目は[validation-results.md](validation-results.md)。
+実装v0.2では、親/goalが`develop-mission.js`を呼び、複数スプリントを直列制御する。`develop-sprint.js`は1スプリントburstの入口。persistent missionにはcanonical repository ID、sessionにはパス/worktree/branchを分離。backlog/contract/assessment/recordはSchema v2、operation/progressとSDKモデル・終了記録を別管理する。元の役割分担と要求は維持する。詳細は[深層監査](08-deep-audit.md)、[実際のコマンド](06-usage.md)、[実証範囲](validation-results.md)。
 
 ## 1. 方式
 

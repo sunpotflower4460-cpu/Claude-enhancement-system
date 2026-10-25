@@ -4,21 +4,21 @@
 
 Codex 6.1-sol（高推論）で、小さな実装→テスト→レビュー→修正を繰り返す。指示書だけ増えて動かない状態を避けるため、各フェーズは動く成果物と証拠で終える。計画は必要に応じて更新してよいが、`docs/00-requirements.md`の要求を無断で縮小しない。
 
-## 実装進捗（2026-10-25）
+## 実装進捗（v0.2 深層監査反映）
 
-チェックリストは各フェーズの実機終了条件まで満たしたときに完了とする。未実測の項目をコードの存在だけでチェックしない。
+チェックリストは各フェーズのClaude実機終了条件まで満たしたときに完了とする。コードの存在や模擬モデルだけでチェックしない。
 
-| フェーズ | 実装済みの範囲 | 終了条件の状態 |
+| フェーズ | v0.2で実装・検証する範囲 | 受け入れ状態 |
 | --- | --- | --- |
-| 0 | doctor、公式Workflow/SDK資料の再取得、feasibility-report | UNVERIFIED：Claude Codeなし |
-| 1 | bootstrap、JSON Schema、状態遷移、指紋、record、verify、故障テスト | ローカル試験PASS |
-| 2 | 役割定義、直列Workflow、null拒否、修正とSonnet昇格、所有権と再開 | 模擬試験PASS、実モデル試験UNVERIFIED |
-| 3 | Opus計画/監査Workflow、要件対応検査、監査欠損/重大指摘の拒否 | 機械検査PASS、Opus監査UNVERIFIED |
-| 4 | 3プロファイルの必須検査、実コマンド証拠、JSON/概要の最終出力 | 機械検査とHTTP実行PASS、ブラウザ/ゲームUNVERIFIED |
-| 5 | START、対象自動選択、非破壊導入、plugin/skills/agents/workflows | ローカル初期化PASS、Claude発見/起動UNVERIFIED |
-| 6 | 回帰テスト、CLI統合試験、CI設定、証拠と残課題 | ローカルPASS、クラウド総合試験UNVERIFIED |
+| 0 | 現行5公式資料/SDKとCLI 2.1.310 help/version照合、隔離probe | 静的照合済み、Claude実機UNVERIFIED |
+| 1 | Schema v2、原文保護、全task/check/要件gate、非破壊atomic setup、再接続/移行 | ローカル試験、validation-results参照 |
+| 2 | native agentType、null拒否、task/run/attempt/receipt、実テスト中のkill/recover | ローカル/模擬試験、実モデル未検証 |
+| 3 | 長期計画、永続milestone、再計画、全execution付き最終監査 | 模擬統合試験、実Opus未検証 |
+| 4 | 6kind report、実HTTP/Chromium、artifact鮮度、FAIL/UNVERIFIED分離 | ローカル実行、Claude開発の実機追試未検証 |
+| 5 | START、agent-only事前setup、原要求入力、隔離probe生成とSDK import | ローカルCLI試験、cloud起動/権限未検証 |
+| 6 | 正常/故障/複数burst/回帰/独立監査/CI | 最新結果と残項目はvalidation-results |
 
-再現コマンドとT01〜T20の対応・根拠は [validation-results.md](validation-results.md)。次の必須工程はClaude CodeでSTARTの手順4の権限制限probeを実測し、同じ実行記録でT01/T02/T03/T19を検証すること。
+ユーザー追加Phase A〜Gの対応、Before/After、独立監査の追加指摘と修正は[08-deep-audit.md](08-deep-audit.md)。実機専用の残試験は[live-probe.md](live-probe.md)へ集約。元のT01〜T20は維持する。
 
 ## フェーズ0：前提機能のスモークテスト【最優先】
 

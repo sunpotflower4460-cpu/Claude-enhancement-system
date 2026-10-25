@@ -1,68 +1,83 @@
-# 06 — 利用と再開
+# 06 — v0.2の利用・証拠・再開
 
-ローカル状態・検証CLIはNode.js 22以上とGitで動作する。Claude Codeクラウドの一指示開始は未検証。実際の利用は START.md に従い、未確認の機能をPASSにしない。
+Node.js 22以上、Git、Linux/POSIXを前提とする。CLIは機械用JSONをstdout、verify概要をstderrへ出す。終了0は本番COMPLETE、1は検査未達/人間確認/TEST判定、2は入力不正/診断未検証。`npm ci --ignore-scripts && npm test`で回帰試験（ブラウザ試験には`npx playwright install --with-deps chromium`）。製品利用の状態CLIはAjv以外の有料サービスを必要としない。
 
-## 初回指示
+## 初回の一指示
 
-Claude Codeクラウドで対象と共通の2リポジトリを選び、以下を送る。
+対象と共通をClaude Codeで選択し、原要求の場所を埋めて送る。
 
 ```text
-/goal 開発対象の原要求と完成条件をすべて満たすまで自律開発してください。
-Claude-enhancement-system/START.mdを読み、対象と共通を識別して実行してください。
-Opus 5.5で長期設計と監査、Sonnet 5.5で短期計画・独立レビュー・実行検証、
-Haiku 5.5で実装し、失敗を修正して続行してください。
-原要求は対象の［設計書のパス］です。範囲を縮小しないでください。
-Workflow終了後、現在の成果物に最終verifyを実行し、結果を表示してください。
-確認できない機能はUNVERIFIEDとし、独立に進められる作業は続けてください。
+/goal 対象の［設計書パス］にある原要求と完成条件をすべて満たしてください。
+Claude-enhancement-system/START.mdを実行し、Opus長期設計、Sonnet短期計画、
+Haiku実装、独立Sonnetレビュー・実行検証、必要な修正と節目のOpus監査を進めてください。
+未完了バックログが残れば次のスプリントへ進み、終了したWorkflowの後で最終verifyを実行してください。
+未確認のモデル・権限・実機品質をPASSにせず、独立して進められる作業は続けてください。
 ```
 
-権限承認は環境設定に依存する。初回承認回数と再起動時の発見動作は未実測。プラグインが自動適用されるとは仮定しない。
+新規agent directoryの再起動要件はdocs/runtime-spec-audit.md参照。事前setupとして`node COMMON/scripts/install-agents.mjs --target TARGET`を実行できる（mission不要）。既存設定を上書きしない。cloudでの一指示開始、承認回数、モデルアクセス、共有scriptPathは未実証。
 
-## ローカルコマンド
-
-共通にて `npm ci --ignore-scripts`。以下のCOMMON/TARGET/INPUTを実際の絶対パスに置き換える。
+## コマンドの流れ
 
 ```bash
+node COMMON/scripts/bootstrap.mjs --target TARGET --mission INPUT_JSON --profile backend
 node COMMON/scripts/doctor.mjs --target TARGET
-node COMMON/scripts/bootstrap.mjs --target TARGET --mission INPUT --profile backend
+node COMMON/scripts/state.mjs --target TARGET --action begin --run RUN --task mission --attempt ATTEMPT
+node COMMON/scripts/context.mjs --target TARGET --run RUN
 node COMMON/scripts/record.mjs --target TARGET --check CHECK_ID
 node COMMON/scripts/verify.mjs --target TARGET
 ```
 
-対象自動選択は `--target` の代わりに `--repositories '["/absolute/common","/absolute/target"]'`。共通以外が1つに定まらなければ拒否する。mission入力はexamples/mission.json形式で原文とID付き要件を渡す。既存状態を上書きしない。新要求は既存原文を消さず、人間の明示的な追記を別途保存し再計画する（自動要件マージは提供しない）。
+bootstrapの代わりに`--repositories '["/absolute/common","/absolute/target"]'`で対象候補を渡せる。共通以外が1つに定まらなければ拒否。原文/要件IDの入力はexamples/mission.json形式。bootstrapはsessionを含む状態をatomic publishする。既存missionとの衝突は上書きせず拒否する。
 
-bootstrap後にOpusが `.autodev/contract.json` をschemas/contract.schema.jsonに沿って作る。チェックはid、requirement_refs、kind、command、timeout_ms。backendはtest/api、web-appはtest/build/behavior/visual、gameはtest/build/behavior/visual/playが必須。各コマンドは期待動作をassertし、失敗を非0で返す。検査実行が製品ファイルを書き換える場合、証拠は失効する。テスト時生成物は適切にgitignoreし、製品ソースはignoreしない。
+Opusは原要求を全タスクへ分解し、backlogのcheck_refsとcontractのtask_id/requirement_refsを双方に対応させる。全タスクが受け入れ検査を持ち、全要件がタスク/チェック/評価に含まれる必要がある。backendはtest/api、web-appはtest/build/behavior/visual、gameはさらにplayが必須。
 
-`record`は実際にコマンドを実行し、終了コード・signal・ログハッシュ・実行環境・前後指紋を保存する。verifyの出力はJSON、stderrは概要。終了0はCOMPLETE、1は未達/人間レビュー、2は入力不正/診断未検証。
+## 種別別の実行report
 
-CLI利用は `claude --model claude-sonnet-5-5 --add-dir COMMON --plugin-dir COMMON`。agents/skillsとworkflowsの発見・ツール制限・モデル適用は起動後に実測する。
+contract commandは実際のテスト/ブラウザ/ビルドツールを起動する。recordは`AUTODEV_REPORT_PATH`と`AUTODEV_CHECK_CONTEXT`（nonce/check/task/run/attempt/session/kind）を渡す。runnerは`scripts/lib/reports.mjs`のwriteReportで結果を出す。実例はexamples/api-check.mjs、examples/browser-check.mjs。
 
-## 状態と再開
+| kind | detailsと必須証拠 |
+| --- | --- |
+| test | 実行件数、passed/failed/skipped、具体的なassertions |
+| build | 終了結果、実際の生成物とハッシュ |
+| api | method/URL/status/期待status、応答本文artifactとSHA256、内容のassertions |
+| behavior | 実入力、前状態、後状態、期待状態 |
+| visual | browser/viewport、実PNG/JPEG captures、検査内容とassertions |
+| play | 実入力列、進行、到達結果/期待結果、実画像とassertions |
+
+report自体とartifactをハッシュで照合し、コマンドからの新規nonceが無い旧reportを再利用しない。単なる`true`/`echo`では全kindとも未検証。ツール不足ならreportが揃わずUNVERIFIED、実行失敗やassert失敗ならFAIL。繰り返す操作入力は正当な列として扱う。画像があるだけで視覚的魅力や面白さを自動承認しない。
+
+## モデル・独立評価
+
+`import-runtime.mjs --target TARGET --raw RAW_JSONL --tool_use ACTUAL_TOOL_ID --task TASK_OR_mission --stage review --expected claude-sonnet-5-5`で既知SDK構造を照合する。CLI収集は`--forward-subagent-text`を使う。書類上のmodel文字列や自己紹介は採用しない。
+
+SDK init.cwd、task/run区間、assistant UUID/model/timestamp、invocation tag（Workflowがlabelとpromptへ付与）を現在のmission/binding/run/task/attempt/stageと照合する。必要な形で記録が出ない実機ではUNVERIFIED。parserのために偽の実ログ形式を作らない。過去executionの成功観測はrouting_historyに表示し、現executionのモデル証拠から外す。現contextの不正記録は失敗として残る。
+
+assessmentはv2。status、scope、task_ids、各taskのexecutions、run/task/attempt/session、product/contract/identity、原要件refs、findings、runtime_refを保持する。`assessment.mjs --target TARGET --input ACTUAL_ASSESSMENT --kind review --scope task --task TASK --runtime IMPORTED_REF`で、独立に返された評価を改変せず保存する。古いコードへ現在指紋を後付けしたり、NEEDS_FIXを指摘0件だからPASSへ変えたりしない。
+
+タスク選択/完了はtask.mjs（action select/complete/reset/block/fail）。completeはcurrent evidenceと独立task reviewから判定する。resetは新execution IDで古い承認を失効させる。最終評価は現在の全task executionを含むscope=finalで再取得する。
+
+## 中断と再接続
+
+runはmission全体の所有者、sprint_task_idは実タスク。実装前にoperation.mjs start、適用後にcompleteして結果を保存する。同じreceiptを再投入した場合、同じ製品ならALREADY_APPLIED、差異があればOBSERVE_REQUIRED。未終了writerがあれば別writerを開始しない。
+
+親は実際のWorkflow停止/終了と稼働一覧を取得し、`import-termination.mjs --target TARGET --raw RAW --tool_use WORKFLOW_TOOL_ID`を実行する。rawのWorkflow args・launch taskId/runId・terminal notification・empty snapshot以後の開始まで検査する。古い空snapshotを最新のdrained証拠にしない。
 
 ```bash
-node COMMON/scripts/state.mjs --target TARGET --action begin --run RUN_ID --task TASK_ID
-node COMMON/scripts/state.mjs --target TARGET --action transition --run RUN_ID --task TASK_ID --stage ARCHITECTURE
-node COMMON/scripts/state.mjs --target TARGET --action end --run RUN_ID --task TASK_ID
+node COMMON/scripts/state.mjs --target TARGET --action recover --proof TERMINATION_JSON
+node COMMON/scripts/state.mjs --target TARGET --action begin --run RUN --task mission --attempt NEW_ATTEMPT
+node COMMON/scripts/next.mjs --target TARGET --run RUN
 ```
 
-初回はIDLE→ARCHITECTURE→PLAN、以後PLAN→IMPLEMENT→REVIEW→VERIFY→AUDIT→IDLE。修正はREVIEW/VERIFY→IMPLEMENT。次スプリントはVERIFY/AUDIT→PLAN。各writeは直列、run/task所有権を確認する。状態履歴とhandoffを読む。中断でactiveが残ると新規beginは拒否される。ランタイムで旧writerの終了を確認し、終了ログを `--action recover --proof /absolute/stopped-log.txt` へ渡す。BLOCKEDになり、変更指紋が記録される。Git diffと部分編集を観察してからPLAN/REVIEW/VERIFY/AUDITへ再開する。証拠が最新なら不要な再実装はしない。
+recoverは部分編集を保持し、旧started operationをinterruptedへ記録、resume.jsonで実タスクと段階を渡す。差分を観察後、`operation.mjs --action observe`と`observed_fingerprint/reason`を持つ検査JSONで旧receiptを引き継ぐ。実装途中の変更ならレビューから、レビュー/テスト途中なら当該検査から再開する。旧attemptを再利用しない。CLIとWorkflowは同じ構造化resumeを使う。
 
-プロセスクラッシュで `.autodev/.mutex` が残った場合は、関連プロセスとWorkflowが全て停止したことを確認し、ファイルを退避してからrecoverする。自動で生きたlockを奪わない。別worktree・branch・remoteへ移動すると識別不一致で拒否する。意図的な移行は元状態を保全して再初期化し、証拠を再取得する。
+クラッシュでmutexが残ったときはrecover-lock.mjs。生きたowner/検査processや他hostの不明ownerを自動で奪わない。テスト実行中の親停止でも検査processの停止確認が必要。解消しない他host/欠損runtimeは人間/環境による復旧待ちとしてBLOCKEDを記録する。
 
-## レビュー・モデルの記録
+同じremoteの別clone/worktree/branchは`reconnect.mjs --target NEW_PATH`。missionにはcanonical repository ID、sessionには現在のパス/worktree/branchを分けて保存する。異なるrepoは拒否。旧run activeなら現在の停止証拠が必要。旧state/evidence/operationsは保存し、現在bindingで製品・検証・モデル・評価を再判定する。未コミット変更を捨てない。
 
-`evidence/review.json` / `audit.json` はassessment.schema.json準拠。productはfingerprint、contractはcontracts().digest、identityはhash(JSON.stringify(mission.target))。findingsとrequirement_refsは独立エージェントの出力を保持する。runtime_recordはevidence内の元ランタイムログのbasename、runtime_hashはそのSHA256、expected_model/observed_modelは実際の観測値。ログが無ければ作らず未検証のままにする。
+v1は`migrate.mjs --target TARGET`。原文・旧Schema・証拠を保存し、全条件をUNVERIFIEDへ戻して再計画/再検証する。migration journalにより途中停止後も再実行でき、未関係の編集が混入したら拒否。旧共通パスが存在しない場合は当時のremoteを`--legacy_shared_remote URL`で明示する。
 
-`.autodev/routing.json` は以下の配列を3モデル分保存する。
+## 指紋と信頼境界
 
-```json
-[{"expected":"claude-opus-5-5","observed":"claude-opus-5-5","record":"actual-task-detail.txt","hash":"SHA256_OF_ACTUAL_LOG"}]
-```
+製品はtracked＋ignoreされていないuntrackedの内容/種別/mode。削除は現存ファイル集合から消えるため、削除のstage/commitだけで再度無効化しない。内部symlinkの実体もhashし、外部/状態/ディレクトリsymlinkとsubmoduleは拒否。.autodevは除外するが、原要求・契約・backlog構造・共通検証器/検査adapter/役割規則/依存ロックは別契約指紋へ含める。ignoreした未追跡ソースは対象外なので、製品ソースをignoreしない。
 
-ゲートはモデル一致とログの現存・ハッシュを確認する。ただし任意形式のランタイムログからモデル名を自動解析するアダプタは未実装。ログと正規化値の照合は親セッションの責任。エージェント自身の「私はOpus」は根拠にならない。
-
-## 判定の限界
-
-この基盤は信頼された親とエージェントを前提に、欠損・古い証拠・通常の誤判定を防ぐ。任意shellの隔離、ログの署名、悪意あるエージェントによる証拠偽造の防止は提供しない。レビューの読み取り専用境界はClaude Codeの実ツール制限で担保する必要があり、実測前にはWorkflowを起動しない。
-
-製品指紋はGitで追跡済み＋ignoreされていない未追跡ファイル（内容・種別・mode・削除）。.autodevは除外。原要求・契約・バックログ構造・共通検証器は別指紋に含む。未追跡でもignoreされたソース、submoduleは未対応（submoduleは拒否）。原要件IDの意味と原文の完全な対応はOpus監査が必要。
+信頼された親とツール実行者を前提にした誤判定防止であり、任意shellや悪意ある偽造JSONの署名/隔離基盤ではない。実際のログを収集する親の信頼性と、最新の外部runtime観測は必要。TEST FIXTUREを使った試験は明示的に分離し、`--fixture true`でもTEST_COMPLETE等を返し、終了0や実機PASSにしない。

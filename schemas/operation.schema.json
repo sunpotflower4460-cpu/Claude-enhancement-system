@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "operation_id",
+    "run_id",
+    "task_id",
+    "attempt_id",
+    "session_id",
+    "stage",
+    "state",
+    "before",
+    "after",
+    "result",
+    "updated_at"
+  ],
+  "properties": {
+    "version": {
+      "const": 2
+    },
+    "operation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stage": {
+      "enum": ["PLAN", "IMPLEMENT", "REVIEW", "VERIFY", "AUDIT"]
+    },
+    "state": {
+      "enum": ["started", "completed", "interrupted", "observed"]
+    },
+    "before": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "after": {
+      "type": ["string", "null"]
+    },
+    "result": {},
+    "updated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

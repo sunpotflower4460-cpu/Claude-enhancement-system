@@ -1,48 +1,45 @@
 # Claude-enhancement-system
 
-Claude Codeの標準機能を活用し、**開発対象リポジトリ + この共通開発リポジトリ**を選んで、初回指示から設計・実装・独立レビュー・修正・実機検証・再計画を自律的に進めるための、再利用可能な軽量開発基盤。
-
-## 目標
-
-- Opus 5.5：長期設計・節目の監査
-- Sonnet 5.5：短期計画・レビュー・実機検証・進行管理
-- Haiku 5.5：小さく分割した実装・修正（難航時はSonnetに引き上げ可能）
-- Claude Code `/goal`：完成条件が未達の間の継続
-- Dynamic Workflows：工程と再試行の順序を管理
-- 検証コントラクト：証拠のない完成宣言を防ぐ
-
-使用する本体はClaude Code。別の開発統合プロジェクトや他のコーディングエージェントへの依存は設けない。
+Claude Codeの標準 `/goal`、Dynamic Workflows、native custom agentsを使い、**開発対象＋共通リポジトリ**から設計・計画・実装・独立レビュー・修正・検証を進める軽量開発基盤。
 
 ## 現在の状態
 
-**v0.1 実装：ローカル検証基盤とClaude向けWorkflow/役割定義を追加。V1全体の受け入れはUNVERIFIED。**
+**v0.2実装 / Schema v2。ローカル実証とClaude Code実機受け入れを分離しています。V1全体はUNVERIFIEDです。**
 
-Node.js 22以上で `npm ci --ignore-scripts && npm test`。今回の実測環境はNode.js 24.19.0。
-対象識別・冪等初期化・要件/状態スキーマ・実コマンド証拠・指紋・完成ゲート・再開履歴を実装した。
-独立レビューと監査、モデル置換検出、null拒否、Sonnet昇格を組み込んだWorkflowを同梱する。
+- Opus 5.5：長期設計、重要判断、節目/最終監査。
+- Sonnet 5.5：短期計画、独立レビュー、実行検証、進行管理。難航時の実装。
+- Haiku 5.5：標準実装と修正。
+- 親セッション＋/goal：Workflow起動・完了待機、現在状態からの再開、未達時の継続。
+- 機械ゲート：全原要件・全タスク・種別別証拠・独立評価・実モデル記録・稼働状態から完成を再計算。
 
-Claude Code本体がこの環境に無いため、クラウド2リポジトリ、/goal、Workflowの実ツール制限と5.5モデルルーティングは未実証。
-ローカルのテスト成功をクラウド受け入れ合格とは扱わない。
+共通/対象の識別、非破壊bootstrap、永続状態、再接続、operation journal、Schema移行、複数sprint、故障時昇格、実HTTP/Chromiumの検証interfaceを実装しています。TEST FIXTUREから本番COMPLETEは出しません。
 
-開始は [START.md](START.md)、コマンドと再開は [利用手順](docs/06-usage.md)、
-実証済みの範囲と未検証項目は [検証結果](docs/validation-results.md) を参照。
+## 試す
 
-## 設計書を読む順序
+```bash
+npm ci --ignore-scripts
+npx playwright install --with-deps chromium
+npm test
+```
 
-1. [要求と対象範囲](docs/00-requirements.md)
-2. [構成と環境別起動](docs/01-architecture.md)
-3. [自走実行プロトコル](docs/02-execution-protocol.md)
-4. [品質・証拠・完了判定](docs/03-quality-contract.md)
-5. [OSSと公式資料](docs/04-research-sources.md)
-6. [実装順序・受け入れテスト](docs/05-implementation-plan.md)
-7. [ユーザー向け利用手順](docs/06-usage.md)
-8. [設計自己レビュー・残る検証事項](docs/07-self-review.md)
+Node.js 22以上、Git、Linux/POSIX。ブラウザ検査は開発用Playwrightで実行し、製品側CLIの必須外部依存はAjvのみです。
 
-## 境界
+通常のClaude開始は [START.md](START.md)。原要求を保全して対象だけへ書き込みます。最初の実機受け入れは [隔離一括probe](docs/live-probe.md) へ。選択したテストリポジトリを変更せず、隔離clone・故障fixture・開始指示・結果表を生成できます。
 
-- **このリポジトリ**：エージェント定義、共通Skills、ワークフロー、初期設定、検証ロジック。
-- **開発対象リポジトリ**：元の設計、長期計画、バックログ、進捗、検証証拠、成果物。
-- 共通基盤の利用によって別プロジェクトの設計・運用に干渉しない。
-- 初回操作の最小化は目標。権限承認、利用制限、環境の制約による一時停止は起こり得る。
+## 実証と未検証
 
-実装の引き継ぎルールは [AGENTS.md](AGENTS.md) に記載。
+[検証結果](docs/validation-results.md)にローカル/CI、正常/故障、実ブラウザ、模擬モデルを区別して記録しています。クラウド2repo、一指示起動、実5.5モデル、native権限制限、実Workflow内の記録、/goal停止再開は未検証です。必要なruntime記録が取れなければUNVERIFIEDを返します。
+
+## 設計と運用
+
+1. [要求](docs/00-requirements.md)
+2. [構成](docs/01-architecture.md)
+3. [実行プロトコル](docs/02-execution-protocol.md)
+4. [品質契約](docs/03-quality-contract.md)
+5. [調査資料](docs/04-research-sources.md)
+6. [実装計画と受け入れ試験](docs/05-implementation-plan.md)
+7. [コマンド・再開・証拠形式](docs/06-usage.md)
+8. [深層監査のBefore/After](docs/08-deep-audit.md)
+9. [公式仕様照合](docs/runtime-spec-audit.md)
+
+Development系の長期統合基盤や他社coding-agent adapterは含めません。アプリ開発中の共通側は読取中心、製品・要求・計画・証拠は対象側へ保存します。作業規則は [AGENTS.md](AGENTS.md)。

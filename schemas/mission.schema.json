@@ -4,6 +4,7 @@
   "additionalProperties": false,
   "required": [
     "version",
+    "mission_id",
     "original",
     "requirements",
     "profile",
@@ -12,7 +13,11 @@
   ],
   "properties": {
     "version": {
-      "const": 1
+      "const": 2
+    },
+    "mission_id": {
+      "type": "string",
+      "minLength": 1
     },
     "original": {
       "type": "string",
@@ -24,10 +29,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "id",
-          "text"
-        ],
+        "required": ["id", "text"],
         "properties": {
           "id": {
             "type": "string",
@@ -38,46 +40,33 @@
             "minLength": 1
           }
         }
-      }
+      },
+      "uniqueItems": true
     },
     "profile": {
-      "enum": [
-        "backend",
-        "web-app",
-        "game"
-      ]
+      "enum": ["backend", "web-app", "game"]
     },
     "target": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "root",
-        "gitDir",
-        "remote",
-        "branch"
-      ],
+      "required": ["repository"],
       "properties": {
-        "root": {
-          "type": "string",
-          "minLength": 1
-        },
-        "gitDir": {
-          "type": "string",
-          "minLength": 1
-        },
-        "remote": {
-          "type": "string",
-          "minLength": 1
-        },
-        "branch": {
+        "repository": {
           "type": "string",
           "minLength": 1
         }
       }
     },
     "shared": {
-      "type": "string",
-      "minLength": 1
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository"],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     }
   }
 }

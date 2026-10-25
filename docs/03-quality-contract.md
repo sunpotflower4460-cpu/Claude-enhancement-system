@@ -1,6 +1,6 @@
 # 03 — 品質コントラクトと証拠の仕様
 
-v0.1実装：`scripts/record.mjs`が実行証拠を保存し、`scripts/verify.mjs`が必須検査・鮮度・レビュー/監査・モデル記録・稼働状態を再計算する。実形式はschemas/を正とする。任意形式のモデル元ログの自動解析は未実装で、実ランタイムからの正規化値は親セッションが元ログと照合する。ゲートはログの存在/ハッシュと値の一致を検査するが、信頼された親による記録を前提とし、偽造ログの認証機構ではない。詳細と指紋範囲は[06-usage.md](06-usage.md)。
+v0.2は全backlogタスクの状態とcheck_refs、全原要件、kind別report/artifact、現在execution付きの明示的独立評価、SDKモデル記録、Workflow終了/稼働、未観察operationから最終判定を再計算する。旧v1証拠は自動承認しない。SDKの既知構造だけを照合し、未知形式・欠損・モデル自己申告は未検証。TEST FIXTUREは本番COMPLETEに使わない。実形式はschemas/、共通interfaceはscripts/lib/reports.mjs。詳細は[06-usage.md](06-usage.md)と[監査差分](08-deep-audit.md)。
 
 ## 1. 目的
 

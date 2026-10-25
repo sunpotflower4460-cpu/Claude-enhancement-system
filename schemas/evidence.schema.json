@@ -5,6 +5,11 @@
   "required": [
     "version",
     "check_id",
+    "kind",
+    "run_id",
+    "task_id",
+    "attempt_id",
+    "session_id",
     "product",
     "contract",
     "identity",
@@ -16,27 +21,50 @@
     "stable",
     "log",
     "log_hash",
-    "environment"
+    "environment",
+    "report",
+    "report_error",
+    "nonce"
   ],
   "properties": {
     "version": {
-      "const": 1
+      "const": 2
     },
     "check_id": {
       "type": "string",
       "minLength": 1
     },
-    "product": {
+    "kind": {
       "type": "string",
       "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "product": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
     },
     "contract": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^[a-f0-9]{64}$"
     },
     "identity": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^[a-f0-9]{64}$"
     },
     "started": {
       "type": "string",
@@ -51,16 +79,10 @@
       "minLength": 1
     },
     "exit_code": {
-      "type": [
-        "integer",
-        "null"
-      ]
+      "type": ["integer", "null"]
     },
     "signal": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "stable": {
       "type": "boolean"
@@ -71,9 +93,42 @@
     },
     "log_hash": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^[a-f0-9]{64}$"
     },
     "environment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "report": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "media_type"],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "media_type": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "report_error": {
+      "type": ["string", "null"]
+    },
+    "nonce": {
       "type": "string",
       "minLength": 1
     }

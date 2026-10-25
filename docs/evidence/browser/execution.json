@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "check_id": "R1-play",
+  "kind": "play",
+  "nonce": "69f51f02-2dfb-4ecc-8433-8ad124339dad",
+  "run_id": "run",
+  "task_id": "R1",
+  "attempt_id": "attempt",
+  "session_id": "ef4a4a08-4a2b-4db4-a080-7dde4c04bc27",
+  "product": "cb00c1fb2c8623bb48efe2645c76488aaf3f2a0d7454fe59d177b8c88a88dbe8",
+  "contract": "7630a679a86d91990be00fef27e4d72bee2a3cb724342c75e4fd7a10910273a7",
+  "identity": "45d356ea90ac1643ee0d295d27c90ff814af3fb83f6e97473106eedab1198d26",
+  "started": "2026-10-25T12:21:32.320Z",
+  "ended": "2026-10-25T12:21:33.974Z",
+  "command": "node '/workspace/Claude-enhancement-system/examples/browser-check.mjs' '/tmp/autodev-audit-Ig6AJG/target/app.html'",
+  "exit_code": 0,
+  "signal": null,
+  "stable": true,
+  "log": "ce0037ccef0c009d8787afcee2571a43d097cd9cf5599fcd9f5e4612fade53c8.log",
+  "log_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "environment": "linux/x64 node v24.19.0",
+  "report": {
+    "path": "ce0037ccef0c009d8787afcee2571a43d097cd9cf5599fcd9f5e4612fade53c8.report.json",
+    "sha256": "6d352e08ac22a9a9f891dc35098c04c65262cac7889a0980f97644b18189817b",
+    "media_type": "application/json"
+  },
+  "report_error": null
+}

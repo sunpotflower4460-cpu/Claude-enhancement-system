@@ -1,4 +1,6 @@
-# 実現可能性調査 — 2026-10-25
+# v0.1実現可能性調査（履歴）— 2026-10-25
+
+これは初回PR実装の履歴。モデルparserやargs等についての当時の制限・説明は現行実装と異なる。v0.2の現在仕様/実証状況は[runtime-spec-audit.md](runtime-spec-audit.md)、[08-deep-audit.md](08-deep-audit.md)、[validation-results.md](validation-results.md)を参照。
 
 ## 実測環境
 

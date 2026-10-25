@@ -1,0 +1,17 @@
+{
+  "schema": 2,
+  "observed_at": "2026-10-25T12:53:03.158Z",
+  "node": "v24.19.0",
+  "tests": 80,
+  "pass": 80,
+  "fail": 0,
+  "skipped": 0,
+  "test_log": "tests-v2.txt",
+  "test_log_sha256": "9e79d9a64e3662b60b84495f943028f060ded78a2a581fc6151424d73694abde",
+  "verifier_version": "26066357cc72cf8fc5038d5de5c221987ab1c9fac819dac7651ad10de4741056",
+  "local_browser": "Playwright Chromium 156.0.8078.4",
+  "mock_agents": "TEST_FIXTURE_ONLY",
+  "claude_cloud": "UNVERIFIED",
+  "actual_55_model_routing": "UNVERIFIED",
+  "native_readonly_runtime": "UNVERIFIED"
+}

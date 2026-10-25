@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "mode",
+    "source",
+    "run_id",
+    "task_id",
+    "attempt_id",
+    "session_id",
+    "stage",
+    "expected_model",
+    "record",
+    "sha256",
+    "sdk_session_id",
+    "tool_use_id",
+    "message_uuid",
+    "sdk_task_id",
+    "observed_at",
+    "sdk_run_id"
+  ],
+  "properties": {
+    "version": {
+      "const": 2
+    },
+    "mode": {
+      "enum": ["LIVE", "TEST_FIXTURE"]
+    },
+    "source": {
+      "const": "claude-sdk-jsonl"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stage": {
+      "enum": [
+        "architecture",
+        "plan",
+        "implement",
+        "review",
+        "verify",
+        "audit",
+        "probe_architecture",
+        "probe_implement",
+        "probe_review"
+      ]
+    },
+    "expected_model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "record": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "sdk_session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tool_use_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "message_uuid": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sdk_task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observed_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sdk_run_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

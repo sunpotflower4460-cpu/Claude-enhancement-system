@@ -5,55 +5,81 @@
   "required": [
     "version",
     "kind",
+    "scope",
+    "status",
+    "run_id",
+    "task_id",
+    "attempt_id",
+    "session_id",
+    "task_ids",
     "product",
     "contract",
     "identity",
     "findings",
     "requirement_refs",
-    "runtime_record",
-    "runtime_hash",
-    "expected_model",
-    "observed_model"
+    "runtime_ref",
+    "executions"
   ],
   "properties": {
     "version": {
-      "const": 1
+      "const": 2
     },
     "kind": {
-      "enum": [
-        "review",
-        "audit"
-      ]
+      "enum": ["review", "audit"]
+    },
+    "scope": {
+      "enum": ["task", "final", "milestone"]
+    },
+    "status": {
+      "enum": ["PASS", "NEEDS_FIX", "UNVERIFIED", "BLOCKED"]
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_ids": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
     },
     "product": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^[a-f0-9]{64}$"
     },
     "contract": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^[a-f0-9]{64}$"
     },
     "identity": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^[a-f0-9]{64}$"
     },
     "findings": {
       "type": "array",
+      "minItems": 0,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "severity",
-          "message",
-          "resolved"
-        ],
+        "required": ["severity", "message", "resolved"],
         "properties": {
           "severity": {
-            "enum": [
-              "critical",
-              "major",
-              "minor"
-            ]
+            "enum": ["critical", "major", "minor"]
           },
           "message": {
             "type": "string",
@@ -63,7 +89,8 @@
             "type": "boolean"
           }
         }
-      }
+      },
+      "uniqueItems": true
     },
     "requirement_refs": {
       "type": "array",
@@ -71,23 +98,36 @@
       "items": {
         "type": "string",
         "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "runtime_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "executions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["task_id", "run_id", "attempt_id"],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attempt_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
       }
-    },
-    "runtime_record": {
-      "type": "string",
-      "minLength": 1
-    },
-    "runtime_hash": {
-      "type": "string",
-      "minLength": 1
-    },
-    "expected_model": {
-      "type": "string",
-      "minLength": 1
-    },
-    "observed_model": {
-      "type": "string",
-      "minLength": 1
     }
   }
 }

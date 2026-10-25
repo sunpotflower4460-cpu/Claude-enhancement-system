@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "source",
+    "run_id",
+    "task_id",
+    "attempt_id",
+    "state",
+    "observed_at",
+    "record",
+    "sha256",
+    "sdk_session_id",
+    "sdk_task_id",
+    "sdk_run_id",
+    "sdk_tool_use_id"
+  ],
+  "properties": {
+    "version": {
+      "const": 2
+    },
+    "source": {
+      "enum": ["parent-runtime-observation", "TEST_FIXTURE"]
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state": {
+      "enum": ["stopped", "completed", "failed"]
+    },
+    "observed_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "record": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "sdk_session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sdk_task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sdk_run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sdk_tool_use_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

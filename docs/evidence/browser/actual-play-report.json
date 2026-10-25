@@ -1,0 +1,73 @@
+{
+  "version": 2,
+  "run_id": "run",
+  "task_id": "R1",
+  "attempt_id": "attempt",
+  "session_id": "ef4a4a08-4a2b-4db4-a080-7dde4c04bc27",
+  "kind": "play",
+  "check_id": "R1-play",
+  "nonce": "69f51f02-2dfb-4ecc-8433-8ad124339dad",
+  "tool": {
+    "name": "Playwright Chromium",
+    "version": "156.0.8078.4"
+  },
+  "assertions": [
+    {
+      "name": "Board renders at useful size",
+      "status": "PASS",
+      "expected": "true",
+      "actual": "true"
+    },
+    {
+      "name": "Heading is visible",
+      "status": "PASS",
+      "expected": "true",
+      "actual": "true"
+    },
+    {
+      "name": "Three inputs advance score",
+      "status": "PASS",
+      "expected": "3",
+      "actual": "3"
+    },
+    {
+      "name": "Win condition",
+      "status": "PASS",
+      "expected": "Won",
+      "actual": "Won"
+    },
+    {
+      "name": "No runtime page errors",
+      "status": "PASS",
+      "expected": "0",
+      "actual": "0"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "R1-play-69f51f02-2dfb-4ecc-8433-8ad124339dad.png",
+      "sha256": "7722162c6b83b25160bdf78d761bc10ed3ce5fd98803b4743511715c8210b0be",
+      "media_type": "image/png"
+    }
+  ],
+  "details": {
+    "engine": "Chromium 156.0.8078.4",
+    "inputs": [
+      "Start",
+      "Collect star",
+      "Collect star",
+      "Collect star"
+    ],
+    "progress": [
+      "Playing",
+      "1",
+      "2",
+      "3"
+    ],
+    "outcome": "Won",
+    "expected_outcome": "Won",
+    "captures": [
+      "R1-play-69f51f02-2dfb-4ecc-8433-8ad124339dad.png"
+    ]
+  }
+}

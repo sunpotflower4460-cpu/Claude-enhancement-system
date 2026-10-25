@@ -1,142 +1,378 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import {execFileSync} from 'node:child_process';
-import {bootstrap} from '../scripts/bootstrap.mjs';
-import {contracts,fingerprint,hash,json,read,shared,validate,identity} from '../scripts/lib/core.mjs';
-import {record} from '../scripts/record.mjs';
-import {verify} from '../scripts/verify.mjs';
-import {state} from '../scripts/state.mjs';
-function fixture(t,profile='backend') {
- const base=fs.mkdtempSync(path.join(os.tmpdir(),'harness-'));t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
- const target=path.join(base,'target');fs.mkdirSync(target);
- const git=(...args)=>execFileSync('git',['-C',target,...args],{stdio:'pipe'});
- git('init','-b','main');git('remote','add','origin','https://example.test/project.git');
- fs.writeFileSync(path.join(target,'app.js'),'console.log("works")\n');
- fs.mkdirSync(path.join(target,'.claude'));fs.writeFileSync(path.join(target,'.claude','settings.json'),'{"existing":true}');
- const source=path.join(base,'mission.json');json(source,{original:'Build all features without omissions.',requirements:[{id:'R1',text:'Service works'}]});
- bootstrap({target,mission:source,profile});
- const dir=path.join(target,'.autodev');
- const kinds={backend:['test','api'],'web-app':['test','build','behavior','visual'],game:['test','build','behavior','visual','play']}[profile];
- json(path.join(dir,'contract.json'),{version:1,checks:kinds.map(id=>({id,requirement_refs:['R1'],kind:id,command:'node app.js',timeout_ms:2000})),human_review:false});
- return {target,dir,source,git};
-}
-function attest(f) {
- const c=contracts(f.target),product=fingerprint(f.target),identity=hash(JSON.stringify(c.mission.target));
- fs.writeFileSync(path.join(f.dir,'evidence','mock-runtime.txt'),'TEST FIXTURE ONLY: not live routing');
- const runtime_hash=hash('TEST FIXTURE ONLY: not live routing');
- for(const kind of ['review','audit']) json(path.join(f.dir,'evidence',kind+'.json'),{version:1,kind,product,contract:c.digest,identity,findings:[],requirement_refs:['R1'],runtime_record:'mock-runtime.txt',runtime_hash,expected_model:kind==='review'?'claude-sonnet-5-5':'claude-opus-5-5',observed_model:kind==='review'?'claude-sonnet-5-5':'claude-opus-5-5'});
- json(path.join(f.dir,'routing.json'),['opus','sonnet','haiku'].map(m=>({expected:`claude-${m}-5-5`,observed:`claude-${m}-5-5`,record:'mock-runtime.txt',hash:runtime_hash})));
-}
-function pass(f) {for(const c of contracts(f.target).contract.checks) record({target:f.target,check:c.id});attest(f);assert.equal(verify(f).status,'COMPLETE');}
-test('T01/T10 initialization is idempotent, preserves settings and refuses shared target',t=>{
- const f=fixture(t);const before=fs.readFileSync(path.join(f.dir,'mission.json'),'utf8');
- assert.equal(bootstrap({target:f.target,mission:f.source}).status,'RESUMED');
- assert.equal(fs.readFileSync(path.join(f.dir,'mission.json'),'utf8'),before);
- assert.equal(read(path.join(f.target,'.claude','settings.json')).existing,true);
- assert.throws(()=>bootstrap({target:shared,mission:f.source}));
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import {
+  fixture,
+  allPass,
+  recordAll,
+  seal,
+  completed,
+  read,
+  json,
+  contracts,
+  fingerprint,
+  hash,
+  artifactPath,
+  attest,
+  runtime,
+  shared,
+} from "./helpers/fixture.mjs";
+import { verify } from "../scripts/verify.mjs";
+import { record } from "../scripts/record.mjs";
+import { validate, canonicalRemote } from "../scripts/lib/core.mjs";
+import { runtimeObservation } from "../scripts/lib/runtime.mjs";
+const gate = (f) => verify({ target: f.target, fixture: true });
+for (const status of ["UNVERIFIED", "FAIL", "BLOCKED"])
+  test("A1 rejects unfinished backlog " + status, (t) => {
+    const f = fixture(t);
+    allPass(f);
+    const b = read(path.join(f.dir, "backlog.json"));
+    b.items[0].status = status;
+    json(path.join(f.dir, "backlog.json"), b);
+    const r = gate(f);
+    assert.notEqual(r.status, "TEST_COMPLETE");
+    assert.equal(r.tasks[0].status, status);
+  });
+test("A1 manual task PASS without evidence is refused", (t) => {
+  const f = fixture(t);
+  completed(f);
+  seal(f);
+  assert.equal(gate(f).status, "UNVERIFIED");
 });
-test('schemas reject malformed, unknown properties, duplicate IDs and missing coverage',t=>{
- const f=fixture(t);assert.throws(()=>validate('current-task',{stage:'BOGUS'}));
- const b=read(path.join(f.dir,'backlog.json'));b.items.push(b.items[0]);json(path.join(f.dir,'backlog.json'),b);assert.throws(()=>contracts(f.target),/Duplicate/);
- b.items=[];json(path.join(f.dir,'backlog.json'),b);assert.throws(()=>contracts(f.target));
+test("A1 aligned checks/tasks/requirements get test-only completion; default refuses fixtures", (t) => {
+  const f = fixture(t);
+  allPass(f);
+  assert.equal(gate(f).status, "TEST_COMPLETE");
+  assert.equal(verify(f).status, "UNVERIFIED");
+  assert.equal(gate(f).assurance, "TEST_FIXTURE");
 });
-test('T04 real faulty code fails, repaired code passes with mock assessments',t=>{
- const f=fixture(t);fs.writeFileSync(path.join(f.target,'app.js'),'throw Error("deliberate bug")');
- assert.notEqual(record({target:f.target,check:'test'}).exit_code,0);assert.equal(verify(f).status,'FAIL');
- fs.writeFileSync(path.join(f.target,'app.js'),'console.log("fixed")');pass(f);
+test("A1 partial requirement achievement remains visible", (t) => {
+  const f = fixture(t, { count: 3 });
+  allPass(f);
+  const b = read(path.join(f.dir, "backlog.json"));
+  b.items[2].status = "UNVERIFIED";
+  json(path.join(f.dir, "backlog.json"), b);
+  const r = gate(f);
+  assert.equal(r.requirements[0].status, "PASS", JSON.stringify(r));
+  assert.equal(r.requirements[2].status, "UNVERIFIED");
+  assert.notEqual(r.status, "TEST_COMPLETE");
 });
-test('T05 missing/stale/log-tampered evidence is UNVERIFIED',t=>{
- const f=fixture(t);assert.equal(verify(f).status,'UNVERIFIED');pass(f);
- fs.appendFileSync(path.join(f.target,'app.js'),'\n// changed');assert.equal(verify(f).status,'UNVERIFIED');
- pass(f);fs.appendFileSync(path.join(f.dir,'evidence',hash('test')+'.log'),'tampered');assert.equal(verify(f).status,'UNVERIFIED');
+for (const kind of ["review", "audit"])
+  for (const status of ["NEEDS_FIX", "BLOCKED", "UNVERIFIED"])
+    test(
+      "A2 " + kind + " " + status + " with zero findings refuses completion",
+      (t) => {
+        const f = fixture(t);
+        allPass(f);
+        attest(f, { kind, status });
+        assert.notEqual(gate(f).status, "TEST_COMPLETE");
+      },
+    );
+test("A2 prior task, prior run, stale code, missing coverage cannot serve as final approval", (t) => {
+  const f = fixture(t, { count: 2 });
+  allPass(f);
+  const p = artifactPath(f.dir, "review.json"),
+    a = read(p);
+  for (const patch of [
+    { scope: "task" },
+    { run_id: "old-run" },
+    { attempt_id: "old-attempt" },
+    { task_ids: ["R1"] },
+    { requirement_refs: ["R1"] },
+    { task_id: "old-task" },
+  ]) {
+    json(p, { ...a, ...patch });
+    assert.notEqual(gate(f).status, "TEST_COMPLETE");
+  }
+  json(p, a);
+  fs.appendFileSync(path.join(f.target, "check.mjs"), "\n// new product");
+  assert.equal(gate(f).status, "UNVERIFIED");
 });
-test('T06 build passes but visual failure rejects completion',t=>{
- const f=fixture(t,'web-app');const c=read(path.join(f.dir,'contract.json'));c.checks.find(c=>c.kind==='visual').command='exit 1';json(path.join(f.dir,'contract.json'),c);
- for(const check of c.checks) record({target:f.target,check:check.id});attest(f);assert.equal(verify(f).status,'FAIL');
+test("A2 version-1 assessment is rejected rather than upgraded to PASS", (t) => {
+  const f = fixture(t);
+  allPass(f);
+  const p = artifactPath(f.dir, "review.json"),
+    a = read(p);
+  a.version = 1;
+  json(p, a);
+  assert.equal(gate(f).status, "UNVERIFIED");
 });
-test('T07 removed requirement mapping and dependencies rejected',t=>{
- const f=fixture(t);const b=read(path.join(f.dir,'backlog.json'));b.items[0].requirement_refs=['other'];json(path.join(f.dir,'backlog.json'),b);assert.throws(()=>contracts(f.target),/Unknown requirement/);
- b.items[0].requirement_refs=['R1'];b.items[0].dependencies=['R1'];json(path.join(f.dir,'backlog.json'),b);assert.throws(()=>contracts(f.target),/dependency/);
+test("A2 unresolved major findings override PASS and human review stays separate", (t) => {
+  const f = fixture(t);
+  allPass(f);
+  attest(f, {
+    findings: [{ severity: "major", message: "fault", resolved: false }],
+  });
+  assert.equal(gate(f).status, "FAIL");
+  const c = read(path.join(f.dir, "contract.json"));
+  c.human_review = true;
+  json(path.join(f.dir, "contract.json"), c);
+  allPass(f);
+  assert.equal(gate(f).status, "TEST_READY_FOR_HUMAN_REVIEW");
 });
-test('T09/T16 ownership prevents double writers and recovery observes partial edits',t=>{
- const f=fixture(t),o={target:f.target,run:'run1',task:'task1'};
- state({...o,action:'begin'});assert.throws(()=>state({...o,action:'begin'}),/Active/);
- assert.throws(()=>state({...o,action:'transition',stage:'IMPLEMENT'}),/Invalid state/);
- state({...o,action:'transition',stage:'ARCHITECTURE'});
- fs.appendFileSync(path.join(f.target,'app.js'),'\n// partial edit');
- const proof=path.join(f.target,'stopped.txt');fs.writeFileSync(proof,'fixture runtime terminated');
- const s=state({...o,action:'recover',proof});assert.match(s.history.at(-1).note,/Product changed/);assert.equal(s.stage,'BLOCKED');
- assert.match(fs.readFileSync(path.join(f.target,'app.js'),'utf8'),/partial edit/);
+test("A3 parses actual SDK envelope model and rejects normalized forgery", (t) => {
+  const f = fixture(t),
+    c = contracts(f.target),
+    ref = runtime(f);
+  assert.equal(
+    runtimeObservation(c, ref, {}, { fixture: true }).observed_model,
+    "claude-sonnet-5-5",
+  );
+  const r = read(artifactPath(f.dir, ref)),
+    raw = artifactPath(f.dir, r.record);
+  const es = fs.readFileSync(raw, "utf8").split("\n").map(JSON.parse);
+  es[2].message.model = "substituted";
+  fs.writeFileSync(raw, es.map(JSON.stringify).join("\n"));
+  r.sha256 = hash(fs.readFileSync(raw));
+  json(artifactPath(f.dir, ref), r);
+  assert.throws(
+    () => runtimeObservation(c, ref, {}, { fixture: true }),
+    /substituted|mismatch/,
+  );
 });
-test('T12 all profiles reuse harness with command evidence only',t=>{for(const p of ['backend','web-app','game']) pass(fixture(t,p));});
-test('T13 evidence does not invalidate product; contract edits do',t=>{
- const f=fixture(t);pass(f);const fp=fingerprint(f.target);fs.writeFileSync(path.join(f.dir,'evidence','extra.txt'),'new');assert.equal(fp,fingerprint(f.target));assert.equal(verify(f).status,'COMPLETE');
- const c=read(path.join(f.dir,'contract.json'));c.human_review=true;json(path.join(f.dir,'contract.json'),c);assert.equal(verify(f).status,'UNVERIFIED');
- passHuman();function passHuman(){for(const c of contracts(f.target).contract.checks)record({target:f.target,check:c.id});attest(f);assert.equal(verify(f).status,'READY_FOR_HUMAN_REVIEW');}
+test("A3 rejects unrecognized formats, absent timestamps and unrelated SDK task IDs", (t) => {
+  const f = fixture(t),
+    c = contracts(f.target),
+    ref = runtime(f),
+    p = artifactPath(f.dir, ref),
+    r = read(p),
+    raw = artifactPath(f.dir, r.record);
+  for (const es of [
+    [{ model: "claude-sonnet-5-5" }],
+    [
+      {
+        type: "assistant",
+        uuid: r.message_uuid,
+        message: { model: r.expected_model },
+      },
+    ],
+  ]) {
+    fs.writeFileSync(raw, es.map(JSON.stringify).join("\n"));
+    r.sha256 = hash(fs.readFileSync(raw));
+    json(p, r);
+    assert.throws(() => runtimeObservation(c, ref, {}, { fixture: true }));
+  }
 });
-test('T14 untracked files, deletions, executable bit and symlink target affect fingerprint',t=>{
- const f=fixture(t);let fp=fingerprint(f.target);const app=path.join(f.target,'app.js');fs.chmodSync(app,0o755);assert.notEqual(fp,fingerprint(f.target));
- fp=fingerprint(f.target);fs.writeFileSync(path.join(f.target,'new.js'),'new');assert.notEqual(fp,fingerprint(f.target));
- fp=fingerprint(f.target);f.git('add','app.js');fs.unlinkSync(app);assert.notEqual(fp,fingerprint(f.target));
- fs.symlinkSync('first',app);fp=fingerprint(f.target);fs.unlinkSync(app);fs.symlinkSync('second',app);assert.notEqual(fp,fingerprint(f.target));
+for (const kind of ["visual", "play"])
+  test("C1 " + kind + " placeholder exit 0 produces UNVERIFIED", (t) => {
+    const f = fixture(t, { profile: "game" });
+    allPass(f);
+    const p = path.join(f.dir, "contract.json"),
+      c = read(p),
+      check = c.checks.find((x) => x.kind === kind);
+    check.command = "true";
+    json(p, c);
+    const e = record({ target: f.target, check: check.id });
+    assert.equal(e.exit_code, 0);
+    assert.equal(e.report, null);
+    assert.equal(gate(f).status, "UNVERIFIED");
+  });
+test("C1 failed browser assertions give FAIL, report/artifact removal or tampering invalidates", (t) => {
+  const f = fixture(t, { profile: "web-app" });
+  allPass(f);
+  const check = contracts(f.target).contract.checks.find(
+      (c) => c.kind === "visual",
+    ),
+    e = read(artifactPath(f.dir, hash(check.id) + ".json")),
+    report = read(artifactPath(f.dir, e.report.path)),
+    capture = artifactPath(f.dir, report.artifacts[0].path);
+  fs.appendFileSync(capture, "changed");
+  assert.equal(gate(f).status, "UNVERIFIED");
+  recordAll(f);
+  fs.unlinkSync(capture);
+  assert.equal(gate(f).status, "UNVERIFIED");
+  recordAll(f);
+  const reportPath = artifactPath(f.dir, e.report.path);
+  fs.unlinkSync(reportPath);
+  assert.equal(gate(f).status, "UNVERIFIED");
 });
-test('T17 substituted models and unresolved reviews cannot complete',t=>{
- const f=fixture(t);pass(f);const p=path.join(f.dir,'evidence','review.json'),r=read(p);r.observed_model='other';json(p,r);assert.equal(verify(f).status,'UNVERIFIED');
- r.observed_model=r.expected_model;r.findings=[{severity:'major',message:'broken',resolved:false}];json(p,r);assert.equal(verify(f).status,'FAIL');
+test("C1 actual test assertion failure cannot complete", (t) => {
+  const f = fixture(t);
+  allPass(f);
+  json(path.join(f.target, "product.json"), { R1: false });
+  recordAll(f);
+  seal(f);
+  assert.equal(gate(f).status, "FAIL");
 });
-test('T20 in-flight run and command modifying product reject completion',t=>{
- const f=fixture(t);pass(f);state({target:f.target,action:'begin',run:'r',task:'t'});assert.equal(verify(f).status,'UNVERIFIED');
- const c=read(path.join(f.dir,'contract.json'));c.checks[0].command='echo changed >> app.js';json(path.join(f.dir,'contract.json'),c);assert.equal(record({target:f.target,check:'test'}).stable,false);
+test("C2 evidence updates do not self-invalidate; contract and product changes do", (t) => {
+  const f = fixture(t);
+  allPass(f);
+  const before = fingerprint(f.target);
+  fs.writeFileSync(artifactPath(f.dir, "extra.txt"), "note");
+  assert.equal(fingerprint(f.target), before);
+  assert.equal(gate(f).status, "TEST_COMPLETE");
+  fs.writeFileSync(path.join(f.target, "new.js"), "new");
+  assert.equal(gate(f).status, "UNVERIFIED");
 });
-test('state symlinks rejected; branch mismatch and mission tamper rejected',t=>{
- const f=fixture(t);fs.appendFileSync(path.join(f.dir,'mission.md'),'tamper');assert.throws(()=>contracts(f.target),/mission changed/);
- fs.writeFileSync(path.join(f.dir,'mission.md'),'Build all features without omissions.');f.git('checkout','-b','other');assert.throws(()=>contracts(f.target),/identity changed/);f.git('symbolic-ref','HEAD','refs/heads/main');
- fs.symlinkSync(f.source,path.join(f.dir,'evidence','planted'));assert.throws(()=>contracts(f.target),/Symlink/);
+test("C2 staged deletion does not change fingerprint again on commit; mode and symlink changes detected", (t) => {
+  const f = fixture(t);
+  f.git("add", "product.json");
+  let before = fingerprint(f.target);
+  fs.unlinkSync(path.join(f.target, "product.json"));
+  assert.notEqual(fingerprint(f.target), before);
+  before = fingerprint(f.target);
+  f.git("rm", "--cached", "product.json");
+  assert.equal(fingerprint(f.target), before);
+  const p = path.join(f.target, "script");
+  fs.writeFileSync(p, "x");
+  before = fingerprint(f.target);
+  fs.chmodSync(p, 0o755);
+  assert.notEqual(fingerprint(f.target), before);
+  fs.symlinkSync("a", path.join(f.target, "link"));
+  before = fingerprint(f.target);
+  fs.unlinkSync(path.join(f.target, "link"));
+  fs.symlinkSync("b", path.join(f.target, "link"));
+  assert.notEqual(fingerprint(f.target), before);
 });
-test('CLI subprocess: bootstrap auto-select, real HTTP check, context, gate, doctor',t=>{
- const f=fixture(t);
- const run=(script,args)=>{
-  try{return {code:0,stdout:execFileSync(process.execPath,[path.join(shared,'scripts',script+'.mjs'),...args],{encoding:'utf8',stdio:['ignore','pipe','pipe']})};}
-  catch(e){return {code:e.status,stdout:e.stdout};}
- };
- const selected=run('bootstrap',['--repositories',JSON.stringify([shared,f.target]),'--mission',f.source]);assert.equal(selected.code,0);assert.equal(JSON.parse(selected.stdout).status,'RESUMED');
- const app=path.join(f.target,'http-check.mjs');fs.writeFileSync(app,`import http from 'node:http'; import assert from 'node:assert/strict'; const server=http.createServer((req,res)=>{res.setHeader('content-type','application/json');res.end(JSON.stringify({ok:true}));}); await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));try {const response=await fetch('http://127.0.0.1:'+server.address().port);assert.equal(response.status,200);assert.deepEqual(await response.json(),{ok:true});console.log('HTTP 200, expected payload confirmed');}finally{server.closeAllConnections();server.close();}`);
- const c=read(path.join(f.dir,'contract.json'));c.checks.find(x=>x.id==='api').command='node http-check.mjs';json(path.join(f.dir,'contract.json'),c);
- for(const check of c.checks)assert.equal(run('record',['--target',f.target,'--check',check.id]).code,0);
- assert.equal(run('context',['--target',f.target]).code,0);
- assert.equal(run('verify',['--target',f.target]).code,1); // real model evidence missing
- attest(f);assert.equal(run('verify',['--target',f.target]).code,0); // mock evidence, parser path only
- assert.equal(JSON.parse(run('doctor',['--target',f.target]).stdout).checks.actual_model_routing,'UNVERIFIED');
+test("contract validation rejects missing task checks, dropped requirements and cycles", (t) => {
+  const f = fixture(t, { count: 2 }),
+    p = path.join(f.dir, "backlog.json"),
+    b = read(p);
+  b.items[0].check_refs = [];
+  json(p, b);
+  assert.throws(() => contracts(f.target), /no acceptance/);
+  b.items[0].check_refs = ["R1-test", "R1-api"];
+  b.items[0].dependencies = ["R2"];
+  b.items[1].dependencies = ["R1"];
+  json(p, b);
+  assert.throws(() => contracts(f.target), /cycle/);
+  b.items.pop();
+  json(p, b);
+  assert.throws(() => contracts(f.target), /coverage/);
 });
-test('record timeout fails and command contract edits invalidate evidence',t=>{
- const f=fixture(t);const c=read(path.join(f.dir,'contract.json'));c.checks[0].command='node -e "setTimeout(()=>{}, 10000)"';c.checks[0].timeout_ms=30;json(path.join(f.dir,'contract.json'),c);
- const e=record({target:f.target,check:'test'});assert.equal(e.exit_code,null);assert.equal(verify(f).status,'FAIL');
- c.checks[0].command=`node -e "const fs=require('fs');const p='.autodev/contract.json';const c=JSON.parse(fs.readFileSync(p));c.human_review=true;fs.writeFileSync(p,JSON.stringify(c));"`;c.checks[0].timeout_ms=2000;json(path.join(f.dir,'contract.json'),c);
- assert.equal(record({target:f.target,check:'test'}).stable,false);
+test("checks changing product/contract during execution cannot create fresh evidence", (t) => {
+  const f = fixture(t),
+    p = path.join(f.dir, "contract.json"),
+    c = read(p);
+  c.checks[0].command = "echo changed >> product.json";
+  json(p, c);
+  const e = record({ target: f.target, check: c.checks[0].id });
+  assert.equal(e.stable, false);
 });
-test('canonical remote rejects shared clones even under SSH URL spelling',t=>{
- const f=fixture(t);f.git('remote','set-url','origin','git@github.com:sunpotflower4460-cpu/Claude-enhancement-system.git');
- assert.throws(()=>bootstrap({target:f.target,mission:f.source}),/shared repository/);
+test("duplicate IDs, malformed schema, state symlinks and mission tampering rejected", (t) => {
+  const f = fixture(t);
+  assert.throws(() => validate("assessment", { version: 1 }));
+  fs.appendFileSync(path.join(f.dir, "mission.md"), "changed");
+  assert.throws(() => contracts(f.target), /mission changed/);
+  fs.writeFileSync(
+    path.join(f.dir, "mission.md"),
+    read(path.join(f.dir, "mission.json")).original,
+  );
+  fs.symlinkSync(f.source, artifactPath(f.dir, "bad"));
+  assert.throws(() => contracts(f.target), /Symlink/);
 });
-test('timeout terminates a check process group including child processes',async t=>{
- const f=fixture(t);const c=read(path.join(f.dir,'contract.json'));
- fs.writeFileSync(path.join(f.target,'slow.mjs'),`import fs from 'node:fs'; fs.writeFileSync('.autodev/evidence/child-pid.txt',String(process.pid)); setInterval(()=>{},1000);`);
- c.checks[0].command='node slow.mjs';c.checks[0].timeout_ms=500;json(path.join(f.dir,'contract.json'),c);
- const e=record({target:f.target,check:'test'});assert.equal(e.exit_code,null);
- const pid=Number(fs.readFileSync(path.join(f.dir,'evidence','child-pid.txt'),'utf8'));
- await new Promise(resolve=>setTimeout(resolve,100));
- // A terminated process can briefly remain a zombie until init reaps it.
- if(fs.existsSync('/proc/'+pid+'/stat')) {
-  const status=fs.readFileSync('/proc/'+pid+'/stat','utf8');assert.match(status,/\) Z /);
- }
+test("canonical repository IDs match SSH/HTTPS but preserve case for other hosts", () => {
+  assert.equal(
+    canonicalRemote("git@github.com:Example/Project.git"),
+    canonicalRemote("https://github.com/example/project"),
+  );
+  assert.notEqual(
+    canonicalRemote("https://git.example/Owner/Project"),
+    canonicalRemote("https://git.example/owner/project"),
+  );
 });
-
-test('read-only common sources and target identity support detached checkout',t=>{
- const f=fixture(t);f.git('add','app.js');f.git('-c','user.name=Test','-c','user.email=test@example.test','commit','-qm','fixture');f.git('checkout','--detach');
- assert.match(identity(f.target).branch,/^DETACHED:[0-9a-f]+$/);
- // Moving an already initialized target still invalidates its original identity.
- assert.throws(()=>contracts(f.target),/identity changed/);
+test("G prior SDK assistant cannot approve a new SDK run sharing task/tool identity", (t) => {
+  const f = fixture(t),
+    ref = runtime(f),
+    r = read(artifactPath(f.dir, ref)),
+    raw = artifactPath(f.dir, r.record),
+    es = fs.readFileSync(raw, "utf8").split("\n").map(JSON.parse);
+  es.push({ ...es[1], run_id: "new-sdk-run" });
+  fs.writeFileSync(raw, es.map(JSON.stringify).join("\n"));
+  r.sdk_run_id = "new-sdk-run";
+  r.sha256 = hash(fs.readFileSync(raw));
+  json(artifactPath(f.dir, ref), r);
+  assert.throws(
+    () => runtimeObservation(contracts(f.target), ref, {}, { fixture: true }),
+    /window/,
+  );
+});
+test("G raw SDK from another cwd or another invocation cannot be relabelled as current", (t) => {
+  const f = fixture(t),
+    ref = runtime(f),
+    p = artifactPath(f.dir, ref),
+    r = read(p),
+    raw = artifactPath(f.dir, r.record),
+    es = fs.readFileSync(raw, "utf8").split("\n").map(JSON.parse);
+  es[0].cwd = f.base;
+  fs.writeFileSync(raw, es.map(JSON.stringify).join("\n"));
+  r.sha256 = hash(fs.readFileSync(raw));
+  json(p, r);
+  assert.throws(
+    () => runtimeObservation(contracts(f.target), ref, {}, { fixture: true }),
+    /cwd/,
+  );
+  es[0].cwd = f.target;
+  es[1].description = "unrelated task";
+  fs.writeFileSync(raw, es.map(JSON.stringify).join("\n"));
+  r.sha256 = hash(fs.readFileSync(raw));
+  json(p, r);
+  assert.throws(
+    () => runtimeObservation(contracts(f.target), ref, {}, { fixture: true }),
+    /invocation/,
+  );
+});
+test("G final assessment cannot be reused after a task execution is reset on identical code", (t) => {
+  const f = fixture(t);
+  allPass(f);
+  const p = path.join(f.dir, "backlog.json"),
+    b = read(p);
+  b.items[0].execution.attempt_id = "new-task-attempt";
+  json(p, b);
+  assert.ok(gate(f).issues.some((x) => x.includes("previous task execution")));
+});
+test("G ignored internal symlink targets are hashed; external executable symlinks are refused", (t) => {
+  const f = fixture(t),
+    ignored = path.join(f.target, "node_modules");
+  fs.mkdirSync(ignored);
+  const binary = path.join(ignored, "binary");
+  fs.writeFileSync(binary, "v1");
+  fs.symlinkSync("node_modules/binary", path.join(f.target, "local-bin"));
+  const fp = fingerprint(f.target);
+  fs.writeFileSync(binary, "v2");
+  assert.notEqual(fp, fingerprint(f.target));
+  fs.symlinkSync("/bin/true", path.join(f.target, "outside"));
+  assert.throws(() => fingerprint(f.target), /External/);
+});
+test("G bundled API/browser checker edits change common verifier version even outside target", async (t) => {
+  const f = fixture(t),
+    copy = path.join(f.base, "common-copy");
+  fs.mkdirSync(copy);
+  for (const name of ["package.json", "package-lock.json"])
+    fs.copyFileSync(path.join(shared, name), path.join(copy, name));
+  for (const dir of [
+    "scripts",
+    "examples",
+    "schemas",
+    "agents",
+    "profiles",
+    "workflows",
+    "skills",
+  ])
+    fs.cpSync(path.join(shared, dir), path.join(copy, dir), {
+      recursive: true,
+    });
+  fs.symlinkSync(
+    path.join(shared, "node_modules"),
+    path.join(copy, "node_modules"),
+    "dir",
+  );
+  const { pathToFileURL } = await import("node:url"),
+    core = await import(pathToFileURL(path.join(copy, "scripts/lib/core.mjs")));
+  const before = core.verifierVersion();
+  fs.appendFileSync(
+    path.join(copy, "examples/api-check.mjs"),
+    "\n// Changed acceptance assertions",
+  );
+  assert.notEqual(core.verifierVersion(), before);
+  const second = core.verifierVersion();
+  fs.appendFileSync(
+    path.join(copy, "examples/browser-check.mjs"),
+    "\n// Changed browser assertions",
+  );
+  assert.notEqual(core.verifierVersion(), second);
+  const third = core.verifierVersion();
+  fs.appendFileSync(path.join(copy, "package-lock.json"), "\n");
+  assert.notEqual(core.verifierVersion(), third);
 });

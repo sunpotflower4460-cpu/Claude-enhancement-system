@@ -1,6 +1,6 @@
 # 00 — 製品要求とスコープ
 
-状態：要求ベースラインv0.2を維持。2026-10-25にローカル実装・回帰試験を追加。Claude Codeクラウドの実機実証は未実施。詳細はvalidation-results.md。
+状態：原要求v0.2を維持。実装v0.2/Schema v2のローカル検証・深層監査を追加。Claude Codeクラウド実機の受け入れはUNVERIFIED。validation-results.mdと08-deep-audit.mdを参照。
 
 ## 1. 何を完成させるか
 

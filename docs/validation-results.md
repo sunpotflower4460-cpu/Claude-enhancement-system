@@ -1,49 +1,56 @@
-# 検証結果 — 2026-10-25
+# 検証結果 — v0.2 / 2026-10-25
 
-状態：**ローカル回帰試験PASS、Claude Code V1受け入れUNVERIFIED**。
+**ローカルの実装・正常/故障/模擬統合・実Chromiumと、Claude Code実機の受け入れを区別する。V1全体はUNVERIFIED。**
 
-環境：Linux、Node.js v24.19.0、npm、Git。Claude Codeと実モデル呼び出しなし。`npm ci --ignore-scripts`、`npm test`、`npm audit --omit=dev --json`を実行。正確なテスト名と出力は[evidence/tests.txt](evidence/tests.txt)、依存監査は[evidence/npm-audit.json](evidence/npm-audit.json)。
+## 実行環境と証拠
 
-## 実際に観察した動作
+Linux、Node.js v24.19.0、Ajv 8.20.0、Playwright 1.64.1、Chromium 156.0.8078.4。`npm ci --ignore-scripts`、ブラウザ導入、`npm test`、`npm audit --json`、`git diff --check`を実行。最終ローカル試験は**80件PASS、失敗0、skip0**。最終テスト件数/結果は[evidence/tests-v2.txt](evidence/tests-v2.txt)。[機械用結果](evidence/local-v2-summary.json)も保存した。依存監査は脆弱性0件。GitHub ActionsはNode.js 22で同じ試験と実Chromiumを実行する。最新CI情報はPR checksとevidence/github-ci-v2.json（取得後）へ記録する。
 
-一時Gitリポジトリで、既存.claude/settings.jsonを保全して初期化・再開した。CLIサブプロセスからbootstrap/record/context/verify/doctorを起動した。HTTPサーバーを127.0.0.1の空きポートに起動し、実際にfetchでHTTP 200と期待JSONを確認し、サーバーを終了した。
+初回バグの再現は[evidence/audit-before.txt](evidence/audit-before.txt)。バックログのUNVERIFIED/FAIL/BLOCKED、偽のplay/visual成功に対して期待する拒否assertが4件失敗し、v0.1のfalse COMPLETEを確認した。v0.1の24件成功は[evidence/tests.txt](evidence/tests.txt)に履歴として残す。
 
-意図的にthrowするコードは実コマンドで非0となりFAIL、修正後は実行成功となった。完成判定の正例では、独立レビュー・監査・モデルの記録に**テスト専用の模擬記録**を使った。したがって正例のCOMPLETEは判定器のテストであり、実際のClaudeシステム完成の証拠ではない。
+## 実際に確認したこと
 
-## 受け入れマトリクス
+- 一時Git repoで既存設定を保全し、対象自動選択、初期化、別clone/worktree/branch/detachedへのreconnect、v1→v2途中停止からの移行再実行を確認。
+- node:assertとHTTPサーバー/fetchを実行。故障コード/状態は非0またはFAIL report。成功を装うshell終了0でも失敗assertがあればFAIL。
+- 実Chromiumで描画bounds・見出し・例外0件・Start→3回Collect→score3/Wonを確認。壊した入力処理はFAIL。代表画像と[実プレイreport](evidence/browser/actual-play-report.json)を保存。これは小規模fixtureのブラウザ検証で、Claudeの実モデルでゲームを開発した証拠ではない。
+- 実recordプロセスを検査中にkill。子検査groupが生きた間は復旧を拒否し、停止後にlock/recover/部分ファイル保全を確認。
+- 4タスクのmock agent統合で実ファイル編集/検査を進めた。R1の故障レビュー→修正、R3の2失敗→Sonnet診断/実装、Opus milestoneの未完了指摘→再計画、全タスク→最終gate。別例ではR1をBLOCKEDに残して独立R4を完了。最終回帰→task reset→再修正、および1-sprint burstを繰り返す場合の監査間隔/receiptも検査した。
+- mockモデルはすべてTEST FIXTUREと明記。parser/完成ゲートの正例もTEST_COMPLETE等であり、本番COMPLETEや実ルーティングPASSとは扱わない。
 
-「ローカルPASS」は表に記すプログラム部分の実測結果。モデル・クラウド・UIを含む元のシナリオ全体は別欄で判定する。
+## 原T01〜T20の位置づけ
 
-| ID | ローカルでの実行・結果 | Claudeを含む全体判定 |
+| ID | v0.2のローカル/模擬実証 | Claude実機を含む全体 |
 | --- | --- | --- |
-| T01 | PASS：対象識別、共通/SSH同一remote拒否、対象だけの初期化 | UNVERIFIED：クラウド2repo未実施 |
-| T02 | 継続器を独自実装せず/goal手順を用意 | UNVERIFIED |
-| T03 | PASS：定義とWorkflowの期待モデル文字列を検査 | UNVERIFIED：実モデルなし |
-| T04 | PASS：意図的コードバグの実行失敗と修正後成功、模擬review分岐 | UNVERIFIED：実Haiku/Sonnetなし |
-| T05 | PASS：証拠欠落、内容変更、ログ改変でUNVERIFIED | ローカル機械ゲートPASS |
-| T06 | PASS：build成功でもvisualコマンド失敗ならFAIL | UNVERIFIED：実ブラウザ表示なし |
-| T07 | PASS：元要件との対応欠落・未知参照・重複を拒否 | UNVERIFIED：自然言語要件のOpus監査なし |
-| T08 | PASS：模擬review2巡失敗でSonnet根本原因調査へ | UNVERIFIED：実モデルなし |
-| T09 | PASS：active二重begin、所有権、状態遷移の拒否 | UNVERIFIED：Claude再開キャッシュなし |
-| T10 | PASS：既存設定をバイト単位で保全、再初期化で原要求維持 | UNVERIFIED：Claudeの設定発見なし |
-| T11 | PASS：doctorがCLI欠落と未確認機能を報告、模擬BLOCKEDで後続停止 | UNVERIFIED：実モデル利用拒否なし |
-| T12 | PASS：3profileを別fixtureで再利用、HTTP実呼出し | UNVERIFIED：実Web/ゲーム開発追試なし |
-| T13 | PASS：evidenceだけ更新しても鮮度維持、契約更新で失効 | ローカル機械ゲートPASS |
-| T14 | PASS：新規未追跡・削除・mode・symlink変更を検出 | ローカル機械ゲートPASS |
-| T15 | PASS：4段階それぞれのnullで後続停止、例外も伝播 | UNVERIFIED：Claude stall/replayなし |
-| T16 | PASS：部分編集を保全し、終了ログ付きrecoverで差分指紋を記録 | UNVERIFIED：実Workflow再起動なし |
-| T17 | PASS：模擬モデル置換を完成判定から拒否 | UNVERIFIED：ポリシーによる実置換なし |
-| T18 | PASS：模擬BLOCKEDとAPI拒否例外で停止 | UNVERIFIED：実読取/実行権限拒否なし |
-| T19 | PASS：定義/模擬呼出のtoolsはRead/Grep/Globだけ | UNVERIFIED：実ランタイムで書込拒否probe必要 |
-| T20 | PASS：active runと検査中製品/契約変更で完成拒否 | UNVERIFIED：実Workflow稼働状態の照合なし |
+| T01 | 識別、非破壊setup、canonical remote、reconnect | UNVERIFIED：cloud2repo |
+| T02 | multi-sprint/複数burstのmock controller | UNVERIFIED：本物/goal |
+| T03 | SDK既知envelopeのmodel/cwd/run区間/tag/時刻照合、置換拒否 | UNVERIFIED：実5.5 |
+| T04 | 故障コードの実assert、mock独立review→修正 | UNVERIFIED：実Haiku/Sonnet |
+| T05 | 欠落/古い証拠・report/log/artifact改変を拒否 | ローカル機械ゲート検証済み |
+| T06 | 実Chromium操作故障をFAIL、偽visual/play成功をUNVERIFIED | ローカル機械ゲート/ブラウザ検証済み |
+| T07 | 全タスク/要件/check/assessment対応、未達可視化 | UNVERIFIED：自然言語の実Opus監査 |
+| T08 | 2失敗の原因調査とSonnet昇格、Opus再計画 | UNVERIFIED：実モデル |
+| T09 | durable operation/attempt、lost reply、next→controllerのresume | UNVERIFIED：native runtime cache |
+| T10 | 設定/agent衝突の拒否、atomic publish、事前配置 | UNVERIFIED：cloud発見 |
+| T11 | 欠損CLI/モデル記録/権限の正直な未検証、blocked独立継続 | UNVERIFIED：実提供/拒否 |
+| T12 | 3profile＋実API/Chromium/game fixture | UNVERIFIED：実Claudeの3種類開発 |
+| T13 | evidence自己無効化なし、原要求/契約/共通adapter変更で失効 | ローカル機械ゲート検証済み |
+| T14 | untracked/削除/mode/link実体、外部link拒否 | ローカル機械ゲート検証済み |
+| T15 | 各null/例外/欠落で後続拒否 | UNVERIFIED：native stall/replay |
+| T16 | 部分編集、旧attempt継承、実検査killからの復旧 | UNVERIFIED：native再起動 |
+| T17 | 元SDK model置換、旧SDK run流用/別project流用拒否 | UNVERIFIED：実policy置換 |
+| T18 | native mapping不足/不正を拒否、probeを準備 | UNVERIFIED：実scriptPath拒否/承認 |
+| T19 | native固定roleとRead/Grep/Glob、汎用writer誤配線拒否 | UNVERIFIED：実ツール拒否 |
+| T20 | active/pending receipt/check、検査中変更、空snapshot後writerを拒否 | UNVERIFIED：実Workflow稼働照合 |
 
-追加：timeout時の子プロセス停止（/procで実行中でないことを確認）、Schema不正・要件ID重複・依存循環・原文改変・branch不一致・状態ディレクトリsymlink・コマンドtimeoutも検査した。
+ユーザーPhase A〜Gの個別Before/Afterは[08-deep-audit.md](08-deep-audit.md)。独立した別コンテキスト監査の再現・再監査でも主要修正を確認した。
 
-## 未解決・次に必要な作業
+## 残る作業
 
-1. Claude Codeクラウドで/goal、Workflow、共有scriptPath、tools制限、承認条件、モデル実ルーティングを実測。Workflow呼出形式の差があれば公式/workflow-authoringに沿って修正し回帰試験する。
-2. 実レビュー/監査/モデルログを取得し、正規化値と元ログを照合する。任意ログ形式の自動解析は未実装。
-3. Web・既存プロジェクト・ゲームを実Claudeで開発し、実ブラウザ/プレイ・中断再開・故障注入を追試する。画像や操作成功を今回の結果から推測しない。
-4. GitHub ActionsのNode.js v22.23.3でも最終コードの24件がPASS。push用[run 40188835146](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40188835146)、PR用[run 40188837751](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40188837751)を確認。初回に見つかったtimeout子プロセス残存と、PRのdetached HEADでの識別失敗は修正済み。[CIメタデータ](evidence/github-ci.json)。
+実コード上の既知P1は独立再監査時点で未報告。実環境との不一致が見つかれば修正する。現時点で残すのは以下の実機条件。
 
-上記1〜3のClaude実機確認が完了するまでは「V1完成」「クラウドで一指示から動作済み」とは表示しない。実装要求は維持している。
+1. 選択したClaude cloud2repoから共通scriptPath/Read/Workflowを起動できるか。初回native agentsの発見・必要な再起動/承認回数。
+2. 実Opus/Sonnet/Haiku 5.5の提供/アクセス/実モデル、native readonlyの書込/委任拒否。
+3. 実Workflow内のSDK記録が既知parserの相関情報を出すか。出なければUNVERIFIEDとして実観測されたadapterまたはnative Agent経路を検証する。
+4. /goalの背景待機と複数sprint継続、実際の途中停止/再開、実ClaudeでのWeb/既存変更/game追試。
+
+[隔離一括probe](live-probe.md)で生成から記録まで同じ手順で試せる。未知のログ/モデルを推測し、未実施項目をPASSへ変える作業は行わない。
