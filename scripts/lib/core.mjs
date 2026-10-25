@@ -21,7 +21,11 @@ export function canonicalRemote(remote) {
 export function identity(root) {
  root=fs.realpathSync(root);
  if(git(root,'rev-parse','--show-toplevel')!==root) throw Error('Target must be repository root');
- return {root,gitDir:git(root,'rev-parse','--absolute-git-dir'),remote:git(root,'remote','get-url','origin'),branch:git(root,'symbolic-ref','--short','HEAD')};
+ return {root,gitDir:git(root,'rev-parse','--absolute-git-dir'),remote:git(root,'remote','get-url','origin'),branch:branchIdentity(root)};
+}
+function branchIdentity(root) {
+ try {return execFileSync('git',['-C',root,'symbolic-ref','--quiet','--short','HEAD'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();}
+ catch {return 'DETACHED:'+git(root,'rev-parse','HEAD');}
 }
 export function safeState(root) {
  const dir=path.join(root,'.autodev');

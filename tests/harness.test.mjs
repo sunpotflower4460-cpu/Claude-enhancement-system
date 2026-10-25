@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {bootstrap} from '../scripts/bootstrap.mjs';
-import {contracts,fingerprint,hash,json,read,shared,validate} from '../scripts/lib/core.mjs';
+import {contracts,fingerprint,hash,json,read,shared,validate,identity} from '../scripts/lib/core.mjs';
 import {record} from '../scripts/record.mjs';
 import {verify} from '../scripts/verify.mjs';
 import {state} from '../scripts/state.mjs';
@@ -132,4 +132,11 @@ test('timeout terminates a check process group including child processes',async 
  if(fs.existsSync('/proc/'+pid+'/stat')) {
   const status=fs.readFileSync('/proc/'+pid+'/stat','utf8');assert.match(status,/\) Z /);
  }
+});
+
+test('read-only common sources and target identity support detached checkout',t=>{
+ const f=fixture(t);f.git('add','app.js');f.git('-c','user.name=Test','-c','user.email=test@example.test','commit','-qm','fixture');f.git('checkout','--detach');
+ assert.match(identity(f.target).branch,/^DETACHED:[0-9a-f]+$/);
+ // Moving an already initialized target still invalidates its original identity.
+ assert.throws(()=>contracts(f.target),/identity changed/);
 });
