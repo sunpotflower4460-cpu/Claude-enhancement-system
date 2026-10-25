@@ -4,7 +4,7 @@
 
 ## 実行環境と証拠
 
-Linux、Node.js v24.19.0、Ajv 8.20.0、Playwright 1.64.1、Chromium 156.0.8078.4。`npm ci --ignore-scripts`、ブラウザ導入、`npm test`、`npm audit --json`、`git diff --check`を実行。最終ローカル試験は**80件PASS、失敗0、skip0**。最終テスト件数/結果は[evidence/tests-v2.txt](evidence/tests-v2.txt)。[機械用結果](evidence/local-v2-summary.json)も保存した。依存監査は脆弱性0件。GitHub ActionsはNode.js 22で同じ試験と実Chromiumを実行する。最新CI情報はPR checksとevidence/github-ci-v2.json（取得後）へ記録する。
+Linux、Node.js v24.19.0、Ajv 8.20.0、Playwright 1.64.1、Chromium 156.0.8078.4。`npm ci --ignore-scripts`、ブラウザ導入、`npm test`、`npm audit --json`、`git diff --check`を実行。最終ローカル試験は**80件PASS、失敗0、skip0**。最終テスト件数/結果は[evidence/tests-v2.txt](evidence/tests-v2.txt)。[機械用結果](evidence/local-v2-summary.json)も保存した。依存監査は脆弱性0件。GitHub ActionsでもNode.js 22.23.3＋実Chromiumで**80件PASS、失敗0、skip0**。push用[run 40195098672](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40195098672)、PR用[run 40195103065](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40195103065)の成功とログを確認。コードcommitは`d4bf7d0`。[PR CI metadata](evidence/github-ci-v2.json)、[push CI metadata](evidence/github-push-ci-v2.json)。
 
 初回バグの再現は[evidence/audit-before.txt](evidence/audit-before.txt)。バックログのUNVERIFIED/FAIL/BLOCKED、偽のplay/visual成功に対して期待する拒否assertが4件失敗し、v0.1のfalse COMPLETEを確認した。v0.1の24件成功は[evidence/tests.txt](evidence/tests.txt)に履歴として残す。
 
