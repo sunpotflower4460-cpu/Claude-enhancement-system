@@ -50,9 +50,9 @@ test at tests/portability.test.mjs:33:1
 test at tests/portability.test.mjs:37:1
 ✖ portability: inability to observe a local process is unknown, never dead (1.095202ms)
   AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
-  
+
   false !== null
-  
+
       at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/portability.test.mjs:45:10)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1382:25)
@@ -71,9 +71,9 @@ test at tests/portability.test.mjs:37:1
 test at tests/portability.test.mjs:54:1
 ✖ portability: leader exit does not hide a still-running process group (9.952074ms)
   AssertionError [ERR_ASSERTION]: background writer must prevent recovery
-  
+
   false !== true
-  
+
       at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/portability.test.mjs:63:12)
       at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
       at async Test.run (node:internal/test_runner/test:1389:7)
@@ -105,7 +105,7 @@ test at tests/checkpoint.test.mjs:12:1
   AssertionError [ERR_ASSERTION]: node:internal/modules/cjs/loader:1520
     throw err;
     ^
-  
+
   Error: Cannot find module '/workspace/Claude-enhancement-system/scripts/checkpoint.mjs'
       at Module._resolveFilename (node:internal/modules/cjs/loader:1517:15)
       at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)
@@ -118,12 +118,12 @@ test at tests/checkpoint.test.mjs:12:1
     code: 'MODULE_NOT_FOUND',
     requireStack: []
   }
-  
+
   Node.js v24.19.0
-  
-  
+
+
   1 !== 0
-  
+
       at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/checkpoint.test.mjs:21:9)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1382:25)
@@ -140,9 +140,9 @@ test at tests/checkpoint.test.mjs:12:1
 test at tests/checkpoint.test.mjs:35:1
 ✖ reconnect after stopped partial edit preserves operation and review resume point (540.870852ms)
   AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
-  
+
   'SPRINT' !== 'RESUME'
-  
+
       at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/checkpoint.test.mjs:44:50)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1382:25)
@@ -176,9 +176,9 @@ test at tests/checkpoint.test.mjs:35:1
 test at tests/continuation.test.mjs:11:1
 ✖ long continuation resumes Sonnet elevation from persisted task failures without local Workflow repair counter (9.937066ms)
   AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
-  
+
     assert.ok(trace.some(x=>x.action==='implement'&&x.role==='sonnet-planner'))
-  
+
       at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/continuation.test.mjs:20:9)
       at async Test.run (node:internal/test_runner/test:1389:7)
       at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
@@ -193,9 +193,9 @@ test at tests/continuation.test.mjs:11:1
 test at tests/continuation.test.mjs:24:1
 ✖ classified environment blockers are persisted and defer task without an irrelevant Opus code replan (2.831246ms)
   AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
-  
+
     assert.ok(trace.some(x=>x.action==='checkpoint-failure'))
-  
+
       at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/continuation.test.mjs:33:9)
       at async Test.run (node:internal/test_runner/test:1389:7)
       at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
@@ -212,7 +212,7 @@ test at tests/continuation.test.mjs:37:1
   AssertionError [ERR_ASSERTION]: node:internal/modules/cjs/loader:1520
     throw err;
     ^
-  
+
   Error: Cannot find module '/workspace/Claude-enhancement-system/scripts/failure.mjs'
       at Module._resolveFilename (node:internal/modules/cjs/loader:1517:15)
       at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)
@@ -225,12 +225,12 @@ test at tests/continuation.test.mjs:37:1
     code: 'MODULE_NOT_FOUND',
     requireStack: []
   }
-  
+
   Node.js v24.19.0
-  
-  
+
+
   1 !== 0
-  
+
       at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/continuation.test.mjs:42:40)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1382:25)
@@ -298,7 +298,7 @@ test at tests/long-routing.test.mjs:260:1
 ✖ model, terminal and independent assessment importers cannot write through an active gate mutex (1844.731874ms)
   AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
   + actual - expected
-  
+
     [
   +   false,
   +   false,
@@ -307,7 +307,7 @@ test at tests/long-routing.test.mjs:260:1
   -   true,
   -   true
     ]
-  
+
       at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/long-routing.test.mjs:266:9)
       at async Test.run (node:internal/test_runner/test:1389:7)
       at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
@@ -377,10 +377,10 @@ test at tests/checkpoint.test.mjs:738:1
       "refs/heads/autodev/checkpoint/d762dba2-c073-4476-89a3-195f6a1a1c8c:refs/heads/autodev/checkpoint/d762dba2-c073-4476-89a3-195f6a1a1c8c"
     ]
   }
-  
-  
+
+
   0 !== 2
-  
+
       at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/checkpoint.test.mjs:744:61)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1382:25)
@@ -410,9 +410,9 @@ test at tests/checkpoint.test.mjs:738:1
 test at tests/cli-probe.test.mjs:100:1
 ✖ F one-command live probe prepares isolated clone, all checks UNVERIFIED, source unchanged (509.158198ms)
   AssertionError [ERR_ASSERTION]: live probe must exercise parent continuation across multiple bursts
-  
+
   undefined !== 1
-  
+
       at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/cli-probe.test.mjs:117:10)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1382:25)
@@ -426,3 +426,74 @@ test at tests/cli-probe.test.mjs:100:1
     diff: 'simple'
   }
 
+
+=== claude-macos-alias-before.txt ===
+✖ portability: symlinked repository root preserves internal product links and external-link refusal (233.181382ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 349.732398
+
+✖ failing tests:
+
+test at tests/portability.test.mjs:165:1
+✖ portability: symlinked repository root preserves internal product links and external-link refusal (233.181382ms)
+  Error: External product symlink is unsupported: internal-link
+      at fingerprint (file:///workspace/Claude-enhancement-system/scripts/lib/core.mjs:359:15)
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/portability.test.mjs:168:15)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+=== checkpoint-absolute-before.txt ===
+✖ checkpoint refuses path-bound absolute product links before publishing an unrestorable clone (915.02909ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1039.800394
+
+✖ failing tests:
+
+test at tests/checkpoint.test.mjs:785:1
+✖ checkpoint refuses path-bound absolute product links before publishing an unrestorable clone (915.02909ms)
+  AssertionError [ERR_ASSERTION]: {
+    "status": "SAVED_LOCAL",
+    "branch": "autodev/checkpoint/f0a8eb46-fdea-4491-adcb-b0032d7e0171",
+    "commit": "58984a597acfdbc56a5e938dad9f9cfc84e45f05",
+    "product": "4b3e1f93ee5ae18364d514d69e11213903cceb1b8ab28847fe4379af396a505c",
+    "included": 10,
+    "omitted": [],
+    "publish_command": [
+      "git",
+      "-C",
+      "/tmp/autodev-audit-Qx6gLf/target",
+      "push",
+      "origin",
+      "refs/heads/autodev/checkpoint/f0a8eb46-fdea-4491-adcb-b0032d7e0171:refs/heads/autodev/checkpoint/f0a8eb46-fdea-4491-adcb-b0032d7e0171"
+    ]
+  }
+
+
+  0 !== 2
+
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/checkpoint.test.mjs:787:60)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

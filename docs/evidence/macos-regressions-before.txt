@@ -1,0 +1,236 @@
+macOS CI first failure: https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40212409425
+head 34bff31; 174 total,165 pass,9 fail,0 skipped. Excerpts below.
+
+2026-10-25T16:37:29.2626070Z not ok 38 - F repeated failed mock CLI probe launches preserve separate raw files without claiming live success
+2026-10-25T16:37:29.2626650Z   ---
+2026-10-25T16:37:29.2626870Z   duration_ms: 585.468
+2026-10-25T16:37:29.2627090Z   type: 'test'
+2026-10-25T16:37:29.2627660Z   location: '/Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/cli-probe.test.mjs:196:1'
+2026-10-25T16:37:29.2628190Z   failureType: 'testCodeFailure'
+2026-10-25T16:37:29.2628520Z   error: |-
+2026-10-25T16:37:29.2628860Z     Expected values to be strictly equal:
+2026-10-25T16:37:29.2629440Z
+2026-10-25T16:37:29.2629720Z     2 !== 1
+2026-10-25T16:37:29.2629900Z
+2026-10-25T16:37:29.2630150Z   code: 'ERR_ASSERTION'
+2026-10-25T16:37:29.2630380Z   name: 'AssertionError'
+2026-10-25T16:37:29.2630670Z   expected: 1
+2026-10-25T16:37:29.2630950Z   actual: 2
+2026-10-25T16:37:29.2631150Z   operator: 'strictEqual'
+2026-10-25T16:37:29.2631440Z   stack: |-
+2026-10-25T16:37:29.2632740Z     TestContext.<anonymous> (file:///Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/cli-probe.test.mjs:211:12)
+2026-10-25T16:37:29.2633350Z     Test.runInAsyncScope (node:async_hooks:214:14)
+2026-10-25T16:37:29.2633850Z     Test.run (node:internal/test_runner/test:1047:25)
+2026-10-25T16:37:29.2634260Z     Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+2026-10-25T16:37:29.2634650Z     Test.postRun (node:internal/test_runner/test:1173:19)
+2026-10-25T16:37:29.2634990Z     Test.run (node:internal/test_runner/test:1101:12)
+2026-10-25T16:37:29.2635400Z     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+2026-10-25T16:37:29.2663050Z   ...
+
+2026-10-25T16:37:29.2666680Z not ok 40 - C1 failed preparation leaves no partial output and can retry after source repair
+2026-10-25T16:37:29.2667180Z   ---
+2026-10-25T16:37:29.2667410Z   duration_ms: 1596.882792
+2026-10-25T16:37:29.2667640Z   type: 'test'
+2026-10-25T16:37:29.2668220Z   location: '/Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/cli-probe.test.mjs:249:1'
+2026-10-25T16:37:29.2668760Z   failureType: 'testCodeFailure'
+2026-10-25T16:37:29.2669050Z   error: |-
+2026-10-25T16:37:29.2669390Z     Expected values to be strictly equal:
+2026-10-25T16:37:29.2669660Z     + actual - expected
+2026-10-25T16:37:29.2669950Z
+2026-10-25T16:37:29.2670400Z     + '/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/autodev-audit-oyXrIQ/failed-probe'
+2026-10-25T16:37:29.2671230Z     - '/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/autodev-audit-oyXrIQ/failed-probe'
+2026-10-25T16:37:29.2671610Z
+2026-10-25T16:37:29.2671830Z   code: 'ERR_ASSERTION'
+2026-10-25T16:37:29.2672100Z   name: 'AssertionError'
+2026-10-25T16:37:29.2672550Z   expected: '/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/autodev-audit-oyXrIQ/failed-probe'
+2026-10-25T16:37:29.2673810Z   actual: '/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/autodev-audit-oyXrIQ/failed-probe'
+2026-10-25T16:37:29.2674230Z   operator: 'strictEqual'
+2026-10-25T16:37:29.2674480Z   stack: |-
+2026-10-25T16:37:29.2675150Z     TestContext.<anonymous> (file:///Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/cli-probe.test.mjs:286:10)
+2026-10-25T16:37:29.2675780Z     Test.runInAsyncScope (node:async_hooks:214:14)
+2026-10-25T16:37:29.2676200Z     Test.run (node:internal/test_runner/test:1047:25)
+2026-10-25T16:37:29.2676640Z     Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+2026-10-25T16:37:29.2677150Z     Test.postRun (node:internal/test_runner/test:1173:19)
+2026-10-25T16:37:29.2677580Z     Test.run (node:internal/test_runner/test:1101:12)
+
+2026-10-25T16:37:29.2679540Z not ok 41 - C1 repeated CLI invocations reset prior observations and preserve run manifests
+2026-10-25T16:37:29.2680000Z   ---
+2026-10-25T16:37:29.2680420Z   duration_ms: 597.076166
+2026-10-25T16:37:29.2680700Z   type: 'test'
+2026-10-25T16:37:29.2681200Z   location: '/Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/cli-probe.test.mjs:289:1'
+2026-10-25T16:37:29.2681780Z   failureType: 'testCodeFailure'
+2026-10-25T16:37:29.2682080Z   error: |-
+2026-10-25T16:37:29.2682310Z     Expected values to be strictly equal:
+2026-10-25T16:37:29.2682590Z
+2026-10-25T16:37:29.2682760Z     2 !== 1
+2026-10-25T16:37:29.2682930Z
+2026-10-25T16:37:29.2683090Z   code: 'ERR_ASSERTION'
+2026-10-25T16:37:29.2683360Z   name: 'AssertionError'
+2026-10-25T16:37:29.2683660Z   expected: 1
+2026-10-25T16:37:29.2683840Z   actual: 2
+2026-10-25T16:37:29.2684080Z   operator: 'strictEqual'
+2026-10-25T16:37:29.2684280Z   stack: |-
+2026-10-25T16:37:29.2684900Z     TestContext.<anonymous> (file:///Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/cli-probe.test.mjs:317:12)
+2026-10-25T16:37:29.2685490Z     Test.runInAsyncScope (node:async_hooks:214:14)
+2026-10-25T16:37:29.2685920Z     Test.run (node:internal/test_runner/test:1047:25)
+2026-10-25T16:37:29.2686390Z     Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+2026-10-25T16:37:29.2686830Z     Test.postRun (node:internal/test_runner/test:1173:19)
+2026-10-25T16:37:29.2687280Z     Test.run (node:internal/test_runner/test:1101:12)
+2026-10-25T16:37:29.2687670Z     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+2026-10-25T16:37:29.2688070Z   ...
+
+2026-10-25T16:37:29.2691410Z not ok 43 - C1 probe run lease rejects a second launch and SIGTERM preserves interrupted evidence
+2026-10-25T16:37:29.2691740Z   ---
+2026-10-25T16:37:29.2691920Z   duration_ms: 1206.229042
+2026-10-25T16:37:29.2692140Z   type: 'test'
+2026-10-25T16:37:29.2692680Z   location: '/Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/cli-probe.test.mjs:370:1'
+2026-10-25T16:37:29.2693140Z   failureType: 'testCodeFailure'
+2026-10-25T16:37:29.2693330Z   error: |-
+2026-10-25T16:37:29.2693510Z     Expected values to be strictly equal:
+2026-10-25T16:37:29.2693700Z
+2026-10-25T16:37:29.2693820Z     2 !== 1
+2026-10-25T16:37:29.2694230Z
+2026-10-25T16:37:29.2694370Z   code: 'ERR_ASSERTION'
+2026-10-25T16:37:29.2694540Z   name: 'AssertionError'
+2026-10-25T16:37:29.2694700Z   expected: 1
+2026-10-25T16:37:29.2695020Z   actual: 2
+2026-10-25T16:37:29.2695210Z   operator: 'strictEqual'
+2026-10-25T16:37:29.2695380Z   stack: |-
+2026-10-25T16:37:29.2695910Z     TestContext.<anonymous> (file:///Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/cli-probe.test.mjs:435:10)
+2026-10-25T16:37:29.2696490Z     async Test.run (node:internal/test_runner/test:1054:7)
+2026-10-25T16:37:29.2696900Z     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+2026-10-25T16:37:29.2697200Z   ...
+2026-10-25T16:37:29.2697530Z # Subtest: C1 stale probe-result updates cannot overwrite a newer invocation
+2026-10-25T16:37:29.2698020Z ok 44 - C1 stale probe-result updates cannot overwrite a newer invocation
+2026-10-25T16:37:29.2698290Z   ---
+2026-10-25T16:37:29.2698430Z   duration_ms: 585.770125
+
+2026-10-25T16:39:26.9274780Z not ok 87 - C2 staged deletion does not change fingerprint again on commit; mode and symlink changes detected
+2026-10-25T16:39:26.9276100Z   ---
+2026-10-25T16:39:26.9278300Z   duration_ms: 312.878458
+2026-10-25T16:39:26.9278610Z   type: 'test'
+2026-10-25T16:39:26.9279280Z   location: '/Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/harness.test.mjs:208:1'
+2026-10-25T16:39:26.9280530Z   failureType: 'testCodeFailure'
+2026-10-25T16:39:26.9283720Z   error: 'External product symlink is unsupported: link'
+2026-10-25T16:39:26.9302660Z   code: 'ERR_TEST_FAILURE'
+2026-10-25T16:39:26.9305140Z   stack: |-
+2026-10-25T16:39:26.9307040Z     fingerprint (file:///Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/scripts/lib/core.mjs:359:15)
+2026-10-25T16:39:26.9308790Z     TestContext.<anonymous> (file:///Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/harness.test.mjs:223:12)
+2026-10-25T16:39:26.9309940Z     Test.runInAsyncScope (node:async_hooks:214:14)
+2026-10-25T16:39:26.9311070Z     Test.run (node:internal/test_runner/test:1047:25)
+2026-10-25T16:39:26.9314140Z     Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+2026-10-25T16:39:26.9367050Z     Test.postRun (node:internal/test_runner/test:1173:19)
+2026-10-25T16:39:26.9385390Z     Test.run (node:internal/test_runner/test:1101:12)
+2026-10-25T16:39:26.9394660Z     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+2026-10-25T16:39:26.9395220Z   ...
+2026-10-25T16:39:26.9398600Z # Subtest: contract validation rejects missing task checks, dropped requirements and cycles
+2026-10-25T16:39:26.9399830Z ok 88 - contract validation rejects missing task checks, dropped requirements and cycles
+2026-10-25T16:39:26.9401360Z   ---
+2026-10-25T16:39:26.9402250Z   duration_ms: 768.743958
+2026-10-25T16:39:26.9406660Z   type: 'test'
+2026-10-25T16:39:26.9421940Z   ...
+2026-10-25T16:39:26.9424330Z # Subtest: checks changing product/contract during execution cannot create fresh evidence
+
+2026-10-25T16:39:26.9621130Z not ok 95 - G ignored internal symlink targets are hashed; external executable symlinks are refused
+2026-10-25T16:39:26.9622460Z   ---
+2026-10-25T16:39:26.9623480Z   duration_ms: 171.162541
+2026-10-25T16:39:26.9624490Z   type: 'test'
+2026-10-25T16:39:26.9625730Z   location: '/Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/harness.test.mjs:325:1'
+2026-10-25T16:39:26.9626930Z   failureType: 'testCodeFailure'
+2026-10-25T16:39:26.9628030Z   error: 'External product symlink is unsupported: local-bin'
+2026-10-25T16:39:26.9629310Z   code: 'ERR_TEST_FAILURE'
+2026-10-25T16:39:26.9630330Z   stack: |-
+2026-10-25T16:39:26.9631320Z     fingerprint (file:///Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/scripts/lib/core.mjs:359:15)
+2026-10-25T16:39:26.9633600Z     TestContext.<anonymous> (file:///Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/harness.test.mjs:332:14)
+2026-10-25T16:39:26.9634440Z     Test.runInAsyncScope (node:async_hooks:214:14)
+2026-10-25T16:39:26.9635090Z     Test.run (node:internal/test_runner/test:1047:25)
+2026-10-25T16:39:26.9639200Z     Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+2026-10-25T16:39:26.9643290Z     Test.postRun (node:internal/test_runner/test:1173:19)
+2026-10-25T16:39:26.9673440Z     Test.run (node:internal/test_runner/test:1101:12)
+2026-10-25T16:39:26.9680380Z     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+2026-10-25T16:39:26.9681850Z   ...
+2026-10-25T16:39:26.9696920Z # Subtest: G bundled API/browser checker edits change common verifier version even outside target
+2026-10-25T16:39:26.9698900Z ok 96 - G bundled API/browser checker edits change common verifier version even outside target
+2026-10-25T16:39:26.9700080Z   ---
+2026-10-25T16:39:26.9701720Z   duration_ms: 206.473625
+2026-10-25T16:39:26.9703270Z   type: 'test'
+2026-10-25T16:39:26.9704060Z   ...
+2026-10-25T16:39:26.9705800Z # Subtest: long routing retains proved role provenance across a fresh root run without duplicate implementation
+
+2026-10-25T16:44:58.2574610Z not ok 115 - initial repair records absent inputs and refuses a newer contract after process death
+2026-10-25T16:44:58.2575270Z   ---
+2026-10-25T16:44:58.2575490Z   duration_ms: 1211.456459
+2026-10-25T16:44:58.2575770Z   type: 'test'
+2026-10-25T16:44:58.2577360Z   location: '/Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/plan-repair.test.mjs:189:1'
+2026-10-25T16:44:58.2577890Z   failureType: 'testCodeFailure'
+2026-10-25T16:44:58.2578180Z   error: |-
+2026-10-25T16:44:58.2578430Z     Expected values to be strictly equal:
+2026-10-25T16:44:58.2578710Z
+2026-10-25T16:44:58.2578940Z     null !== 'SIGKILL'
+2026-10-25T16:44:58.2579180Z
+2026-10-25T16:44:58.2579470Z   code: 'ERR_ASSERTION'
+2026-10-25T16:44:58.2579720Z   name: 'AssertionError'
+2026-10-25T16:44:58.2579980Z   expected: 'SIGKILL'
+2026-10-25T16:44:58.2580190Z   actual: ~
+2026-10-25T16:44:58.2580430Z   operator: 'strictEqual'
+2026-10-25T16:44:58.2580680Z   stack: |-
+2026-10-25T16:44:58.2581260Z     TestContext.<anonymous> (file:///Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/plan-repair.test.mjs:198:10)
+2026-10-25T16:44:58.2581940Z     Test.runInAsyncScope (node:async_hooks:214:14)
+2026-10-25T16:44:58.2582420Z     Test.run (node:internal/test_runner/test:1047:25)
+2026-10-25T16:44:58.2582870Z     Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+2026-10-25T16:44:58.2583370Z     Test.postRun (node:internal/test_runner/test:1173:19)
+2026-10-25T16:44:58.2583820Z     Test.run (node:internal/test_runner/test:1101:12)
+2026-10-25T16:44:58.2584270Z     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+2026-10-25T16:44:58.2584980Z   ...
+
+2026-10-25T16:44:58.2726420Z not ok 156 - G bootstrap publishes session and mission together even if interrupted immediately after rename
+2026-10-25T16:44:58.2726850Z   ---
+2026-10-25T16:44:58.2727000Z   duration_ms: 365.692542
+2026-10-25T16:44:58.2727190Z   type: 'test'
+2026-10-25T16:44:58.2727670Z   location: '/Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/recovery.test.mjs:393:1'
+2026-10-25T16:44:58.2728170Z   failureType: 'testCodeFailure'
+2026-10-25T16:44:58.2728460Z   error: 'Missing expected exception.'
+2026-10-25T16:44:58.2728660Z   code: 'ERR_ASSERTION'
+2026-10-25T16:44:58.2728870Z   name: 'AssertionError'
+2026-10-25T16:44:58.2729040Z   expected:
+2026-10-25T16:44:58.2729180Z   operator: 'throws'
+2026-10-25T16:44:58.2729330Z   stack: |-
+2026-10-25T16:44:58.2729870Z     TestContext.<anonymous> (file:///Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/recovery.test.mjs:406:12)
+2026-10-25T16:44:58.2730490Z     Test.runInAsyncScope (node:async_hooks:214:14)
+2026-10-25T16:44:58.2730870Z     Test.run (node:internal/test_runner/test:1047:25)
+2026-10-25T16:44:58.2740850Z     Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+2026-10-25T16:44:58.2741310Z     Test.postRun (node:internal/test_runner/test:1173:19)
+2026-10-25T16:44:58.2741640Z     Test.run (node:internal/test_runner/test:1101:12)
+2026-10-25T16:44:58.2742040Z     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+2026-10-25T16:44:58.2742360Z   ...
+2026-10-25T16:44:58.2742720Z # Subtest: G migration resumes after mission-v2 publication before backlog update
+2026-10-25T16:44:58.2743290Z not ok 157 - G migration resumes after mission-v2 publication before backlog update
+2026-10-25T16:44:58.2744600Z   ---
+2026-10-25T16:44:58.2745100Z   duration_ms: 538.992042
+2026-10-25T16:44:58.2745620Z   type: 'test'
+
+2026-10-25T16:44:58.2743290Z not ok 157 - G migration resumes after mission-v2 publication before backlog update
+2026-10-25T16:44:58.2744600Z   ---
+2026-10-25T16:44:58.2745100Z   duration_ms: 538.992042
+2026-10-25T16:44:58.2745620Z   type: 'test'
+2026-10-25T16:44:58.2746180Z   location: '/Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/recovery.test.mjs:419:1'
+2026-10-25T16:44:58.2746700Z   failureType: 'testCodeFailure'
+2026-10-25T16:44:58.2746940Z   error: 'Missing expected exception.'
+2026-10-25T16:44:58.2747160Z   code: 'ERR_ASSERTION'
+2026-10-25T16:44:58.2747330Z   name: 'AssertionError'
+2026-10-25T16:44:58.2747500Z   expected:
+2026-10-25T16:44:58.2747640Z   operator: 'throws'
+2026-10-25T16:44:58.2747790Z   stack: |-
+2026-10-25T16:44:58.2748330Z     TestContext.<anonymous> (file:///Users/runner/work/Claude-enhancement-system/Claude-enhancement-system/tests/recovery.test.mjs:451:12)
+2026-10-25T16:44:58.2749150Z     Test.runInAsyncScope (node:async_hooks:214:14)
+2026-10-25T16:44:58.2749610Z     Test.run (node:internal/test_runner/test:1047:25)
+2026-10-25T16:44:58.2750030Z     Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+2026-10-25T16:44:58.2750420Z     Test.postRun (node:internal/test_runner/test:1173:19)
+2026-10-25T16:44:58.2750840Z     Test.run (node:internal/test_runner/test:1101:12)
+2026-10-25T16:44:58.2751250Z     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+2026-10-25T16:44:58.2751550Z   ...
+2026-10-25T16:44:58.2752040Z # Subtest: G next CLI returns the actual selected task and structured resume stage to controller
+2026-10-25T16:44:58.2752800Z ok 158 - G next CLI returns the actual selected task and structured resume stage to controller
+2026-10-25T16:44:58.2753130Z   ---
+2026-10-25T16:44:58.2753290Z   duration_ms: 1897.188417
+2026-10-25T16:44:58.2753730Z   type: 'test'

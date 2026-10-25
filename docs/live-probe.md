@@ -9,10 +9,12 @@ Claude Codeでテストrepoと共通repoを選び、次を一度送る。初回�
 ```text
 /goal Claude-enhancement-system/docs/live-probe.mdの隔離実機試験を最後まで実行してください。
 選択したテストrepoをsourceとしてlive-probe prepareでrepo外の新しい隔離cloneを作り、
-生成された.autodev/probe-prompt.txtとSTART.mdに従ってください。sourceのファイル・設定・branchは変更しないでください。
+生成された.autodev/probe-prompt.txtとSTART.mdに従ってください。sourceのファイル・設定・branch・remote refsは変更しないでください。source remoteへpushせず、隔離コピーのpushガードを解除しないでください。
 クラウド2repo、共有Workflow、native agent発見、実Opus/Sonnet/Haiku 5.5、reviewerの実読み取り専用制限、
 /goal継続、max_sprints=1による3burst以上のclaim/実起動/完了待機、実装→レビュー→故障修正→次task、実検証、中断と再開を観測してください。
-節目にGit checkpointをpublishし、隔離コピーの別cloneで原要求・進捗・部分実装を復元し、最終検証も再実行してください。
+節目にGit checkpointをLOCAL保存（--publish trueは使わない）し、隔離コピーからもう一つLOCAL cloneを作って復元し、最終検証も再実行してください。
+二つ目のcloneも元のfetch URLはidentity照合のため保持し、origin.pushurlは自身の.git/autodev-probe-push-disabledへ設定してください。
+source remoteへの公開試験は未実施として残してください。
 最後は実Workflowがdrainedになってから独立verifyを実行し、モデル元記録・拒否の根拠・結果を保存してください。
 確認不能はUNVERIFIEDのまま、独立して試せる項目は続けてください。
 ```
@@ -31,6 +33,10 @@ node COMMON/scripts/live-probe.mjs --mode run --target NEW_DIR
 ```
 
 sourceはローカルGit cloneの読み取り元。元worktree/branch/configを変更しない。出力はsource/共通の外側で、既存directoryを置換しない。prepareはsibling stagingでfixture・contract・native agents・probe-input/prompt/resultsを作り、完了後に一括publishする。初期結果は全項目UNVERIFIED。
+
+隔離cloneのfetch用originは元repoのURLを保持するため、missionのcanonical identityは変わらない。一方、`remote.origin.pushurl`は隔離先の`.git/autodev-probe-push-disabled`という**存在しないローカルパス**へ設定する。通常の`git push origin`やcheckpointの`--publish true`はローカルで失敗し、元GitHub repoへbranch/checkpointを作らない。このガードはセキュリティsandboxではなく、既定経路の誤公開防止。source URLを直接指定するpushやガード解除は行わない。
+
+このprobeでのcheckpoint試験は`checkpoint.mjs --action save --target ISOLATED`のLOCAL保存と、ISOLATEDからの追加LOCAL clone/restoreを使う。二つ目のcloneではfetch originを元repoのURLへ戻して実際のidentityを維持し、pushurlをそのclone自身の絶対パス`.git/autodev-probe-push-disabled`へ設定する。元repoのidentityを別repoに偽装しない。remote publicationはUNVERIFIEDのまま記録し、別の明示的な公開先が後で承認される場合にだけ切り離して試験する。通常の開発対象でのcheckpoint公開機能は変わらない。
 
 `run`は通常の`claude -p "/goal ..."`を呼ぶ。実binaryは`--claude /absolute/path/to/claude`で指定可能。`--model claude-sonnet-5-5 --add-dir COMMON --plugin-dir COMMON --output-format stream-json --verbose --include-partial-messages --forward-subagent-text`を使い、認証/権限を迂回するflagを追加しない。
 
@@ -61,7 +67,7 @@ node COMMON/scripts/live-probe.mjs --mode recover-prepare --output NEW_DIR
 4. 現contextからburstをclaimし、実測済みcapabilitiesだけを渡してnative Workflowを起動。実launchをattachする。4taskで故障検出→修正→独立review→実HTTP/test→次taskを観測する。
 5. 生成argsのmax_sprints=1で3burst以上を継続し、/goalの自動継続とmilestone間隔、Sonnet昇格/Opus再計画の記録を確認する。上限到達を完成とは扱わない。
 6. 実装/レビュー途中でnative Workflowを停止。実terminal+drainedをimportしburst finish→state recover。nextの実タスク/段階とoperation.observeから再開し、部分編集を二重適用しない。
-7. 完了したburst後にstate pause→checkpoint save/publish。隔離コピーの別cloneでcheckpoint restoreし、原要求・未完了task・既実装部分・省略証拠の扱いを確認する。restore途中の停止は`checkpoint.mjs --action recover-restore --target TARGET`から再開し、状態を手動削除して合格にしない。
+7. 完了したburst後にstate pause→checkpoint save（LOCALのみ）。隔離コピーから二つ目のLOCAL cloneを作り、fetch identityを保持してpushurlガードも設定してからcheckpoint restoreし、原要求・未完了task・既実装部分・省略証拠の扱いを確認する。restore途中の停止は`checkpoint.mjs --action recover-restore --target TARGET`から再開し、状態を手動削除して合格にしない。
 8. 全必須checksと最終Sonnet review/Opus auditを更新。実runtimeがdrained後にburst finish→state end→verify。COMPLETE以外を完成扱いしない。
 
 native Workflowが使えない場合、同じ制限付きnative Agent役を親が直列に呼ぶ標準経路を評価できる。ただしそれをWorkflow試験合格とはせず、現在のWorkflow専用終了証拠を偽造しない。実行可能な別経路の受け入れ設計と実観測が揃うまではUNVERIFIED。
@@ -74,6 +80,6 @@ native Workflowが使えない場合、同じ制限付きnative Agent役を親�
 node COMMON/scripts/probe-result.mjs --target ISOLATED --invocation CURRENT_INVOCATION_ID --check CHECK_ID --status PASS --evidence '[{"path":"actual-log.jsonl","sha256":"ACTUAL_SHA256"}]' --reason "具体的な実観測"
 ```
 
-PASS/FAILは実ファイルとhashを必要とする。これは親の観察を保存するinterfaceで、任意ログの意味内容を自動承認する機能ではない。モデルは専用parser、完成はverifyが独立再計算する。raw/stderr/manifest、probe-results、最終verify JSON、必要な画像/拒否ログ、checkpoint branch/commitを一組として回収し、未実行項目は未検証理由と次の採取手順を残す。
+PASS/FAILは実ファイルとhashを必要とする。これは親の観察を保存するinterfaceで、任意ログの意味内容を自動承認する機能ではない。モデルは専用parser、完成はverifyが独立再計算する。raw/stderr/manifest、probe-results、最終verify JSON、必要な画像/拒否ログ、LOCAL checkpoint branch/commitを一組として回収し、remote publicationはUNVERIFIEDとして、未実行項目は未検証理由と次の採取手順を残す。
 
 ローカル試験が証明するのは隔離準備・故障復旧・状態/証拠処理、模擬モデル継続、実Git/HTTP/Chromium等の範囲。実5.5モデル、cloud2repo、native read-only拒否、本物の/goalとWorkflow停止再開は、この実機試験で初めて確認する。

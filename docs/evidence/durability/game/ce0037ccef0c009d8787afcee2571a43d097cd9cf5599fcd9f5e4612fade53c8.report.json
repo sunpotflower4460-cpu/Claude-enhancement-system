@@ -3,10 +3,10 @@
   "run_id": "run",
   "task_id": "R1",
   "attempt_id": "attempt",
-  "session_id": "8fd5f7dc-ffb3-46fe-9c83-416966a3318e",
+  "session_id": "aa3e79ce-29e9-4a36-8565-b9469c8a799f",
   "kind": "play",
   "check_id": "R1-play",
-  "nonce": "08bd289a-30c6-4d41-bad3-0b99274f857e",
+  "nonce": "5d692557-556e-43a2-ae03-1bb4442aa496",
   "tool": {
     "name": "Playwright Chromium durability",
     "version": "156.0.8078.4"
@@ -52,7 +52,7 @@
       "name": "Forty bounded inputs complete within ten seconds",
       "status": "PASS",
       "expected": "<10000ms",
-      "actual": "63ms"
+      "actual": "60ms"
     },
     {
       "name": "Boundary inputs preserve playable state",
@@ -81,7 +81,7 @@
   ],
   "artifacts": [
     {
-      "path": "R1-play-08bd289a-30c6-4d41-bad3-0b99274f857e-screen.png",
+      "path": "R1-play-5d692557-556e-43a2-ae03-1bb4442aa496-screen.png",
       "sha256": "30fadb3d4e3325465abec66b25d438da583ec4dccf9568f27b2611257f301c64",
       "media_type": "image/png"
     }
@@ -111,7 +111,7 @@
     "outcome": "Won",
     "expected_outcome": "Won",
     "captures": [
-      "R1-play-08bd289a-30c6-4d41-bad3-0b99274f857e-screen.png"
+      "R1-play-5d692557-556e-43a2-ae03-1bb4442aa496-screen.png"
     ]
   }
 }

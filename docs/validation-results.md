@@ -4,7 +4,7 @@
 
 ## 最新の長期継続強化
 
-実装checkpointは `e7d6afa`。前回80件を維持し、新clone・複数burst・中断・権限・実プロジェクトに近い検証を追加した。現在の全体試験結果は **174件PASS、失敗0、skip0**。[全出力](evidence/tests-long-running.txt)と[機械用結果](evidence/local-long-running-summary.json)を保存する。テスト対象の共通指紋にはスクリプト・Schema・役割/Workflow・依存ロックに加えSTART/AGENTSも含む。今回のBefore/AfterとR01〜R12対応は[長期監査](09-long-running-audit.md)。
+実装checkpointは `17825cc`（前段 `e7d6afa`）。前回80件を維持し、新clone・複数burst・中断・権限・実プロジェクトに近い検証を追加した。現在の全体試験結果は **177件PASS、失敗0、skip0**。[全出力](evidence/tests-long-running.txt)と[機械用結果](evidence/local-long-running-summary.json)を保存する。テスト対象の共通指紋にはスクリプト・Schema・役割/Workflow・依存ロックに加えSTART/AGENTSも含む。今回のBefore/AfterとR01〜R12対応は[長期監査](09-long-running-audit.md)。
 
 | 実証範囲 | 結果・証拠 |
 | --- | --- |
@@ -81,3 +81,7 @@ Linux、Node.js v24.19.0、Ajv 8.20.0、Playwright 1.64.1、Chromium 156.0.8078.
 4. /goalの背景待機と複数sprint継続、実際の途中停止/再開、実ClaudeでのWeb/既存変更/game追試。
 
 [隔離一括probe](live-probe.md)で生成から記録まで同じ手順で試せる。未知のログ/モデルを推測し、未実施項目をPASSへ変える作業は行わない。
+
+初回macOS CIは9件失敗したため終了判定を保留し、実pathの正規化、故障注入の実path照合、コマンド配置差を修正した。[実失敗抜粋](evidence/macos-regressions-before.txt)。新しいコードでLinux全177件を再実行し、macOSは再push後の同一head CIを確認する。probeでは元repoへのremote pushを禁止し、checkpoint再cloneはLOCAL検証と明記する。実GitHub公開は許可された開発対象で別途実証する。
+
+macOS修正後の独立再確認では、旧9失敗条件と関連5条件の計14件も合格した。これは177件へ重複加算せず、同一headのmacOS CIによる実環境合格とも区別する。
