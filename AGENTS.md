@@ -1,6 +1,6 @@
 # Repository instructions for Codex and coding agents
 
-This repository is a dedicated, immediately usable **Claude Code** development harness. It is independent of Development-Garden, KUROUD, Starter, dots, and any separate long-horizon unified development infrastructure.
+This repository specifies a dedicated **Claude Code** development harness intended for near-term use. It is **design-only until implementation and runtime acceptance tests pass**. It is independent of Development-Garden, KUROUD, Starter, dots, and any separate long-horizon unified development infrastructure.
 
 ## Read first
 
@@ -12,6 +12,7 @@ Before changing code, read in order:
 5. `docs/04-research-sources.md`
 6. `docs/05-implementation-plan.md`
 7. `docs/06-usage.md`
+8. `docs/07-self-review.md`
 
 Preserve the intent, requirements and planned verification conditions; do not silently narrow the mission to make a demo pass. When updating a design decision, record the reason and affected checks. Keep user-authored project requirements distinct from agent-generated plans and assumptions.
 
@@ -25,6 +26,8 @@ Preserve the intent, requirements and planned verification conditions; do not si
 6. Prevent concurrent writers on the same worktree. Keep work resumable and protect unrelated files/configuration.
 7. Use clear, small dependencies. Do not require an extra paid hosted service for the harness.
 8. For each completed phase, run its described tests and record actual output. Report untested behavior explicitly.
+9. Treat workflow `null`, stall/replay, model substitution and in-flight background work as first-class failure cases; never discard errors from an array of agent results.
+10. Derive evidence freshness from product files, not generated `.autodev/` evidence itself; see `docs/03-quality-contract.md`.
 
 ## Scope and workflow
 
