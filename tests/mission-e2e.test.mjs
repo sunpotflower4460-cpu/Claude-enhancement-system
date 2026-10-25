@@ -23,6 +23,7 @@ import { verify } from "../scripts/verify.mjs";
 import { nextAction } from "../scripts/next.mjs";
 import { checkpointAudit } from "../scripts/progress.mjs";
 import { operation } from "../scripts/operation.mjs";
+import { failureAction, failureSummary } from "../scripts/failure.mjs";
 async function scenario(
   t,
   {
@@ -78,6 +79,7 @@ async function scenario(
   const snap = () => ({
     observation_id: observationId(contracts(f.target)),
     architecture_ready: architecture,
+    failure_state: failureSummary(f.target),
     tasks: read(path.join(f.dir, "backlog.json")).items.map(
       ({ id, status, dependencies, execution }) => ({
         id,
@@ -150,12 +152,50 @@ async function scenario(
         task: task_id,
       });
       r = good({ snapshot: snap() });
-    } else if (action === "diagnose")
-      r = good({
-        summary:
-          "TEST FIXTURE: diagnose root cause, change implementation strategy",
+    } else if (action === "diagnose") {
+      const source = path.join(f.base, "strategy.json");
+      json(source, {
+        hypothesis:
+          "TEST FIXTURE: shallow implementation misses retained state",
+        experiment:
+          "Compare current product JSON against each original feature assertion",
+        next_step: "Use Sonnet to implement all required state transitions",
+        model: "claude-sonnet-5-5",
       });
-    else if (action === "implement") {
+      failureAction({
+        target: f.target,
+        action: "strategy",
+        run: "mission-run",
+        attempt: "mission-attempt",
+        task: task_id,
+        id: operation_id + ":strategy",
+        input: source,
+      });
+      r = good({ snapshot: snap() });
+    } else if (action === "checkpoint-failure") {
+      const source = path.join(f.base, "failure-result.json");
+      json(source, {
+        stage: payload.stage,
+        category: payload.category,
+        status: payload.result.status,
+        model: payload.model,
+        summary: payload.result.summary,
+        hypothesis: "TEST FIXTURE implementation is incomplete",
+        experiment: "Assert actual feature flags and review findings",
+        next_step: "Change implementation strategy, then independently review",
+        evidence_refs: [],
+      });
+      failureAction({
+        target: f.target,
+        action: "record",
+        run: "mission-run",
+        attempt: "mission-attempt",
+        task: task_id,
+        id: operation_id,
+        input: source,
+      });
+      r = good({ snapshot: snap() });
+    } else if (action === "implement") {
       transition("IMPLEMENT");
       buildCounts[task_id] = (buildCounts[task_id] || 0) + 1;
       const p = read(path.join(f.target, "product.json"));
@@ -265,7 +305,7 @@ async function scenario(
             resolved: false,
           })),
         });
-      r = good();
+      r = good({ snapshot: snap() });
     } else if (action === "replan-milestone") {
       transition("PLAN");
       r = good({ snapshot: snap() });

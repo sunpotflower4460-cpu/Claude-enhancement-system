@@ -29,6 +29,7 @@ import {
 } from "../scripts/lib/core.mjs";
 import { verify } from "../scripts/verify.mjs";
 import { migrate } from "../scripts/migrate.mjs";
+import { nextAction } from "../scripts/next.mjs";
 function copyCheckout(f, dest) {
   fs.cpSync(f.target, dest, {
     recursive: true,
@@ -288,6 +289,7 @@ test("A2/B1 legacy migration preserves originals, archives evidence, resets acce
     "UNVERIFIED",
   );
   assert.equal(fs.existsSync(path.join(f.dir, "contract.json")), false);
+  assert.equal(nextAction({ target: f.target }).action, "ARCHITECTURE");
   assert.throws(() => validate("assessment", { version: 1 }));
 });
 test("native agent installer is idempotent and refuses collisions before writing any file", (t) => {

@@ -1,3 +1,4 @@
+import { isMain } from "./lib/core.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
@@ -107,5 +108,5 @@ export function installAgents(o) {
     fs.unlinkSync(lock);
   }
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => console.log(JSON.stringify(installAgents(o), null, 2)));

@@ -29,7 +29,11 @@ test("E native controller takes structured args and never supplies unsupported t
     });
   });
   assert.equal(result.status, "BLOCKED");
-  assert.equal(count, 2);
+  assert.equal(
+    count,
+    1,
+    "A current blocked snapshot does not need a duplicate inspector call",
+  );
   await assert.rejects(
     () => runController(JSON.stringify(input), async () => ok()),
     /Structured args/,

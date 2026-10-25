@@ -17,6 +17,7 @@ import {
   invocationTag,
 } from "../../scripts/lib/core.mjs";
 import { record } from "../../scripts/record.mjs";
+import { routingProvenance } from "../../scripts/lib/runtime.mjs";
 export {
   read,
   json,
@@ -94,7 +95,8 @@ export function fixture(t, { profile = "backend", count = 1 } = {}) {
         task_id: t.id,
         requirement_refs: t.requirement_refs,
         kind,
-        command: `node check.mjs '${shared}/scripts/lib/reports.mjs'`,
+        command:
+          '"$AUTODEV_NODE" check.mjs "$AUTODEV_COMMON/scripts/lib/reports.mjs"',
         timeout_ms: 5000,
       })),
     ),
@@ -221,7 +223,7 @@ export function runtime(
       type: "system",
       subtype: "init",
       session_id: "sdk-session",
-      cwd: f.target,
+      cwd: c.session.root,
     },
     {
       type: "system",
@@ -264,6 +266,7 @@ export function runtime(
     sdk_task_id: "sdk-" + key,
     sdk_run_id: "sdk-run-" + key,
     observed_at: timestamp,
+    provenance: routingProvenance(c, { task_id }),
   });
   return name;
 }
@@ -345,6 +348,12 @@ export function seal(f) {
     runtime(f, {
       role: ["architecture", "plan", "implement"][i],
       model: "claude-" + m + "-5-5",
+      ...(m === "haiku"
+        ? {
+            task_id: contracts(f.target).backlog.items[0].id,
+            ...contracts(f.target).backlog.items[0].execution,
+          }
+        : {}),
     }),
   );
   json(path.join(f.dir, "routing.json"), names);

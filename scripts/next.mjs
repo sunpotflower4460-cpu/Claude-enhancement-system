@@ -1,8 +1,16 @@
+import { isMain } from "./lib/core.mjs";
 import fs from "node:fs";
 import path from "node:path";
-import { contracts, read, validate, fingerprint, main } from "./lib/core.mjs";
+import {
+  observationContext,
+  read,
+  validate,
+  fingerprint,
+  main,
+} from "./lib/core.mjs";
+import { readonlyResume } from "./lib/interruption.mjs";
 export function nextAction(o) {
-  const c = contracts(o.target),
+  const c = observationContext(o.target),
     s = validate("current-task", read(path.join(c.dir, "current-task.json"))),
     blocked = c.backlog.items
       .filter((t) => t.status === "BLOCKED")
@@ -22,13 +30,39 @@ export function nextAction(o) {
       run_id: s.run_id,
       attempt_id: s.attempt_id,
     };
+  if (!c.contract)
+    return {
+      action: "ARCHITECTURE",
+      reason: "Initial Opus planning and complete task/check contract required",
+    };
   const p = path.join(c.dir, "resume.json");
   if (fs.existsSync(p)) {
     const r = read(p);
+    if (r.recovery_kind === "READONLY") {
+      const retained = readonlyResume(c);
+      return {
+        action: "RESUME",
+        resume: {
+          stage: retained.stage,
+          task_id: retained.task_id,
+          operation_id: retained.operation_id,
+          recovery_kind: "READONLY",
+          receipt_state: retained.basis === "SNAPSHOT" ? "absent" : "completed",
+          basis: retained.basis,
+          observe_required: true,
+          changed: retained.changed,
+          inspection_fingerprint: retained.inspection_fingerprint,
+          reason: retained.reason,
+        },
+      };
+    }
     return {
       action: "RESUME",
       resume: {
-        stage: r.action,
+        stage:
+          r.action === "VERIFY" && r.product !== fingerprint(o.target)
+            ? "REVIEW"
+            : r.action,
         task_id: r.task_id,
         operation_id: r.operation_id,
         observe_required: true,
@@ -53,7 +87,7 @@ export function nextAction(o) {
       return {
         action: "RESUME",
         resume: {
-          stage: s.stage,
+          stage: s.stage === "VERIFY" && changed ? "REVIEW" : s.stage,
           task_id: current.id,
           observe_required: false,
           changed,
@@ -70,5 +104,5 @@ export function nextAction(o) {
     };
   return { action: "FINAL_REVIEW_AND_AUDIT", blocked };
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => console.log(JSON.stringify(nextAction(o), null, 2)));

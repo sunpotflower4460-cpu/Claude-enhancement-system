@@ -15,7 +15,10 @@ const runnerState = process.env.AUTODEV_RUNNER_STATE;
 if (runnerState && child.pid)
   fs.writeFileSync(
     runnerState,
-    JSON.stringify({ state: "running", owner: owner(child.pid) }),
+    JSON.stringify({
+      state: "running",
+      owner: { ...owner(), process_group: child.pid },
+    }),
   );
 const stop = () => {
   try {

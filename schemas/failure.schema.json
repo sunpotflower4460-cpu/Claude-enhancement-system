@@ -1,0 +1,183 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "mission_id", "events"],
+  "properties": {
+    "version": {
+      "const": 2
+    },
+    "mission_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "task_id",
+          "execution_run_id",
+          "execution_attempt_id",
+          "run_id",
+          "attempt_id",
+          "session_id",
+          "at",
+          "product",
+          "stage",
+          "category",
+          "status",
+          "model",
+          "summary",
+          "hypothesis",
+          "experiment",
+          "next_step",
+          "evidence_refs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": ["failure", "strategy"]
+          },
+          "task_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "execution_run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "execution_attempt_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attempt_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "session_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "at": {
+            "type": "string",
+            "minLength": 1
+          },
+          "product": {
+            "type": "string",
+            "minLength": 1
+          },
+          "stage": {
+            "enum": ["implementation", "review", "test", "diagnosis", "replan"]
+          },
+          "category": {
+            "enum": [
+              "implementation",
+              "review",
+              "test",
+              "repeated_fix",
+              "design",
+              "environment",
+              "model_limit",
+              "permission",
+              "terminated",
+              "evidence"
+            ]
+          },
+          "status": {
+            "enum": ["NEEDS_FIX", "BLOCKED", "UNVERIFIED", "PASS"]
+          },
+          "model": {
+            "enum": ["claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5"]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "hypothesis": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "experiment": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "next_step": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "evidence_refs": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "sha256"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "failure"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "status": {
+                  "enum": ["NEEDS_FIX", "BLOCKED", "UNVERIFIED"]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "strategy"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "status": {
+                  "const": "PASS"
+                },
+                "category": {
+                  "const": "repeated_fix"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { isMain } from "./lib/core.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
@@ -12,19 +13,26 @@ import {
   main,
 } from "./lib/core.mjs";
 import { terminationProof } from "./lib/recovery.mjs";
+import { reconcileInterrupted } from "./lib/interruption.mjs";
+import { burstStatus } from "./burst.mjs";
 export function reconnect(o) {
-  const { dir } = stored(o.target);
+  const { dir, mission } = stored(o.target);
   return mutex(o.target, () => {
     const old = validate("session", read(path.join(dir, "session.json"))),
       s = validate("current-task", read(path.join(dir, "current-task.json")));
+    if (burstStatus({ dir, mission }).active)
+      throw Error(
+        "Finish current burst using original binding before reconnect",
+      );
     if (s.active) {
       if (!o.proof)
         throw Error(
           "Previous workflow active/unknown; termination proof required",
         );
-      terminationProof(dir, o.proof, s, {
+      const proof = terminationProof(dir, o.proof, s, {
         fixture: o.fixture === true || o.fixture === "true",
       });
+      reconcileInterrupted(dir, fingerprint(o.target), proof);
       s.active = false;
       s.owner = null;
       s.stage = "BLOCKED";
@@ -38,11 +46,11 @@ export function reconnect(o) {
     );
     const operations = path.join(dir, "operations");
     if (fs.existsSync(operations)) {
-      fs.renameSync(
+      fs.cpSync(
         operations,
         path.join(dir, "evidence", "operations-before-" + old.session_id),
+        { recursive: true, errorOnExist: true, force: false },
       );
-      fs.mkdirSync(operations);
     }
     const session = validate("session", {
       version: 2,
@@ -61,7 +69,6 @@ export function reconnect(o) {
           "routing-before-" + old.session_id + ".json",
         ),
       );
-      json(path.join(dir, "routing.json"), []);
     }
     s.history.push({
       stage: s.stage,
@@ -84,5 +91,5 @@ export function reconnect(o) {
     return { status: "RECONNECTED", changed, session };
   });
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => console.log(JSON.stringify(reconnect(o), null, 2)));

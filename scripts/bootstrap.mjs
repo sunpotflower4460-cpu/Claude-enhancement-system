@@ -1,6 +1,8 @@
+import { isMain } from "./lib/core.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { excludeState } from "./lib/exclude-state.mjs";
 import {
   shared,
   identity,
@@ -10,6 +12,8 @@ import {
   safeState,
   load,
   fingerprint,
+  assertWritable,
+  initialBacklog,
 } from "./lib/core.mjs";
 export function bootstrap({
   target,
@@ -33,6 +37,8 @@ export function bootstrap({
   if (id.repository === common.repository || id.commonDir === common.commonDir)
     throw Error("Target is shared repository");
   const dir = safeState(id.root);
+  assertWritable(id.root);
+  excludeState(id.root);
   if (fs.existsSync(dir)) {
     const old = load(id.root);
     if (source) {
@@ -72,17 +78,7 @@ export function bootstrap({
       completed_since_audit: 0,
       last_audit_product: null,
     });
-    json(path.join(tmp, "backlog.json"), {
-      version: 2,
-      items: mission.requirements.map((r) => ({
-        id: r.id,
-        requirement_refs: [r.id],
-        status: "UNVERIFIED",
-        dependencies: [],
-        check_refs: [],
-        execution: null,
-      })),
-    });
+    json(path.join(tmp, "backlog.json"), initialBacklog(mission.requirements));
     json(path.join(tmp, "current-task.json"), {
       version: 2,
       stage: "IDLE",
@@ -125,5 +121,5 @@ export function bootstrap({
   }
   return { status: "INITIALIZED", target: id };
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => console.log(JSON.stringify(bootstrap(o), null, 2)));

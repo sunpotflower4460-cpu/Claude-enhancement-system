@@ -1,8 +1,13 @@
+import { mutex } from "./lib/core.mjs";
+import { isMain } from "./lib/core.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { load, read, json, hash, artifactPath, main } from "./lib/core.mjs";
 import { terminationProof } from "./lib/recovery.mjs";
 export function importTermination(o) {
+  return mutex(o.target, () => importTerminationUnlocked(o));
+}
+function importTerminationUnlocked(o) {
   const c = load(o.target),
     s = read(path.join(c.dir, "current-task.json")),
     raw = fs.readFileSync(o.raw),
@@ -59,5 +64,5 @@ export function importTermination(o) {
   terminationProof(c.dir, file, s, { fixture: o.mode === "TEST_FIXTURE" });
   return { status: "TERMINATION_OBSERVED", file };
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => console.log(JSON.stringify(importTermination(o), null, 2)));

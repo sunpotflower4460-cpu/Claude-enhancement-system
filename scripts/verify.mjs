@@ -1,3 +1,4 @@
+import { isMain } from "./lib/core.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import {
@@ -12,10 +13,12 @@ import {
   evidenceName,
   artifactPath,
   alive,
+  mutex,
 } from "./lib/core.mjs";
 import { runtimeObservation } from "./lib/runtime.mjs";
 import { terminationProof } from "./lib/recovery.mjs";
 import { validateReport } from "./lib/reports.mjs";
+import { burstStatus } from "./burst.mjs";
 export function checkEvidence(c, check, product) {
   try {
     const task = c.backlog.items.find((t) => t.id === check.task_id),
@@ -154,6 +157,9 @@ export function taskGate(
   return { id: task.id, status, checks, review };
 }
 export function verify(o) {
+  return mutex(o.target, () => verifySnapshot(o));
+}
+function verifySnapshot(o) {
   const c = contracts(o.target),
     product = fingerprint(o.target),
     issues = [],
@@ -163,9 +169,12 @@ export function verify(o) {
     ),
     fixture = o.fixture === true || o.fixture === "true",
     modes = [],
-    routing_history = [];
+    routing_history = [],
+    routing_provenance = [];
   if (state.active || state.stage !== "IDLE")
     issues.push("UNVERIFIED: active, blocked, or unfinished workflow");
+  if (burstStatus(c).active)
+    issues.push("UNVERIFIED: active/unknown parent Workflow burst");
   for (const n of fs
     .readdirSync(path.join(c.dir, "evidence"))
     .filter((n) => n.startsWith("runner-") && n.endsWith(".json"))) {
@@ -256,37 +265,91 @@ export function verify(o) {
   try {
     const routing = read(path.join(c.dir, "routing.json"));
     if (!Array.isArray(routing)) throw Error("Invalid routing manifest");
+    const omittedPath = path.join(c.dir, "checkpoint-omitted.json"),
+      omitted = fs.existsSync(omittedPath) ? read(omittedPath) : [],
+      observed = [];
+    if (!Array.isArray(omitted))
+      throw Error("Invalid checkpoint omission references");
+    for (const name of routing) {
+      const manifest = validate("runtime", read(artifactPath(c.dir, name)));
+      const selected =
+        manifest.task_id === "mission"
+          ? state
+          : c.backlog.items.find((t) => t.id === manifest.task_id)?.execution;
+      const current =
+        manifest.session_id === c.session.session_id &&
+        manifest.run_id === state.run_id &&
+        selected?.run_id === manifest.run_id &&
+        selected?.attempt_id === manifest.attempt_id;
+      const rawPath = artifactPath(c.dir, manifest.record);
+      if (
+        !current &&
+        !fs.existsSync(rawPath) &&
+        omitted.some(
+          (entry) =>
+            entry.path === ".autodev/evidence/" + manifest.record &&
+            entry.sha256 === manifest.sha256 &&
+            Number.isInteger(entry.size) &&
+            entry.size > 0 &&
+            typeof entry.reason === "string" &&
+            entry.reason.length > 0,
+        )
+      ) {
+        routing_history.push(name);
+        routing_provenance.push({
+          name,
+          assurance: "HISTORICAL_UNAVAILABLE",
+          stage: manifest.stage,
+          task_id: manifest.task_id,
+          reason:
+            "Raw log explicitly omitted by checkpoint; unavailable and excluded from role assurance",
+        });
+        continue;
+      }
+      if (hash(fs.readFileSync(rawPath)) !== manifest.sha256)
+        throw Error("Routing history log changed");
+      if (current) {
+        const r = runtimeObservation(c, name, {}, { fixture });
+        observed.push(r);
+        routing_provenance.push({
+          name,
+          assurance: "CURRENT_VALID",
+          stage: r.stage,
+          task_id: r.task_id,
+        });
+      } else {
+        if (!routing_history.includes(name)) routing_history.push(name);
+        try {
+          const r = runtimeObservation(
+            c,
+            name,
+            {},
+            { fixture, historical: true },
+          );
+          observed.push(r);
+          routing_provenance.push({
+            name,
+            assurance: "HISTORICAL_VALID",
+            stage: r.stage,
+            task_id: r.task_id,
+          });
+        } catch (e) {
+          routing_provenance.push({
+            name,
+            assurance: "UNVERIFIED",
+            reason: e.message,
+          });
+        }
+      }
+    }
     for (const model of [
       "claude-opus-5-5",
       "claude-sonnet-5-5",
       "claude-haiku-5-5",
     ]) {
-      const observed = [];
-      for (const name of routing) {
-        const manifest = validate("runtime", read(artifactPath(c.dir, name)));
-        if (
-          hash(fs.readFileSync(artifactPath(c.dir, manifest.record))) !==
-          manifest.sha256
-        )
-          throw Error("Routing history log changed");
-        const selected =
-          manifest.task_id === "mission"
-            ? state
-            : c.backlog.items.find((t) => t.id === manifest.task_id)?.execution;
-        const current =
-          manifest.session_id === c.session.session_id &&
-          selected?.run_id === manifest.run_id &&
-          selected?.attempt_id === manifest.attempt_id;
-        if (!current) {
-          if (!routing_history.includes(name)) routing_history.push(name);
-          continue;
-        }
-        observed.push(runtimeObservation(c, name, {}, { fixture }));
-      }
       const rs = observed.filter(
         (r) =>
           r.expected_model === model &&
-          r.run_id === state.run_id &&
           r.stage ===
             {
               "claude-opus-5-5": "architecture",
@@ -295,7 +358,7 @@ export function verify(o) {
             }[model],
       );
       if (!rs.length)
-        throw Error("Missing current-run model observation: " + model);
+        throw Error("Missing proved model role observation: " + model);
       modes.push(...rs.map((r) => r.mode));
     }
   } catch (e) {
@@ -336,6 +399,7 @@ export function verify(o) {
     status,
     assurance,
     routing_history,
+    routing_provenance,
     product,
     contract: c.digest,
     tasks,
@@ -344,7 +408,7 @@ export function verify(o) {
     issues,
   };
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => {
     const r = verify(o);
     console.log(JSON.stringify(r, null, 2));

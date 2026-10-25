@@ -27,7 +27,7 @@ async function until(fn) {
 function slowCheck(f, timeout = 1000) {
   fs.writeFileSync(
     path.join(f.target, "slow.mjs"),
-    `import fs from 'node:fs';fs.appendFileSync('product.json',' ');fs.writeFileSync('.autodev/evidence/pid.txt',String(process.pid));setInterval(()=>{},1000);`,
+    `import fs from 'node:fs';import {owner} from ${JSON.stringify(new URL("../scripts/lib/core.mjs", import.meta.url).href)};fs.writeFileSync('.autodev/evidence/process.json',JSON.stringify(owner()));fs.appendFileSync('product.json',' ');fs.writeFileSync('.autodev/evidence/pid.txt',String(process.pid));setInterval(()=>{},1000);`,
   );
   const c = read(path.join(f.dir, "contract.json"));
   c.checks[0].command = "node slow.mjs";
@@ -41,10 +41,8 @@ test("B2 timeout kills actual check process group and records failure", async (t
   assert.equal(e.exit_code, null);
   assert.equal(e.signal, "SIGKILL");
   assert.equal(e.stable, false);
-  const pid = Number(fs.readFileSync(artifactPath(f.dir, "pid.txt")));
   await delay(50);
-  if (fs.existsSync("/proc/" + pid + "/stat"))
-    assert.match(fs.readFileSync("/proc/" + pid + "/stat", "utf8"), /\) Z /);
+  assert.equal(alive(read(artifactPath(f.dir, "process.json"))), false);
 });
 test("B2 killing recorder mid-test retains lock/partial files and refuses recovery while check lives", async (t) => {
   const f = fixture(t);
@@ -89,7 +87,7 @@ test("B2 killing recorder mid-test retains lock/partial files and refuses recove
         return false;
       }
     });
-    group = runner.owner.pid;
+    group = runner.owner.process_group;
     await until(() => fs.existsSync(artifactPath(f.dir, "pid.txt")));
     child.kill("SIGKILL");
     await new Promise((r) => child.on("close", r));

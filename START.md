@@ -1,47 +1,55 @@
-# START — Claude-enhancement-system v0.2 / Schema v2
+# START — Claude-enhancement-system / Schema v2
 
-ローカルの判定器・再開・複数スプリントを実装済み。Claude Codeクラウド全体の受け入れは **UNVERIFIED**。この手順は親セッションが実行する。指示を読むだけで開始済み/完成と報告しない。
+親セッションがこの手順を実行する。**V1のClaude Code実機受け入れはUNVERIFIED**。原要求・全backlog・実証拠から独立verifyが合格するまで完成と報告しない。ユーザーは対象と共通repoを選び、[06-usage](docs/06-usage.md)の一指示を渡す。
 
-## 1. 識別・準備
+## 1. 対象の識別と状態の取得
 
-対象と共通のGit root、remote、branch、worktreeを実測し、共通以外が1つなら対象を選ぶ。不明のまま書き込まない。AGENTS.md、docs/00〜03、対象固有の指示と原要求を読む。共通は読取専用（初回依存導入を除く）、全製品・状態・証拠は対象へ置く。
+対象と共通のGit root/remote/branch/worktreeを実測し、共通以外の1repoを対象とする。対象固有のAGENTS/CLAUDE.md、原設計、本リポジトリのAGENTSとdocs/00〜03を読む。共通は初回依存導入を除き読取中心。原要求の縮小や既存設定の置換をしない。
 
-共通で `npm ci --ignore-scripts`。`node COMMON/scripts/doctor.mjs --target TARGET` を実行する。診断のUNVERIFIEDは成功ではない。原要求全文と要件IDをexamples/mission.json形式で保存し、`bootstrap.mjs --target TARGET --mission INPUT --profile backend`（web-app/gameも可）。既存状態は再利用、v1はmigrate.mjs、別パス/branchはreconnect.mjs。原要求の縮小や既存CLAUDE.md/.claude/AGENTS.mdの置換は禁止。
+共通で`npm ci --ignore-scripts`、`doctor.mjs --target TARGET`。version文字列だけで機能をPASSにしない。既存`.autodev`は再利用し、v1はmigrate、別path/branchはreconnect、active/unknownなownerは実停止証拠からrecoverする。
 
-## 2. Native roleと隔離probe
+新cloneで状態がない場合、originの`autodev/checkpoint/MISSION_ID`を探す。該当checkpointがあれば`checkpoint.mjs --action restore --target TARGET --ref origin/autodev/checkpoint/MISSION_ID`。repo/原要求/hashを照合し、新しいresume branchへ復元する。dirty productや別missionへ重ねない。省略ログは現存扱いせず再取得/再検証する。復元途中で停止した場合は`checkpoint.mjs --action recover-restore --target TARGET`で保存済みjournalから回復し、復元中の状態へ別writerを重ねない。checkpointがなければ原要求をexamples/mission.json形式で保存し、bootstrapを行う。Opus設計前でもPLANNING状態のcheckpointを保存できるので、原要求を先にpublishする。
 
-`install-agents.mjs --target TARGET` は6役を衝突なく配置する。ミッション作成前の事前セットアップでも実行可能。新しいagents directoryをセッション開始後に作った場合や--add-dir側のagent変更は、公式仕様上再起動が必要。事前に環境setupで配置するか、既に発見済みのplugin native agentsを用いる。見つからなければ準備未完了と記録し、汎用writerをreviewerに割り当てない。
+初期Opus計画の途中停止でbacklogだけ更新されcontractが未完成の場合、実terminal/drainedでburst finish・state recoverを済ませ、`repair-plan.mjs --target TARGET --proof TERMINATION_JSON`を実行する。部分backlog/contractはhash付きでarchiveし、原要求から未検証の計画入口を再構成する。architecture.mdは保持し、Opusは保存した草案から続ける。既に公開した計画・完了taskを初期化する用途には使わない。
 
-`/workflow-authoring`で現在のAPIを確認。Workflowのargsは実JSON object。`agent()`のtoolsオプションを仮定せず、`agentType`で`autodev-ROLE`または`claude-autodev:ROLE`を指定する。Read/Grep/Globだけのreviewer/auditorが実際に編集・Bash・MCP・委任を使えないことを隔離fixtureで確認する。
+## 2. Native roleと実機能力
 
-実機を最短で試す場合はdocs/live-probe.mdの一括準備を使う。モデル観測を現在runへ結ぶため、probe呼出前に手順3のroot leaseを一度だけbeginする。`runtime-probe.js`を共通scriptPathから起動し、結果・tool denial/unavailability・sentinel・モデル元記録を親が照合する。`registry_verified/readonly_verified`を自己申告だけでtrueにしない。
+`install-agents.mjs --target TARGET`で6役を非破壊配置できる。CLIの`--plugin-dir COMMON --add-dir COMMON`でも標準発見を利用できる。初めてagents directoryを作った後など、公式仕様上の再起動が必要な場合は準備完了と誤表示しない。クラウドにローカルpluginが自動移行するとは仮定しない。
 
-## 3. 親のrun所有権と実モデル記録
+`/workflow-authoring`で現runtimeのAPIを確認。Workflow argsはJSON object。`agentType`は発見済みの`autodev-ROLE`または`claude-autodev:ROLE`。未確認の`agent({tools:...})`で制限したことにしない。reviewer/auditorはRead/Grep/Globだけのnative定義を使い、実ツール一覧・拒否/不在・sentinel不変を[隔離probe](docs/live-probe.md)で確認する。
 
-`state.mjs --target TARGET --action begin --run RUN --task mission --attempt ROOT_ATTEMPT`（同じleaseをprobe前に取得済みなら再beginしない）。IDは親で生成して保持し、終了したattemptを再利用しない。親は実際のWorkflow tool_use_id/taskId/runIdも記録する。stdoutのlaunchがasync_launchedでもerrorがあれば未起動。
+probeの前に手順3のroot leaseを一度だけ取得し、probe自体もburstとしてclaim/実起動/finishを管理する。Opus/Sonnet/Haiku 5.5の実modelはSDK元記録からimport-runtimeで照合する。CLI収集には`--output-format stream-json --verbose --forward-subagent-text`。未知形式・欠損・代替モデルはUNVERIFIED。probe\_\*の診断記録は実装工程のモデル証拠へ流用しない。実測前に`registry_verified/readonly_verified`をtrueにしない。
 
-SDK記録は`--output-format stream-json --verbose --forward-subagent-text`（CLI）またはforwardSubagentText（SDK）で取得する。`import-runtime.mjs`がSDK init.cwd、task_started、当該run区間内のassistant.message.model/uuid/timestamp、呼出の相関tagを検査する。期待モデルと実モデルが違えば未達。未知形式や記録欠損を架空ログで補わない。
+## 3. 所有権とnative Workflow起動
 
-`context.mjs --target TARGET --run RUN`からmission_id、session_id、observation_id、tasks/nextを取得する。親が新たに起動/再開するたびに現在のobservation_idを読み直す。Workflow argsは`{target,shared,mission_id,session_id,observation_id,run_id,attempt_id,agents,capabilities:{registry_verified:true,readonly_verified:true}}`。機械的に取得した値と実際に確認した能力だけを渡す。
+親が一度だけ`state.mjs --action begin --target TARGET --run RUN --task mission --attempt ROOT_ATTEMPT`。終了したattemptを再利用しない。`context.mjs --target TARGET --run RUN`でmission/session/observation/next/failure_stateを取得する。
 
-## 4. 複数スプリントの自走
+native Workflowの前に`burst.mjs --action claim --target TARGET --run RUN --task mission --attempt ROOT_ATTEMPT --observation_id CURRENT_HASH --script_path COMMON/workflows/develop-mission.js`。返された`burst_id`と現在のargsにagents/capabilitiesを加え、Workflowツールへ`scriptPath`と**args object**を渡す。NodeでWorkflowを実行して代用しない。
 
-Workflowツールへ `scriptPath: COMMON/workflows/develop-mission.js` と上記のargs objectを渡す。共通パスが拒否されたら権限不足を記録し、同じnative Agent役を親が直列呼出する経路を検証する。NodeでWorkflowを実行して代用しない。
+実launchを元SDK記録から`burst.mjs --action attach --target TARGET --id BURST_ID --raw ACTUAL_JSONL --tool_use WORKFLOW_TOOL_ID`で結ぶ。error付きasync_launched、null、欠落、結果未受領は未達。CLAIMED/ATTACHEDが残れば別Workflowを起動しない。ローカルprocessが消えたことだけでnative Workflow終了と判断しない。
 
-初回Opus設計→Sonnet計画→Haiku実装→独立Sonnetレビュー→Sonnet実行検証→task gate→次タスク。2回失敗でSonnet根本原因調査・実装、繰り返し失敗でOpus再計画。解決しないタスクは残したまま独立タスクへ進む。milestone_every（既定2）はprogress.jsonでburstをまたいで維持する。Opusは初期/節目/重大変更/難航/最終で呼ぶ。
+## 4. 複数スプリントと難航時の回復
 
-Sonnet coordinatorは **skills/start-development/coordinator.md** のaction契約に従い、実際のCLI結果・独立評価を永続化する。各writerはoperation receiptを確認し、同じ変更を二重適用しない。中断後は構造化resumeの実タスクとstageを使う。親runのtask_id=missionとsprint_task_idを混同しない。
+初回Opus長期計画→Sonnet短期計画→Haiku実装→独立Sonnetレビュー→Sonnet実検証→task gate→次task。milestone_every既定2の監査間隔はprogress.jsonでburst間も維持する。Opusは初期/節目/重大判断/難航/最終に使い、毎sprintの必須呼出にはしない。
 
-Workflowは非同期。完了結果を待ち、null/例外/欠落は未達として記録する。CONTINUE_PARENTでは状態を保存して現在のobservation_idで再投入し、/goalで継続する。burst上限はスコープ縮小や完成ではない。
+coordinatorは[実行契約](skills/start-development/coordinator.md)に従い、writerのoperation receiptと原要求との対応を保存する。failure.jsonには失敗分類、仮説、試験、次の一手、参照、実行IDを残す。コード由来の2失敗でSonnet診断・実装、4失敗でOpus再計画。明示的な設計矛盾は回数を待たずOpusへ戻す。環境/利用上限/権限の失敗は履歴に残し、コード修正の昇格回数へ加算しない。新仮説/実験によって次の修正枠へ進む。環境・利用上限・権限は具体的な復旧を試み、解決できなければそのtaskを保留して独立taskを進める。
 
-## 5. 完成判定
+中断時は実terminal+drainedを取得し、burst finishとstate recoverを行う。nextが返す実タスク/REVIEW/VERIFY再開地点から部分変更を観察する。確認済みの構造化resumeだけtask selectの`--resume true`で旧executionを維持する。親rootのtask_id=mission、sprint_task_id、実装executionを混同しない。
 
-`record.mjs`で実コマンドと種別別report・artifactを保存する。visual/playには実際の描画・操作・画像が必要。成功コマンドだけではUNVERIFIED。各タスクはcheck_refsと実行ID付き独立レビューからtask.mjsで合格させる。PASSの手書きだけでは完成しない。
+## 5. burst終了、永続保存、次burst
 
-最終レビュー/Opus監査は、現在の全タスクexecutionと原要求を評価したv2 assessmentを保存する。NEEDS_FIX/BLOCKED/UNVERIFIEDは指摘0件でも不合格。最後の検証で回帰があれば該当タスクをresetし計画→実装へ戻る。
+Workflowは非同期。結果を待ち、実terminal/drainedをimport-terminationで照合する。`burst.mjs --action finish --target TARGET --id BURST_ID --proof TERMINATION_JSON`を先に実行する。未終了/不明burstがあれば再投入しない。
 
-全Workflow/agentの終了を実測し、`import-termination.mjs`で実Workflow呼出・launch・terminal・末尾までdrainedを検査する。親が`state.mjs --action end --proof TERMINATION_JSON`を行い、**その後**`verify.mjs --target TARGET`を実行してJSONと概要を会話へ出す。稼働中、未完了バックログ、欠落/古い証拠、重大指摘、未知モデル記録、未観察operationが残れば完成しない。
+CONTINUE_PARENTは完成ではない。backlog未完了なら親が現在contextを再確認し、/goalが有効な間は新burstをclaimして続ける。同じroot leaseを保持するなら再beginしない。
 
-TEST FIXTUREは明示オプションでもTEST_COMPLETE等にしかならず、本番COMPLETEと区別する。人間確認が必要ならREADY_FOR_HUMAN_REVIEW。実機で確認できない条件はUNVERIFIEDのまま、独立して進められる作業は続ける。
+セッションの節目では、完了したburstのproofで`state.mjs --action pause`（最終完成前）またはrecover（停止/失敗）し、`checkpoint.mjs --action save --target TARGET --publish true`。PUBLISHEDだけがremote保存完了。SAVED_LOCALなら保存先は現在環境だけなので、push失敗を解決してpublishする。checkpointのpublishを対象mainへのmergeと混同しない。再開は新root attemptと新観測から行う。
 
-詳細：docs/06-usage.md、docs/08-deep-audit.md、docs/runtime-spec-audit.md、docs/live-probe.md、docs/validation-results.md。
+`/goal`は現sessionを継続し、新sessionを勝手に作らない。同じCLI sessionは標準`claude --resume ID`、新cloneはcheckpoint復元と新しい/goalを用いる。
+
+## 6. 独立した最終判定
+
+recordで全必須kindの実report/artifactを更新する。visual/playは実描画・操作・画像を必要とする。成功コマンドや手書きPASSで代用しない。全task/原要件、現在product/contract/executionに一致する最終Sonnet reviewとOpus auditを取得する。最終回帰はtask reset→計画/実装へ戻す。
+
+全Workflow/agentが終了した実証拠でburst finish→`state end --proof TERMINATION_JSON`を行い、**その後**`verify.mjs --target TARGET`。JSONと概要を会話にも提示する。省略/古い証拠、モデル不明、未完了backlog、重大指摘、未観察operation、進行中writerがあればCOMPLETEにしない。
+
+保持した設計/実装のモデル記録は元SDK記録とprovenanceを照合したHISTORICAL_VALIDとして扱い、現runの実行へ付け替えない。現在の実検証・最終評価・runtime終了証拠は別に必要。TEST FIXTUREはTEST_COMPLETE等にしかならず、本番完成を証明しない。

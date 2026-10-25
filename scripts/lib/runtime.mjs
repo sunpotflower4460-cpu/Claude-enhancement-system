@@ -45,11 +45,35 @@ export function invocationWindow(
       ),
   };
 }
+export function routingProvenance(c, ctx, sdkCwd = c.session.root) {
+  const state = read(path.join(c.dir, "current-task.json")),
+    task = c.backlog.items.find((t) => t.id === ctx.task_id),
+    execution = task?.execution || {
+      run_id: state.run_id,
+      attempt_id: state.attempt_id,
+      started_at: state.run_started_at,
+    };
+  return {
+    mission_id: c.mission.mission_id,
+    repository: c.mission.target.repository,
+    binding: {
+      session_id: c.session.session_id,
+      repository: c.session.repository,
+      root: c.session.root,
+      sdk_cwd: sdkCwd,
+    },
+    execution,
+    contract: c.digest,
+    architecture_sha256: hash(
+      fs.readFileSync(path.join(c.dir, "architecture.md")),
+    ),
+  };
+}
 export function runtimeObservation(
   c,
   name,
   expected = {},
-  { fixture = false } = {},
+  { fixture = false, historical = false } = {},
 ) {
   const r = validate("runtime", read(artifactPath(c.dir, name)));
   if (r.mode === "TEST_FIXTURE" && !fixture)
@@ -69,7 +93,40 @@ export function runtimeObservation(
     throw Error("Role/model routing mismatch");
   for (const [k, v] of Object.entries(expected))
     if (r[k] !== v) throw Error("Runtime context mismatch: " + k);
-  if (r.session_id !== c.session.session_id)
+  let runtimeBinding = c.session;
+  if (historical) {
+    const p = r.provenance;
+    if (
+      !p ||
+      p.mission_id !== c.mission.mission_id ||
+      p.repository !== c.mission.target.repository ||
+      p.binding.repository !== p.repository ||
+      p.binding.session_id !== r.session_id ||
+      p.contract !== c.digest ||
+      !["architecture", "plan", "implement"].includes(r.stage)
+    )
+      throw Error("Missing/stale historical role provenance");
+    if (r.task_id === "mission") {
+      if (
+        !["architecture", "plan"].includes(r.stage) ||
+        p.architecture_sha256 !==
+          hash(fs.readFileSync(path.join(c.dir, "architecture.md")))
+      )
+        throw Error("Historical role does not match retained architecture");
+    } else {
+      const selected = c.backlog.items.find(
+        (t) => t.id === r.task_id,
+      )?.execution;
+      if (
+        !selected ||
+        selected.run_id !== r.run_id ||
+        selected.attempt_id !== r.attempt_id ||
+        selected.started_at !== p.execution.started_at
+      )
+        throw Error("Historical implementation execution no longer selected");
+    }
+    runtimeBinding = p.binding;
+  } else if (r.session_id !== c.session.session_id)
     throw Error("Runtime belongs to previous binding");
   const raw = fs.readFileSync(artifactPath(c.dir, r.record));
   if (hash(raw) !== r.sha256) throw Error("Runtime raw record changed");
@@ -84,7 +141,12 @@ export function runtimeObservation(
       e.subtype === "init" &&
       e.session_id === r.sdk_session_id,
   );
-  if (!init?.cwd || fs.realpathSync(init.cwd) !== c.session.root)
+  if (
+    !init?.cwd ||
+    (historical
+      ? init.cwd !== (runtimeBinding.sdk_cwd || runtimeBinding.root)
+      : fs.realpathSync(init.cwd) !== runtimeBinding.root)
+  )
     throw Error("SDK session cwd does not match target binding");
   const { start, messages } = invocationWindow(events, r),
     message = messages.find((e) => e.uuid === r.message_uuid),
@@ -120,13 +182,15 @@ export function runtimeObservation(
   const state = read(path.join(c.dir, "current-task.json")),
     task = c.backlog.items.find((t) => t.id === r.task_id),
     execution =
-      r.task_id === "mission"
-        ? {
-            run_id: state.run_id,
-            attempt_id: state.attempt_id,
-            started_at: state.run_started_at,
-          }
-        : task?.execution;
+      historical && r.task_id === "mission"
+        ? r.provenance.execution
+        : r.task_id === "mission"
+          ? {
+              run_id: state.run_id,
+              attempt_id: state.attempt_id,
+              started_at: state.run_started_at,
+            }
+          : task?.execution;
   if (
     !execution ||
     execution.run_id !== r.run_id ||
@@ -149,6 +213,7 @@ export function runtimeObservation(
     throw Error("Observed model mismatch");
   return {
     ...r,
+    assurance: historical ? "HISTORICAL_VALID" : "CURRENT_VALID",
     observed_model: message.message.model,
     executed_at: timestamp,
   };

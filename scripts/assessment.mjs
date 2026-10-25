@@ -1,3 +1,5 @@
+import { mutex } from "./lib/core.mjs";
+import { isMain } from "./lib/core.mjs";
 import {
   contracts,
   read,
@@ -13,6 +15,9 @@ import {
 import { runtimeObservation } from "./lib/runtime.mjs";
 import path from "node:path";
 export function saveAssessment(o) {
+  return mutex(o.target, () => saveAssessmentUnlocked(o));
+}
+function saveAssessmentUnlocked(o) {
   const c = contracts(o.target),
     input = read(o.input),
     s = read(path.join(c.dir, "current-task.json")),
@@ -61,5 +66,5 @@ export function saveAssessment(o) {
   json(artifactPath(c.dir, name), a);
   return a;
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => console.log(JSON.stringify(saveAssessment(o), null, 2)));

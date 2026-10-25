@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+  <title>Courier circuit</title
+  ><style>
+    body {
+      font: 18px system-ui;
+      max-width: 700px;
+      margin: 24px auto;
+      padding: 16px;
+      color: #122e46;
+      background: #eef4fa;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      border: 2px solid #122e46;
+    }
+    button {
+      font: inherit;
+      padding: 12px;
+      background: #16567a;
+      color: white;
+      border: 0;
+      margin: 12px 0;
+    }
+    #status {
+      font-weight: bold;
+    }
+  </style>
+  <h1>Courier circuit</h1>
+  <p>
+    Use arrow keys to collect three parcels. Avoid the red hazard below the
+    start.
+  </p>
+  <canvas width="600" height="240" aria-label="Courier playfield"></canvas>
+  <p id="status" role="status"></p>
+  <p>Parcels: <span id="score"></span>/3</p>
+  <button id="restart">Restart</button>
+  <script type="module" src="game.mjs"></script>
+</html>

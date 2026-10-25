@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import os from "node:os";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import Ajv from "ajv";
@@ -128,6 +127,98 @@ export function load(root) {
 export function unique(xs, label) {
   if (new Set(xs).size !== xs.length) throw Error("Duplicate " + label);
 }
+export function initialBacklog(requirements) {
+  const ids = new Set(requirements.map((r) => r.id));
+  return {
+    version: 2,
+    items: requirements.map((r) => {
+      let id = r.id;
+      if (id === "mission") {
+        id = "task:mission";
+        let n = 0;
+        while (ids.has(id)) id = "task:mission:" + ++n;
+        ids.add(id);
+      }
+      return {
+        id,
+        requirement_refs: [r.id],
+        status: "UNVERIFIED",
+        dependencies: [],
+        check_refs: [],
+        execution: null,
+      };
+    }),
+  };
+}
+// Bootstrap intentionally has no acceptance contract until Opus plans it.
+// This context can launch planning, but never satisfies acceptance verification.
+export function observationContext(root) {
+  const c = load(root);
+  if (fs.existsSync(path.join(c.dir, "contract.json"))) return contracts(root);
+  const backlog = validate("backlog", read(path.join(c.dir, "backlog.json"))),
+    state = validate(
+      "current-task",
+      read(path.join(c.dir, "current-task.json")),
+    ),
+    requirements = c.mission.requirements.map((r) => r.id);
+  unique(requirements, "requirement");
+  unique(
+    backlog.items.map((t) => t.id),
+    "task",
+  );
+  if (
+    !["IDLE", "ARCHITECTURE"].includes(state.stage) ||
+    backlog.items.some(
+      (t) =>
+        t.status !== "UNVERIFIED" ||
+        t.check_refs.length ||
+        t.execution !== null,
+    )
+  )
+    throw Error(
+      "Missing contract outside initialized architecture planning; for a stopped initial plan use repair-plan.mjs with actual terminal proof, then resume preserved draft",
+    );
+  if (
+    requirements.some(
+      (id) => !backlog.items.some((t) => t.requirement_refs.includes(id)),
+    ) ||
+    backlog.items.some((t) =>
+      t.requirement_refs.some((id) => !requirements.includes(id)),
+    )
+  )
+    throw Error(
+      "Missing/unknown original requirement coverage in initial planning",
+    );
+  const byId = new Map(backlog.items.map((t) => [t.id, t]));
+  const visiting = new Set(),
+    done = new Set();
+  function visit(id) {
+    if (visiting.has(id)) throw Error("Dependency cycle in initial planning");
+    if (done.has(id)) return;
+    visiting.add(id);
+    for (const dependency of byId.get(id).dependencies) {
+      if (!byId.has(dependency))
+        throw Error("Unknown initial planning dependency");
+      visit(dependency);
+    }
+    visiting.delete(id);
+    done.add(id);
+  }
+  backlog.items.forEach((t) => visit(t.id));
+  return {
+    ...c,
+    backlog,
+    contract: null,
+    digest: hash(
+      JSON.stringify({
+        mission: c.mission,
+        backlog,
+        contract: null,
+        validator: verifierVersion(),
+      }),
+    ),
+  };
+}
 export function contracts(root) {
   const c = load(root),
     backlog = validate("backlog", read(path.join(c.dir, "backlog.json"))),
@@ -214,7 +305,7 @@ export function contracts(root) {
   };
 }
 export function verifierVersion() {
-  const files = ["package.json", "package-lock.json"];
+  const files = ["package.json", "package-lock.json", "START.md", "AGENTS.md"];
   function walk(dir) {
     for (const n of fs.readdirSync(path.join(shared, dir)).sort()) {
       const relative = dir + "/" + n,
@@ -295,27 +386,16 @@ export function fingerprint(root) {
   }
   return hash(JSON.stringify(entries));
 }
-export function owner(pid = process.pid) {
-  const text = fs.readFileSync("/proc/" + pid + "/stat", "utf8"),
-    fields = text.slice(text.lastIndexOf(")") + 2).split(" ");
-  return { pid, host: os.hostname(), start: fields[19] };
-}
-export function alive(o) {
-  if (!o) return false;
-  if (o.host !== os.hostname()) return null;
-  try {
-    const text = fs.readFileSync("/proc/" + o.pid + "/stat", "utf8");
-    if (text.slice(text.lastIndexOf(")") + 2).startsWith("Z ")) return false;
-    return owner(o.pid).start === o.start;
-  } catch {
-    return false;
-  }
-}
-export function mutex(root, fn) {
+export { owner, alive } from "./process.mjs";
+import { owner, alive } from "./process.mjs";
+export function mutex(root, fn, options = {}) {
+  assertWritable(root, options);
   const dir = safeState(root),
     lock = path.join(dir, ".mutex");
-  const fd = fs.openSync(lock, "wx");
-  fs.writeFileSync(fd, JSON.stringify(owner()));
+  // Observe first: unavailable process tools must not publish an empty mutex.
+  const leaseOwner = owner(),
+    fd = fs.openSync(lock, "wx");
+  fs.writeFileSync(fd, JSON.stringify(leaseOwner));
   fs.fsyncSync(fd);
   try {
     return fn();
@@ -323,6 +403,29 @@ export function mutex(root, fn) {
     fs.closeSync(fd);
     fs.unlinkSync(lock);
   }
+}
+export function assertWritable(root, { allowPlanningRepair = false } = {}) {
+  const restore = path.resolve(
+    root,
+    git(root, "rev-parse", "--git-path", "autodev-restore.lock"),
+  );
+  if (fs.existsSync(restore))
+    throw Error(
+      "Checkpoint restore active/interrupted; use checkpoint --action recover-restore before state changes",
+    );
+  const planning = path.join(
+    fs.realpathSync(root),
+    ".autodev",
+    "planning-repair.json",
+  );
+  if (
+    !allowPlanningRepair &&
+    fs.existsSync(planning) &&
+    read(planning).phase === "PREPARED"
+  )
+    throw Error(
+      "Initial-plan repair pending; finish repair-plan with its terminal proof before other state changes",
+    );
 }
 export function unlock(root) {
   const dir = safeState(root),
@@ -385,6 +488,16 @@ export function options(argv = process.argv.slice(2)) {
   }
   return o;
 }
+export function isMain(url) {
+  if (!process.argv[1]) return false;
+  try {
+    return (
+      fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(url))
+    );
+  } catch {
+    return false;
+  }
+}
 export function main(fn) {
   try {
     const r = fn(options());
@@ -414,6 +527,12 @@ export function observationId(c) {
       state: read(path.join(c.dir, "current-task.json")),
       ops,
       progress: validate("progress", read(path.join(c.dir, "progress.json"))),
+      failures: fs.existsSync(path.join(c.dir, "failure.json"))
+        ? validate("failure", read(path.join(c.dir, "failure.json")))
+        : null,
+      bursts: fs.existsSync(path.join(c.dir, "bursts.json"))
+        ? read(path.join(c.dir, "bursts.json"))
+        : null,
       resume: fs.existsSync(path.join(c.dir, "resume.json"))
         ? read(path.join(c.dir, "resume.json"))
         : null,

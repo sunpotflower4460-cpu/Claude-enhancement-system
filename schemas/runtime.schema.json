@@ -95,6 +95,78 @@
     "sdk_run_id": {
       "type": "string",
       "minLength": 1
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mission_id",
+        "repository",
+        "binding",
+        "execution",
+        "contract",
+        "architecture_sha256"
+      ],
+      "properties": {
+        "mission_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "binding": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["session_id", "repository", "root"],
+          "properties": {
+            "session_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "repository": {
+              "type": "string",
+              "minLength": 1
+            },
+            "root": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sdk_cwd": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "execution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["run_id", "attempt_id", "started_at"],
+          "properties": {
+            "run_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "attempt_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "started_at": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "contract": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "architecture_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
     }
   }
 }

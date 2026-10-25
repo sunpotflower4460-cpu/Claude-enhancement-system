@@ -1,0 +1,6 @@
+{
+  "currency": "JPY",
+  "taxRate": 0.1,
+  "discountThreshold": 1000,
+  "discountRate": 0.2
+}

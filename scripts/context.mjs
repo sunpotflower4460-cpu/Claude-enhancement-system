@@ -1,13 +1,14 @@
 import {
-  contracts,
+  observationContext,
   fingerprint,
   binding,
   main,
   observationId,
 } from "./lib/core.mjs";
 import { nextAction } from "./next.mjs";
+import { failureSummary } from "./failure.mjs";
 main((o) => {
-  const c = contracts(o.target);
+  const c = observationContext(o.target);
   console.log(
     JSON.stringify(
       {
@@ -20,6 +21,7 @@ main((o) => {
         requirements: c.mission.requirements.map((r) => r.id),
         tasks: c.backlog.items,
         next: nextAction(o),
+        failure_state: failureSummary(o.target),
       },
       null,
       2,

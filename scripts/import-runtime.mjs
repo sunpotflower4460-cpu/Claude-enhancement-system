@@ -1,7 +1,9 @@
+import { mutex } from "./lib/core.mjs";
+import { isMain } from "./lib/core.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import {
-  contracts,
+  observationContext,
   read,
   json,
   hash,
@@ -9,9 +11,16 @@ import {
   artifactPath,
   main,
 } from "./lib/core.mjs";
-import { runtimeObservation, invocationWindow } from "./lib/runtime.mjs";
+import {
+  runtimeObservation,
+  invocationWindow,
+  routingProvenance,
+} from "./lib/runtime.mjs";
 export function importRuntime(o) {
-  const c = contracts(o.target),
+  return mutex(o.target, () => importRuntimeUnlocked(o));
+}
+function importRuntimeUnlocked(o) {
+  const c = observationContext(o.target),
     s = read(path.join(c.dir, "current-task.json")),
     task = c.backlog.items.find((t) => t.id === o.task),
     ctx =
@@ -72,6 +81,16 @@ export function importRuntime(o) {
     sdk_task_id: start.task_id,
     sdk_run_id: start.run_id,
     observed_at: new Date().toISOString(),
+    provenance: routingProvenance(
+      c,
+      ctx,
+      events.find(
+        (e) =>
+          e.type === "system" &&
+          e.subtype === "init" &&
+          e.session_id === start.session_id,
+      )?.cwd,
+    ),
   };
   json(artifactPath(c.dir, name), r);
   const observation = runtimeObservation(
@@ -92,5 +111,5 @@ export function importRuntime(o) {
     observation,
   };
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => console.log(JSON.stringify(importRuntime(o), null, 2)));

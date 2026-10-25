@@ -1,3 +1,4 @@
+import { isMain } from "./lib/core.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
@@ -14,6 +15,8 @@ import {
   alive,
 } from "./lib/core.mjs";
 import { terminationProof } from "./lib/recovery.mjs";
+import { reconcileInterrupted } from "./lib/interruption.mjs";
+import { burstStatus } from "./burst.mjs";
 const next = {
   IDLE: ["ARCHITECTURE", "PLAN"],
   ARCHITECTURE: ["PLAN"],
@@ -55,8 +58,19 @@ export function state(o) {
       s.attempt_id = o.attempt;
       s.attempt++;
       s.owner = o.pid ? owner(Number(o.pid)) : null;
-    } else if (o.action === "recover" || o.action === "end") {
+    } else if (
+      o.action === "recover" ||
+      o.action === "end" ||
+      o.action === "pause"
+    ) {
       if (!s.active || !o.proof) throw Error("Termination proof required");
+      if (
+        o.action !== "recover" &&
+        burstStatus({ dir, mission: load(o.target).mission }).active
+      )
+        throw Error(
+          "Finish current burst with correlated terminal/drained proof before pause/end",
+        );
       const proof = terminationProof(dir, o.proof, s, {
         fixture: o.fixture === true || o.fixture === "true",
       });
@@ -66,51 +80,30 @@ export function state(o) {
         (s.stage !== "IDLE" || proof.state !== "completed")
       )
         throw Error("End requires IDLE and completed workflow");
+      if (o.action === "pause" && proof.state !== "completed")
+        throw Error("Pause requires a completed and drained burst");
+      const unfinished = fs
+        .readdirSync(path.join(dir, "operations"))
+        .some(
+          (n) =>
+            validate("operation", read(path.join(dir, "operations", n)))
+              .state === "started",
+        );
+      if (o.action === "end" && unfinished)
+        throw Error(
+          "Unfinished operation; use pause/recover and inspect partial effects before ending",
+        );
+      if (o.action === "pause") {
+        reconcileInterrupted(dir, fp, proof);
+        if (unfinished) s.stage = "BLOCKED";
+      }
       s.active = false;
       s.owner = null;
       if (o.action === "recover") {
-        s.stage = "BLOCKED";
-        for (const file of fs.readdirSync(path.join(dir, "operations"))) {
-          const p = path.join(dir, "operations", file),
-            op = validate("operation", read(p));
-          if (op.state === "started") {
-            const resume =
-              op.stage === "IMPLEMENT" && op.before !== fp
-                ? "REVIEW"
-                : op.stage;
-            op.state = "interrupted";
-            op.after = fp;
-            op.result = {
-              status: "UNVERIFIED",
-              reason:
-                "Runtime terminal proof confirms interruption; original effects retained",
-              resume,
-              termination_sha256: proof.sha256,
-            };
-            op.updated_at = new Date().toISOString();
-            json(p, op);
-            if (op.task_id !== "mission")
-              json(path.join(dir, "resume.json"), {
-                operation_id: op.operation_id,
-                task_id: op.task_id,
-                action: resume,
-                product: fp,
-                reason:
-                  "Observe interrupted operation before new implementation",
-              });
-          }
-        }
-        for (const name of fs
-          .readdirSync(path.join(dir, "evidence"))
-          .filter((n) => n.startsWith("runner-") && n.endsWith(".json"))) {
-          const r = read(artifactPath(dir, name));
-          if (r.state === "running" && alive(r.owner) === false)
-            json(artifactPath(dir, name), {
-              ...r,
-              state: "stopped",
-              recovered: true,
-            });
-        }
+        s.stage = fs.existsSync(path.join(dir, "contract.json"))
+          ? "BLOCKED"
+          : "IDLE";
+        reconcileInterrupted(dir, fp, proof);
       }
     } else {
       if (
@@ -149,5 +142,5 @@ export function state(o) {
     return s;
   });
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => console.log(JSON.stringify(state(o), null, 2)));

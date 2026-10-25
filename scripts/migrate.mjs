@@ -1,3 +1,4 @@
+import { isMain } from "./lib/core.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
@@ -13,6 +14,7 @@ import {
   hash,
   canonicalRemote,
   mutex,
+  initialBacklog,
 } from "./lib/core.mjs";
 function apply(dir, journal) {
   for (const [name, step] of Object.entries(journal.files)) {
@@ -95,18 +97,10 @@ export function migrate(o) {
         last_audit_product: null,
       },
       "mission.json": mission,
-      "backlog.json": validate("backlog", {
-        version: 2,
-        items: backlog.items.map((t) => ({
-          ...t,
-          status: "UNVERIFIED",
-          execution: null,
-          check_refs: [],
-        })),
-      }),
+      "backlog.json": validate("backlog", initialBacklog(mission.requirements)),
       "current-task.json": {
         version: 2,
-        stage: "BLOCKED",
+        stage: "IDLE",
         sprint_task_id: null,
         run_started_at: null,
         attempt_history: [],
@@ -152,5 +146,5 @@ export function migrate(o) {
     return result;
   });
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => console.log(JSON.stringify(migrate(o), null, 2)));

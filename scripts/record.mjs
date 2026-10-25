@@ -1,3 +1,4 @@
+import { isMain } from "./lib/core.mjs";
 import { checkEvidence } from "./verify.mjs";
 import fs from "node:fs";
 import path from "node:path";
@@ -52,6 +53,8 @@ export function record(o) {
         maxBuffer: 24 * 1024 * 1024,
         env: {
           ...process.env,
+          AUTODEV_COMMON: shared,
+          AUTODEV_NODE: process.execPath,
           AUTODEV_CHECK_CONTEXT: JSON.stringify(commandContext),
           AUTODEV_REPORT_PATH: reportPath,
           AUTODEV_RUNNER_STATE: artifactPath(
@@ -111,7 +114,7 @@ export function record(o) {
     return e;
   });
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => {
     const e = record(o);
     const c = contracts(o.target),

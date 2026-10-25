@@ -49,11 +49,13 @@ const resultSchema = {
     },
     snapshot: { type: "object" },
     gate: { type: "object" },
+    failure: { type: "object" },
   },
 };
 const base = `Read the ${input.shared}/agents role definition and target's preserved mission. Never modify the common repository. Each writer MUST use scripts/operation.mjs start/complete with stable operation_id, and inspect partial diffs before replay. Return non-PASS when real CLI results or runtime evidence are absent. All task/check/assessment state is schema v2. Read-only roles return their actual status, every finding, current snapshot context and requirement coverage; never delegate or edit. The coordinator persists these verbatim via assessment.mjs; do not stamp an old review with a newer fingerprint. Parent alone confirms runtime drained and invokes final verify after Workflow completion. `;
 const taskContexts = {};
 let planEpoch = 0,
+  inspectionSequence = 0,
   liveObservation = input.observation_id;
 const milestoneEvery = input.milestone_every ?? 2;
 if (
@@ -67,6 +69,20 @@ async function call(role, action, task_id = "mission", payload = {}) {
     !["autodev-" + role, "claude-autodev:" + role].includes(input.agents[role])
   )
     throw new Error("Undiscovered native agentType: " + role);
+  // Native read-only roles cannot recompute a product hash with Bash. Observe
+  // after every writer and pass the current context, rather than asking them to
+  // approve the pre-implementation sprint snapshot. Each inspection has a stable
+  // sequence so runtime prompt caching cannot replay an earlier file observation.
+  if (action === "inspect")
+    payload = { ...payload, inspection_sequence: inspectionSequence++ };
+  if (["sonnet-reviewer", "opus-auditor"].includes(role)) {
+    const latest = await call("sonnet-planner", "inspect");
+    if (!passed(latest) || !latest.snapshot || Array.isArray(latest.snapshot))
+      throw new Error(
+        "Current read-only assessment snapshot unavailable: " + latest.summary,
+      );
+    payload = { ...payload, snapshot: latest.snapshot };
+  }
   const execution = taskContexts[task_id],
     coordinator = role === "sonnet-planner" && action !== "implement";
   const stage =
@@ -84,7 +100,7 @@ async function call(role, action, task_id = "mission", payload = {}) {
   const ctx = {
     mission_id: input.mission_id,
     session_id: input.session_id,
-    run_id: input.run_id,
+    run_id: coordinator ? input.run_id : execution?.run_id || input.run_id,
     task_id: coordinator ? "mission" : task_id,
     attempt_id: coordinator
       ? input.attempt_id
@@ -131,7 +147,7 @@ async function call(role, action, task_id = "mission", payload = {}) {
     operation_id,
     payload,
     context: ctx,
-    observation_id: input.observation_id,
+    observation_id: liveObservation,
   };
   const r = await agent(
     base +
@@ -189,16 +205,45 @@ if (!observed.snapshot.architecture_ready) {
   if (!passed(observed)) return observed;
 }
 let completed = observed.snapshot.completed_since_audit ?? 0;
+async function auditMilestone() {
+  const audit = await call("opus-auditor", "milestone-audit");
+  const checkpoint = await coordinate("checkpoint-audit", "mission", {
+    result: audit,
+  });
+  if (!passed(checkpoint)) return checkpoint;
+  if (checkpoint.snapshot?.completed_since_audit !== 0)
+    return {
+      status: "UNVERIFIED",
+      summary:
+        "Milestone checkpoint did not persist a reset audit counter; inspect progress before retrying Opus.",
+      findings: [],
+      snapshot: checkpoint.snapshot,
+    };
+  completed = 0;
+  if (!passed(audit))
+    return coordinate("replan-milestone", "mission", { result: audit });
+  return checkpoint;
+}
 const deferred = [];
 const maxSprints = input.max_sprints ?? 20;
 if (!Number.isInteger(maxSprints) || maxSprints < 1 || maxSprints > 100)
   throw new Error("Invalid burst size; scope is never reduced by this bound");
 for (let sprint = 0; sprint < maxSprints; sprint++) {
-  observed = await coordinate("inspect");
-  if (!passed(observed)) return observed;
+  if (sprint > 0) {
+    observed = await coordinate("inspect");
+    if (!passed(observed)) return observed;
+  }
   const tasks = observed.snapshot?.tasks;
   if (!Array.isArray(tasks) || !tasks.length)
     throw new Error("Missing original task coverage");
+  completed = observed.snapshot.completed_since_audit ?? completed;
+  if (completed >= milestoneEvery) {
+    const checkpoint = await auditMilestone();
+    if (!passed(checkpoint)) return checkpoint;
+    observed = await coordinate("inspect");
+    if (!passed(observed)) return observed;
+    continue; // Interrupted audit is finished before selecting any further implementation.
+  }
   const resume = observed.snapshot.resume;
   const eligible = (t) =>
     t.status !== "PASS" &&
@@ -297,28 +342,93 @@ for (let sprint = 0; sprint < maxSprints; sprint++) {
     deferred.push(task);
     continue;
   }
-  let success = false;
-  const resumeStart =
-    resume?.task_id === task ? (observed.snapshot.repair_attempt ?? 0) : 0;
-  for (let attempt = resumeStart; attempt < 4; attempt++) {
-    if (attempt === 2) {
+  let success = false,
+    lastFailure = null;
+  let failureState =
+    plan.snapshot?.failure_state?.[task] ||
+    observed.snapshot.failure_state?.[task];
+  const resumeStart = Math.max(
+    resume?.task_id === task ? (observed.snapshot.repair_attempt ?? 0) : 0,
+    failureState?.repair_attempt ?? failureState?.failures ?? 0,
+  );
+  if (!Number.isInteger(resumeStart) || resumeStart < 0)
+    throw new Error("Invalid persisted repair count");
+  const unavailable = (r) =>
+    [
+      "environment",
+      "model_limit",
+      "permission",
+      "terminated",
+      "evidence",
+    ].includes(r?.failure?.category) ||
+    ["BLOCKED", "UNVERIFIED"].includes(r?.status);
+  const saveFailure = async (stage, result, round, model) => {
+    lastFailure = result;
+    const saved = await coordinate("checkpoint-failure", task, {
+      stage,
+      result,
+      round,
+      model,
+      category:
+        result.failure?.category || (unavailable(result) ? "evidence" : stage),
+    });
+    if (saved.snapshot?.failure_state?.[task])
+      failureState = saved.snapshot.failure_state[task];
+    return saved;
+  };
+  if (failureState?.next_action === "DEFER")
+    lastFailure = {
+      status: "BLOCKED",
+      summary: "Persisted external blocker requires changed evidence",
+      findings: [],
+      failure: failureState.blocker,
+    };
+  for (
+    let attempt = resumeStart;
+    attempt < 4 &&
+    !unavailable(lastFailure) &&
+    lastFailure?.failure?.category !== "design" &&
+    failureState?.next_action !== "REPLAN";
+    attempt++
+  ) {
+    if (attempt === 2 && !failureState?.last_strategy) {
       const diagnosis = await coordinate("diagnose", task, {
         reason:
-          "Two failed cycles; investigate root cause before a different implementation",
+          "Two failed cycles; inspect saved hypotheses and test a different cause before a different implementation",
+        previous: failureState?.recent || [],
       });
-      if (!passed(diagnosis)) break;
+      if (!passed(diagnosis)) {
+        lastFailure = diagnosis;
+        break;
+      }
+      if (diagnosis.snapshot?.failure_state?.[task])
+        failureState = diagnosis.snapshot.failure_state[task];
     }
     const resumeStage =
       attempt === resumeStart && resume?.task_id === task ? resume.stage : null;
     if (!["REVIEW", "VERIFY"].includes(resumeStage)) {
+      const model = attempt >= 2 ? "claude-sonnet-5-5" : "claude-haiku-5-5";
       const built = await call(
         attempt >= 2 ? "sonnet-planner" : "haiku-builder",
         "implement",
         task,
-        { attempt: attempt + 1, root_cause_required: attempt >= 2 },
+        {
+          attempt: attempt + 1,
+          root_cause_required: attempt >= 2,
+          previous: failureState?.recent || [],
+        },
       );
-      if (!passed(built) && ["BLOCKED", "UNVERIFIED"].includes(built.status))
-        break;
+      if (!passed(built)) {
+        const saved = await saveFailure(
+          "implementation",
+          built,
+          attempt + 1,
+          model,
+        );
+        if (!passed(saved)) return saved;
+        if (unavailable(built)) break;
+        continue;
+      }
     }
     const review = await call("sonnet-reviewer", "review", task, {
       snapshot: plan.snapshot,
@@ -330,10 +440,25 @@ for (let sprint = 0; sprint < maxSprints; sprint++) {
     });
     if (!passed(saved)) {
       if (saved.snapshot?.blocker_scope === "global") return saved;
+      const recorded = await saveFailure(
+        "review",
+        saved,
+        attempt + 1,
+        "claude-sonnet-5-5",
+      );
+      if (!passed(recorded)) return recorded;
       break;
     }
     if (!passed(review)) {
+      const recorded = await saveFailure(
+        "review",
+        review,
+        attempt + 1,
+        attempt >= 2 ? "claude-sonnet-5-5" : "claude-haiku-5-5",
+      );
+      if (!passed(recorded)) return recorded;
       log(JSON.stringify({ task, attempt: attempt + 1, review }));
+      if (unavailable(review)) break;
       continue;
     }
     const tested = await call("sonnet-verifier", "verify", task, {
@@ -341,7 +466,14 @@ for (let sprint = 0; sprint < maxSprints; sprint++) {
       round: attempt + 1,
     });
     if (!passed(tested)) {
-      if (["BLOCKED", "UNVERIFIED"].includes(tested.status)) break;
+      const recorded = await saveFailure(
+        "test",
+        tested,
+        attempt + 1,
+        attempt >= 2 ? "claude-sonnet-5-5" : "claude-haiku-5-5",
+      );
+      if (!passed(recorded)) return recorded;
+      if (unavailable(tested)) break;
       continue;
     }
     const gate = await coordinate("close-task", task, {
@@ -350,43 +482,52 @@ for (let sprint = 0; sprint < maxSprints; sprint++) {
       round: attempt + 1,
     });
     if (!passed(gate)) {
+      const recorded = await saveFailure(
+        "test",
+        gate,
+        attempt + 1,
+        "claude-sonnet-5-5",
+      );
+      if (!passed(recorded)) return recorded;
       if (gate.status === "NEEDS_FIX") continue;
-      return gate;
+      break;
     }
     success = true;
     completed = gate.snapshot?.completed_since_audit ?? completed + 1;
     break;
   }
   if (!success) {
-    const audit = await call("opus-auditor", "replan", task, {
-      reason:
-        "Repeated failure or unavailable verification; do not repeat identical patches",
-    });
+    // Missing tools, quotas and approval are external blockers, not reasons to redesign working code.
+    const audit = unavailable(lastFailure)
+      ? lastFailure
+      : await call("opus-auditor", "replan", task, {
+          reason:
+            "Repeated failure; use saved hypotheses to evaluate a different design or defer only this task",
+          previous: failureState?.recent || [],
+        });
     const replanned = await coordinate("defer-or-replan", task, {
       result: audit,
     });
     if (!passed(replanned)) return replanned;
     deferred.push(task);
-    continue; // Continue other dependency-ready work rather than ending the whole mission.
+    continue; // Independent work continues; blocked scope remains mandatory.
   }
   if (completed >= milestoneEvery) {
-    const audit = await call("opus-auditor", "milestone-audit");
-    const checkpoint = await coordinate("checkpoint-audit", "mission", {
-      result: audit,
-    });
+    const checkpoint = await auditMilestone();
     if (!passed(checkpoint)) return checkpoint;
-    completed = checkpoint.snapshot?.completed_since_audit ?? 0;
-    if (!passed(audit)) {
-      const replanned = await coordinate("replan-milestone", "mission", {
-        result: audit,
-      });
-      if (!passed(replanned)) return replanned;
-    }
   }
 }
+const handoff = await coordinate("inspect");
+if (!passed(handoff)) return handoff;
 return {
   status: "UNVERIFIED",
   summary:
     "CONTINUE_PARENT: burst ended; persist handoff and relaunch from state under /goal. No completion or requirement reduction.",
   findings: [],
+  snapshot: {
+    ...handoff.snapshot,
+    next: "REOBSERVE_AND_LAUNCH",
+    run_id: input.run_id,
+    attempt_id: input.attempt_id,
+  },
 };

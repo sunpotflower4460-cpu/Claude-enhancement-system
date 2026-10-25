@@ -339,7 +339,12 @@ test("G bundled API/browser checker edits change common verifier version even ou
   const f = fixture(t),
     copy = path.join(f.base, "common-copy");
   fs.mkdirSync(copy);
-  for (const name of ["package.json", "package-lock.json"])
+  for (const name of [
+    "package.json",
+    "package-lock.json",
+    "START.md",
+    "AGENTS.md",
+  ])
     fs.copyFileSync(path.join(shared, name), path.join(copy, name));
   for (const dir of [
     "scripts",
@@ -375,4 +380,10 @@ test("G bundled API/browser checker edits change common verifier version even ou
   const third = core.verifierVersion();
   fs.appendFileSync(path.join(copy, "package-lock.json"), "\n");
   assert.notEqual(core.verifierVersion(), third);
+  const fourth = core.verifierVersion();
+  fs.appendFileSync(
+    path.join(copy, "START.md"),
+    "\nChanged parent continuation/gate protocol.\n",
+  );
+  assert.notEqual(core.verifierVersion(), fourth);
 });

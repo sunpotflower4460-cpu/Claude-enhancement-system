@@ -1,3 +1,4 @@
+import { isMain } from "./lib/core.mjs";
 import path from "node:path";
 import {
   contracts,
@@ -38,5 +39,5 @@ export function checkpointAudit(o) {
     return progress;
   });
 }
-if (process.argv[1] === new URL(import.meta.url).pathname)
+if (isMain(import.meta.url))
   main((o) => console.log(JSON.stringify(checkpointAudit(o), null, 2)));
