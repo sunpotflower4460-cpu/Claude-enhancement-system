@@ -1,10 +1,37 @@
-# 検証結果 — v0.2 / 2026-10-25
+# 検証結果 — 長期継続監査 / 2026-10-25
 
 **ローカルの実装・正常/故障/模擬統合・実Chromiumと、Claude Code実機の受け入れを区別する。V1全体はUNVERIFIED。**
 
+## 最新の長期継続強化
+
+実装checkpointは `e7d6afa`。前回80件を維持し、新clone・複数burst・中断・権限・実プロジェクトに近い検証を追加した。現在の全体試験結果は **174件PASS、失敗0、skip0**。[全出力](evidence/tests-long-running.txt)と[機械用結果](evidence/local-long-running-summary.json)を保存する。テスト対象の共通指紋にはスクリプト・Schema・役割/Workflow・依存ロックに加えSTART/AGENTSも含む。今回のBefore/AfterとR01〜R12対応は[長期監査](09-long-running-audit.md)。
+
+| 実証範囲 | 結果・証拠 |
+| --- | --- |
+| 長期保存 | 8タスク中3タスクを実検査・task gateで完了→専用refをbare remoteへ実push→元checkout削除→新clone・別pathの共通repoから復元→残5タスクをselect/実装/独立評価/実検査/complete→最終再検証。モデルだけTEST FIXTURE、Git/ファイル/HTTPは実操作 |
+| 複数burst | 5タスクの連続3burst以上、永続昇格、監査間隔、未実施監査の繰越、未達でCOMPLETE拒否 |
+| 中断・故障 | SIGKILL、途中publish、Git終盤失敗、二度の初期計画停止、readonly writerなし停止、結果未受領、並行recover、欠落/改変・新draft競合を再現 |
+| 証拠・完成 | 現snapshotをreadonlyへ渡すこと、全import/verifyのmutex、歴史的証拠と現在の受け入れの分離、省略ログの非現存扱い |
+| Web | 実Chromiumで3画面・入力・localStorage再読込・mobile layout。保存欠落をFAIL→修復後全kind合格。[現在の実report/画像](evidence/durability/web/) |
+| Game | 実キーでloss/restart/win、進行/境界/UI、40入力の時間上限。進行不能をFAIL→修復後合格。[現在の実report/画像](evidence/durability/game/) |
+| 既存API | 複数module・設定の維持、税の互換性、新割引、実HTTP正常/異常。回帰と接続漏れを検出→修復 |
+| Linux/macOS | Linuxの実プロセス/groupとencoded CLI path、Darwin adapterの単体。Ubuntu/macOS matrixの実実行は下記CIの同一headログを正本とする |
+| 非特権の権限故障 | UID1000で実EACCES→原因修正→再準備成功。[出力](evidence/permissions-long-running.txt) |
+| 独立監査 | 機能・故障・実用性を別コンテキストから逆監査。指摘を修正後、既知対象の限定再確認21件も合格（全体件数へ重複加算しない） |
+
+機械ゲートの正常例はTEST_COMPLETE/TEST_READY_FOR_HUMAN_REVIEWに留まり、fixture許可なしはUNVERIFIED。実ブラウザ/HTTPの合格をClaudeモデルやnative Workflowの実証へ昇格しない。Gitのignored依存を持つsymlinkは保存前に拒否し、全依存を保存できる内部symlinkは正しく復元する。公開snapshot以前に失われた未保存データを復元できるとは主張しない。
+
+[公式資料の取得hash](evidence/official-spec-long-running.json)、[CLI認証可否の非機密観測](evidence/claude-availability-long-running.json)、[再現時の失敗](evidence/long-running-before.txt)も保存した。公式配布2.1.310は認証されておらず、モデル/APIへの実行要求は行っていない。npm auditは開発依存を含め脆弱性0件。
+
+CIは[PR #1の当該head checks](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/pull/1/checks)と[branchのworkflow runs](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/workflows/test.yml?query=branch%3Afeat%2Fclaude-autonomous-harness)を参照する。Node22、Ubuntu/macOS、Chromiumの成功/失敗を独立に記録し、matrixを設定しただけで実macOS成功とはしない。PR本文と最終報告には確認したrunを記載する。
+
+残る実機項目はcloudの2repo/隔離先cwd・native agents再発見、実5.5ルーティング、readonly実権限、SDK記録の実形式、/goal・native Workflowの継続/停止/再開、実Claudeによる3分野の追試。まとめて[隔離probe](live-probe.md)を実行し、実観測された違いだけadapterへ反映してT01〜T20を再評価する。V1全体はUNVERIFIEDのまま。
+
+## 前回80件の基準と履歴
+
 ## 実行環境と証拠
 
-Linux、Node.js v24.19.0、Ajv 8.20.0、Playwright 1.64.1、Chromium 156.0.8078.4。`npm ci --ignore-scripts`、ブラウザ導入、`npm test`、`npm audit --json`、`git diff --check`を実行。最終ローカル試験は**80件PASS、失敗0、skip0**。最終テスト件数/結果は[evidence/tests-v2.txt](evidence/tests-v2.txt)。[機械用結果](evidence/local-v2-summary.json)も保存した。依存監査は脆弱性0件。GitHub ActionsでもNode.js 22.23.3＋実Chromiumで**80件PASS、失敗0、skip0**。push用[run 40195098672](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40195098672)、PR用[run 40195103065](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40195103065)の成功とログを確認。コードcommitは`d4bf7d0`。[PR CI metadata](evidence/github-ci-v2.json)、[push CI metadata](evidence/github-push-ci-v2.json)。
+Linux、Node.js v24.19.0、Ajv 8.20.0、Playwright 1.64.1、Chromium 156.0.8078.4。`npm ci --ignore-scripts`、ブラウザ導入、`npm test`、`npm audit --json`、`git diff --check`を実行。前回の最終ローカル試験は**80件PASS、失敗0、skip0**。最終テスト件数/結果は[evidence/tests-v2.txt](evidence/tests-v2.txt)。[機械用結果](evidence/local-v2-summary.json)も保存した。依存監査は脆弱性0件。GitHub ActionsでもNode.js 22.23.3＋実Chromiumで**80件PASS、失敗0、skip0**。push用[run 40195098672](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40195098672)、PR用[run 40195103065](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40195103065)の成功とログを確認。コードcommitは`d4bf7d0`。[PR CI metadata](evidence/github-ci-v2.json)、[push CI metadata](evidence/github-push-ci-v2.json)。
 
 初回バグの再現は[evidence/audit-before.txt](evidence/audit-before.txt)。バックログのUNVERIFIED/FAIL/BLOCKED、偽のplay/visual成功に対して期待する拒否assertが4件失敗し、v0.1のfalse COMPLETEを確認した。v0.1の24件成功は[evidence/tests.txt](evidence/tests.txt)に履歴として残す。
 

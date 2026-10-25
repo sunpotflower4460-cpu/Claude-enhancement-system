@@ -1,0 +1,18 @@
+{
+  "observed_at": "2026-10-25T16:12:02.108Z",
+  "results": [
+    {
+      "command": "claude",
+      "available": false
+    },
+    {
+      "command": "/tmp/claude-native/package/claude",
+      "available": true,
+      "version": "2.1.310 (Claude Code)",
+      "authenticated": false,
+      "auth_exit_code": 1,
+      "auth_observation": "Parsed official auth status; credential values and account details omitted"
+    }
+  ],
+  "cloud_runtime": "UNVERIFIED"
+}

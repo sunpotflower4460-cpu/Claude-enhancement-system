@@ -1,0 +1,428 @@
+Development regression reproductions; missing-new-module assertions are implementation gaps, not runtime proof. All model/task logs here are TEST FIXTURE.
+
+=== claude-portability-before.txt ===
+✖ portability: macOS owner does not require /proc and compares process birth (1.872558ms)
+✖ portability: macOS zombie is dead (0.411833ms)
+✖ portability: inability to observe a local process is unknown, never dead (1.095202ms)
+✔ portability: missing processes, reused PID and remote owners remain distinct (0.505329ms)
+✖ portability: leader exit does not hide a still-running process group (9.952074ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 1
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 148.345035
+
+✖ failing tests:
+
+test at tests/portability.test.mjs:26:1
+✖ portability: macOS owner does not require /proc and compares process birth (1.872558ms)
+  Error: No proc on macOS
+      at Object.<anonymous> (file:///workspace/Claude-enhancement-system/tests/portability.test.mjs:15:27)
+      at Object.apply (node:internal/test_runner/mock/mock:767:20)
+      at owner (file:///workspace/Claude-enhancement-system/scripts/lib/core.mjs:299:19)
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/portability.test.mjs:28:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    code: 'ENOENT'
+  }
+
+test at tests/portability.test.mjs:33:1
+✖ portability: macOS zombie is dead (0.411833ms)
+  Error: No proc on macOS
+      at Object.<anonymous> (file:///workspace/Claude-enhancement-system/tests/portability.test.mjs:15:27)
+      at Object.apply (node:internal/test_runner/mock/mock:767:20)
+      at owner (file:///workspace/Claude-enhancement-system/scripts/lib/core.mjs:299:19)
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/portability.test.mjs:35:40)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    code: 'ENOENT'
+  }
+
+test at tests/portability.test.mjs:37:1
+✖ portability: inability to observe a local process is unknown, never dead (1.095202ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== null
+  
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/portability.test.mjs:45:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/portability.test.mjs:54:1
+✖ portability: leader exit does not hide a still-running process group (9.952074ms)
+  AssertionError [ERR_ASSERTION]: background writer must prevent recovery
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/portability.test.mjs:63:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+=== checkpoint-before.txt ===
+✖ new clone restores saved eight-task partial product and original requirements without duplicate implementation (195.927714ms)
+✖ reconnect after stopped partial edit preserves operation and review resume point (540.870852ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 934.248518
+
+✖ failing tests:
+
+test at tests/checkpoint.test.mjs:12:1
+✖ new clone restores saved eight-task partial product and original requirements without duplicate implementation (195.927714ms)
+  AssertionError [ERR_ASSERTION]: node:internal/modules/cjs/loader:1520
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/Claude-enhancement-system/scripts/checkpoint.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1517:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1095:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1122:12)
+      at Module._load (node:internal/modules/cjs/loader:1294:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.19.0
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/checkpoint.test.mjs:21:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/checkpoint.test.mjs:35:1
+✖ reconnect after stopped partial edit preserves operation and review resume point (540.870852ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'SPRINT' !== 'RESUME'
+  
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/checkpoint.test.mjs:44:50)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'SPRINT',
+    expected: 'RESUME',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+=== autodev-continuation-before.txt ===
+✖ long continuation resumes Sonnet elevation from persisted task failures without local Workflow repair counter (9.937066ms)
+✖ classified environment blockers are persisted and defer task without an irrelevant Opus code replan (2.831246ms)
+✖ failure journal persists causal record, deduplicates retries and rejects same strategy after repeated failure (293.608153ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 511.487594
+
+✖ failing tests:
+
+test at tests/continuation.test.mjs:11:1
+✖ long continuation resumes Sonnet elevation from persisted task failures without local Workflow repair counter (9.937066ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(trace.some(x=>x.action==='implement'&&x.role==='sonnet-planner'))
+  
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/continuation.test.mjs:20:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/continuation.test.mjs:24:1
+✖ classified environment blockers are persisted and defer task without an irrelevant Opus code replan (2.831246ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(trace.some(x=>x.action==='checkpoint-failure'))
+  
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/continuation.test.mjs:33:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/continuation.test.mjs:37:1
+✖ failure journal persists causal record, deduplicates retries and rejects same strategy after repeated failure (293.608153ms)
+  AssertionError [ERR_ASSERTION]: node:internal/modules/cjs/loader:1520
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/Claude-enhancement-system/scripts/failure.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1517:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1095:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1122:12)
+      at Module._load (node:internal/modules/cjs/loader:1294:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.19.0
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/continuation.test.mjs:42:40)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+=== claude-cli-path-before.txt ===
+✔ portability: macOS owner does not require /proc and compares process birth (4.908473ms)
+✔ portability: macOS zombie is dead (0.704123ms)
+✔ portability: inability to observe a local process is unknown, never dead (0.765122ms)
+✔ portability: missing processes, reused PID and remote owners remain distinct (0.513885ms)
+✔ portability: leader exit does not hide a still-running process group (39.125495ms)
+✔ portability: absent /proc for a live PID stays unknown (1.260952ms)
+✔ portability: malformed macOS observations and unsupported hosts cannot unlock (1.479353ms)
+✔ portability: macOS ps permission failure is not proof of death (0.69575ms)
+✔ portability: failed process-group observation cannot authorize takeover (0.747999ms)
+✖ portability: CLI entry detection handles encoded paths and symlink launch (267.688246ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 9
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 508.906005
+
+✖ failing tests:
+
+test at tests/portability.test.mjs:121:1
+✖ portability: CLI entry detection handles encoded paths and symlink launch (267.688246ms)
+  SyntaxError: Unexpected end of JSON input
+      at JSON.parse (<anonymous>)
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/portability.test.mjs:134:21)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+=== import-concurrency-before.txt ===
+✖ model, terminal and independent assessment importers cannot write through an active gate mutex (1844.731874ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1988.078302
+
+✖ failing tests:
+
+test at tests/long-routing.test.mjs:260:1
+✖ model, terminal and independent assessment importers cannot write through an active gate mutex (1844.731874ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  +   false,
+  +   false,
+  +   false
+  -   true,
+  -   true,
+  -   true
+    ]
+  
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/long-routing.test.mjs:266:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ false, false, false ],
+    expected: [ true, true, true ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+=== milestone-resume-before.txt ===
+✖ overdue persisted milestone is audited before planning another task after interruption (2.768998ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 119.750791
+
+✖ failing tests:
+
+test at tests/workflow-snapshot.test.mjs:168:1
+✖ overdue persisted milestone is audited before planning another task after interruption (2.768998ms)
+  AssertionError [ERR_ASSERTION]: due audit cannot wait for another task to finish
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/workflow-snapshot.test.mjs:176:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+=== checkpoint-symlink-before.txt ===
+✖ checkpoint refuses omitted symlink dependencies before replacing a durable ref (1309.266787ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1523.873743
+
+✖ failing tests:
+
+test at tests/checkpoint.test.mjs:738:1
+✖ checkpoint refuses omitted symlink dependencies before replacing a durable ref (1309.266787ms)
+  AssertionError [ERR_ASSERTION]: {
+    "status": "SAVED_LOCAL",
+    "branch": "autodev/checkpoint/d762dba2-c073-4476-89a3-195f6a1a1c8c",
+    "commit": "185b29a8e0f0bf43b1f83e88479ce6c461cdc126",
+    "product": "d24cab9caac4c94deb9a1a6201eb6acd8c6876b538d8b819d7ae19b69ddf8cb2",
+    "included": 10,
+    "omitted": [],
+    "publish_command": [
+      "git",
+      "-C",
+      "/tmp/autodev-audit-5yHIzD/target",
+      "push",
+      "origin",
+      "refs/heads/autodev/checkpoint/d762dba2-c073-4476-89a3-195f6a1a1c8c:refs/heads/autodev/checkpoint/d762dba2-c073-4476-89a3-195f6a1a1c8c"
+    ]
+  }
+  
+  
+  0 !== 2
+  
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/checkpoint.test.mjs:744:61)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+=== probe-long-config-before.txt ===
+✖ F one-command live probe prepares isolated clone, all checks UNVERIFIED, source unchanged (509.158198ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 662.10995
+
+✖ failing tests:
+
+test at tests/cli-probe.test.mjs:100:1
+✖ F one-command live probe prepares isolated clone, all checks UNVERIFIED, source unchanged (509.158198ms)
+  AssertionError [ERR_ASSERTION]: live probe must exercise parent continuation across multiple bursts
+  
+  undefined !== 1
+  
+      at TestContext.<anonymous> (file:///workspace/Claude-enhancement-system/tests/cli-probe.test.mjs:117:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
