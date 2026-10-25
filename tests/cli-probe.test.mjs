@@ -17,6 +17,7 @@ import { importRuntime } from "../scripts/import-runtime.mjs";
 import { prepareProbe, recoverPrepare } from "../scripts/live-probe.mjs";
 import { observationId as coreObservationId } from "../scripts/lib/core.mjs";
 import { saveAssessment } from "../scripts/assessment.mjs";
+const falseCLI = execFileSync("which", ["false"], { encoding: "utf8" }).trim();
 function cli(script, args) {
   try {
     return {
@@ -206,7 +207,7 @@ test("F repeated failed mock CLI probe launches preserve separate raw files with
       "--target",
       f.target,
       "--claude",
-      "/bin/false",
+      falseCLI,
     ]);
     assert.equal(result.code, 1);
     assert.equal(
@@ -312,7 +313,7 @@ test("C1 repeated CLI invocations reset prior observations and preserve run mani
       "--target",
       f.target,
       "--claude",
-      "/bin/false",
+      falseCLI,
     ]);
     assert.equal(r.code, 1);
     const data = JSON.parse(r.out);
@@ -415,7 +416,7 @@ test("C1 probe run lease rejects a second launch and SIGTERM preserves interrupt
     "--target",
     f.target,
     "--claude",
-    "/bin/false",
+    falseCLI,
   ]);
   assert.equal(second.code, 2);
   assert.match(second.out, /active or unknown/);
@@ -439,7 +440,7 @@ test("C1 probe run lease rejects a second launch and SIGTERM preserves interrupt
       "--target",
       f.target,
       "--claude",
-      "/bin/false",
+      falseCLI,
     ]).code,
     1,
   );
@@ -484,7 +485,7 @@ test("C1 probe launcher refuses an unresolved native root run even without its o
     "--target",
     f.target,
     "--claude",
-    "/bin/false",
+    falseCLI,
   ]);
   assert.equal(result.code, 2);
   assert.match(result.out, /establish termination and recover/);
@@ -580,4 +581,51 @@ test("C1 preparation permissions failure keeps source unchanged and can be retri
     prepareProbe({ source: f.target, output }).status,
     "PREPARED_UNVERIFIED",
   );
+});
+
+test("C1 isolated probe preserves source fetch identity but blocks every default source push locally", (t) => {
+  const f = fixture(t);
+  f.git("add", ".");
+  f.git(
+    "-c",
+    "user.name=Test",
+    "-c",
+    "user.email=test@example.test",
+    "commit",
+    "-qm",
+    "source",
+  );
+  const configPath = path.join(f.target, ".git/config"),
+    beforeConfig = fs.readFileSync(configPath),
+    beforeRefs = f.git("show-ref"),
+    beforeStatus = f.git("status", "--porcelain", "--untracked-files=all"),
+    output = path.join(f.base, "push-isolated");
+  const prepared = prepareProbe({ source: f.target, output }),
+    git = (...args) =>
+      execFileSync("git", ["-C", output, ...args], {
+        encoding: "utf8",
+        stdio: "pipe",
+      }).trim();
+  assert.equal(
+    git("remote", "get-url", "origin"),
+    f.git("remote", "get-url", "origin"),
+  );
+  const disabled = path.join(output, ".git", "autodev-probe-push-disabled");
+  // Assert the guard before attempting a push: this regression must never make
+  // a baseline network request to the source GitHub repository.
+  assert.equal(git("remote", "get-url", "--push", "origin"), disabled);
+  assert.equal(fs.existsSync(disabled), false);
+  assert.throws(
+    () => git("push", "origin", "HEAD:refs/heads/autodev-probe-guard"),
+    /not appear to be a git repository/,
+  );
+  assert.deepEqual(fs.readFileSync(configPath), beforeConfig);
+  assert.equal(f.git("show-ref"), beforeRefs);
+  assert.equal(
+    f.git("status", "--porcelain", "--untracked-files=all"),
+    beforeStatus,
+  );
+  assert.match(prepared.prompt, /Never push to the source remote/);
+  assert.match(prepared.prompt, /save a LOCAL checkpoint/);
+  assert.match(prepared.prompt, /remote publication remains UNVERIFIED/);
 });

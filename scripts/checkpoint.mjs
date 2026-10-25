@@ -189,7 +189,12 @@ function requireSnapshotDependencies(root, env) {
     while (st?.isSymbolicLink()) {
       if (seen.has(current)) throw Error("Circular product symlink");
       seen.add(current);
-      current = path.resolve(path.dirname(current), fs.readlinkSync(current));
+      const link = fs.readlinkSync(current);
+      if (path.isAbsolute(link))
+        throw Error(
+          "Absolute product symlink is bound to the old checkout path; use relative product links before checkpoint publication. Source remains unchanged.",
+        );
+      current = path.resolve(path.dirname(current), link);
       const relative = path.relative(root, current);
       st = fs.lstatSync(current, { throwIfNoEntry: false });
       if (!st) break;

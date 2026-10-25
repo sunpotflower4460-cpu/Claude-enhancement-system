@@ -781,3 +781,16 @@ test("checkpoint restores internal symlinks when every dependency is in the prod
     "retained bytes",
   );
 });
+
+test("checkpoint refuses path-bound absolute product links before publishing an unrestorable clone", (t) => {
+  const f = savedFixture(t),
+    old = f.git("rev-parse", f.saved.branch);
+  fs.symlinkSync(
+    path.join(f.target, "product.json"),
+    path.join(f.target, "absolute-link"),
+  );
+  const r = cli("--target", f.target, "--action", "save");
+  assert.equal(r.status, 2, r.stdout + r.stderr);
+  assert.match(r.stdout, /absolute.*symlink|symlink.*absolute/i);
+  assert.equal(f.git("rev-parse", f.saved.branch), old);
+});

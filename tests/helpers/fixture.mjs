@@ -30,7 +30,9 @@ export {
   shared,
 };
 export function fixture(t, { profile = "backend", count = 1 } = {}) {
-  const base = fs.mkdtempSync(path.join(os.tmpdir(), "autodev-audit-"));
+  const base = fs.realpathSync(
+    fs.mkdtempSync(path.join(os.tmpdir(), "autodev-audit-")),
+  );
   t.after(() => fs.rmSync(base, { recursive: true, force: true }));
   const target = path.join(base, "target");
   fs.mkdirSync(target);

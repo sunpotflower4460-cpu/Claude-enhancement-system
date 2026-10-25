@@ -183,6 +183,20 @@ function prepareAt(source, target, publicTarget) {
     "origin",
     source.remote,
   ]);
+  // Keep the real fetch URL for canonical mission identity, but a probe must
+  // never publish branches/checkpoints into its source GitHub repository. Use
+  // the final published path, since this clone is still in staging here.
+  execFileSync(
+    "git",
+    [
+      "-C",
+      target,
+      "config",
+      "remote.origin.pushurl",
+      path.join(publicTarget, ".git", "autodev-probe-push-disabled"),
+    ],
+    { stdio: "pipe" },
+  );
   if (fs.existsSync(path.join(target, ".autodev")))
     throw Error(
       "Use a dedicated test repository without existing .autodev state",
@@ -262,7 +276,7 @@ function prepareAt(source, target, publicTarget) {
     commonDir: path.join(publicTarget, ".git"),
   });
   json(path.join(dir, "session.json"), session);
-  const prompt = `/goal Read ${shared}/START.md. This is an isolated LIVE runtime test project at ${publicTarget}, copied from ${source.repository}; never modify the source checkout. Read .autodev/probe-input.json, obtain the root state lease with state begin before model observations, refresh context.mjs, and use workflows/runtime-probe.js before the mission controller. Verify discovered native agents and actual read-only rejection in the isolated fixture before enabling the mission controller. Collect actual SDK/task records and model routing; never set probe PASS from self-report. Then run develop-mission.js with max_sprints=1, repair all four functions across at least three parent-relaunched bursts, review, test, preserve milestone/escalation history, and pause/resume using operation/state evidence. At a drained unfinished boundary publish a checkpoint, restore an additional isolated clone and revalidate; never alter the source checkout. Compute final verify only after runtime drained. Record multi_burst_state and checkpoint_reclone from actual native/Git evidence, not a plan to run them. Record each observation with scripts/probe-result.mjs and leave unavailable conditions UNVERIFIED. Fixture model logs must never be substituted for live records.`;
+  const prompt = `/goal Read ${shared}/START.md. This is an isolated LIVE runtime test project at ${publicTarget}, copied from ${source.repository}; never modify the source checkout. Read .autodev/probe-input.json, obtain the root state lease with state begin before model observations, refresh context.mjs, and use workflows/runtime-probe.js before the mission controller. Verify discovered native agents and actual read-only rejection in the isolated fixture before enabling the mission controller. Collect actual SDK/task records and model routing; never set probe PASS from self-report. Then run develop-mission.js with max_sprints=1, repair all four functions across at least three parent-relaunched bursts, review, test, preserve milestone/escalation history, and pause/resume using operation/state evidence. Never push to the source remote or bypass the isolated origin.pushurl guard. At a drained unfinished boundary save a LOCAL checkpoint without --publish true, make a second LOCAL isolated clone, retain the original fetch URL only as repository identity, configure that clone's origin.pushurl to its own nonexistent .git/autodev-probe-push-disabled path, restore the checkpoint and revalidate. Source checkout/config/refs and source remote refs must remain unchanged; remote publication remains UNVERIFIED unless a separate explicit destination is later authorized. Do not invent a different repository identity to make restoration pass. Compute final verify only after runtime drained. Record multi_burst_state and checkpoint_reclone from actual native/Git evidence, not a plan to run them. Record each observation with scripts/probe-result.mjs and leave unavailable conditions UNVERIFIED. Fixture model logs must never be substituted for live records.`;
   fs.writeFileSync(path.join(dir, "probe-prompt.txt"), prompt + "\n");
   return {
     status: "PREPARED_UNVERIFIED",

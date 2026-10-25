@@ -332,6 +332,7 @@ export function verifierVersion() {
   );
 }
 export function fingerprint(root) {
+  root = fs.realpathSync(root);
   const names = execFileSync("git", [
     "-C",
     root,
@@ -355,8 +356,7 @@ export function fingerprint(root) {
       const link = fs.readlinkSync(p),
         candidate = path.resolve(path.dirname(p), link),
         base = fs.realpathSync(root);
-      if (!candidate.startsWith(base + path.sep))
-        throw Error("External product symlink is unsupported: " + n);
+
       let resolved;
       try {
         resolved = fs.realpathSync(p);
@@ -364,11 +364,10 @@ export function fingerprint(root) {
         if (e.code !== "ENOENT") throw e;
       }
       if (resolved) {
-        if (
-          !resolved.startsWith(base + path.sep) ||
-          resolved.startsWith(path.join(base, ".autodev") + path.sep)
-        )
-          throw Error("External/state product symlink is unsupported");
+        if (!resolved.startsWith(base + path.sep))
+          throw Error("External product symlink is unsupported: " + n);
+        if (resolved.startsWith(path.join(base, ".autodev") + path.sep))
+          throw Error("State product symlink is unsupported: " + n);
         const target = fs.statSync(resolved);
         if (!target.isFile())
           throw Error("Directory product symlink is unsupported");
@@ -379,7 +378,11 @@ export function fingerprint(root) {
           target.mode & 0o777,
           hash(fs.readFileSync(resolved)),
         ]);
-      } else entries.push([n, "symlink", link, "broken"]);
+      } else {
+        if (!candidate.startsWith(base + path.sep))
+          throw Error("External product symlink is unsupported: " + n);
+        entries.push([n, "symlink", link, "broken"]);
+      }
     } else if (st.isFile())
       entries.push([n, st.mode & 0o777, hash(fs.readFileSync(p))]);
     else throw Error("Unsupported product entry (including submodule): " + n);

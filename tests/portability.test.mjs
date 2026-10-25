@@ -6,7 +6,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { fixture, shared } from "./helpers/fixture.mjs";
 import { once } from "node:events";
-import { owner, alive, isMain } from "../scripts/lib/core.mjs";
+import { owner, alive, isMain, fingerprint } from "../scripts/lib/core.mjs";
 
 function platform(t, value) {
   const descriptor = Object.getOwnPropertyDescriptor(process, "platform");
@@ -160,4 +160,22 @@ test("portability: CLI entry detection handles encoded paths and symlink launch"
   process.argv = [process.execPath, alias];
   assert.equal(isMain(pathToFileURL(script)), true);
   assert.equal(isMain(import.meta.url), false);
+});
+
+test("portability: symlinked repository root preserves internal product links and external-link refusal", (t) => {
+  const f = fixture(t),
+    alias = path.join(f.base, "target-alias");
+  fs.symlinkSync(f.target, alias, "dir");
+  fs.symlinkSync("product.json", path.join(f.target, "internal-link"));
+  assert.equal(fingerprint(alias), fingerprint(f.target));
+  fs.symlinkSync(
+    path.join(alias, "product.json"),
+    path.join(f.target, "internal-absolute-alias"),
+  );
+  assert.equal(fingerprint(alias), fingerprint(f.target));
+  fs.symlinkSync("/etc/hosts", path.join(f.target, "external-link"));
+  assert.throws(() => fingerprint(alias), /External product symlink/);
+  fs.unlinkSync(path.join(f.target, "external-link"));
+  fs.symlinkSync(".autodev/mission.json", path.join(f.target, "state-link"));
+  assert.throws(() => fingerprint(alias), /State product symlink/);
 });
