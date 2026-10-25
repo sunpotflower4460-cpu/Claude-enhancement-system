@@ -1,0 +1,5 @@
+{
+  "name": "claude-autodev",
+  "version": "0.1.0",
+  "description": "Evidence-gated Claude Code development workflows"
+}

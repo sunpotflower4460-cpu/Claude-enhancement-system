@@ -1,0 +1,4 @@
+{
+  "original": "Replace this entire string with the user's verbatim original request. Keep all completion conditions.",
+  "requirements": [{"id": "REQ-001", "text": "Replace with a requirement derived from the original request, without dropping scope."}]
+}

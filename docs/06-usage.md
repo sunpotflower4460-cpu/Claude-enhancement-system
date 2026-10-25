@@ -1,66 +1,68 @@
-# 06 — ユーザー利用手順（設計時点の予定）
+# 06 — 利用と再開
 
-> **現時点では設計のみ。以下のコマンド例は実装・実機試験前で、動作を保証しません。** Codexが完成後に画面付きで更新すること。
+ローカル状態・検証CLIはNode.js 22以上とGitで動作する。Claude Codeクラウドの一指示開始は未検証。実際の利用は START.md に従い、未確認の機能をPASSにしない。
 
-## クラウドClaude Codeで毎回使う
+## 初回指示
 
-1. 開発対象のGitHubリポジトリを選ぶ。
-2. 同じクラウドセッションに`sunpotflower4460-cpu/Claude-enhancement-system`を追加する。
-3. 目標の設計書を対象リポジトリに置くか、最初のプロンプトに含める。
-4. `/goal`による一度の開始指示を送る。
-5. 進行記録を`.autodev/`で確認する。必要な場面だけ追加の判断を行う。
-
-### 最初の指示の雛形
+Claude Codeクラウドで対象と共通の2リポジトリを選び、以下を送る。
 
 ```text
-/goal 次の完成条件が実証されるまで自律開発を進めてください。
-開発対象リポジトリの設計・要求をすべて満たし、
-Claude-enhancement-system の START.md と実行プロトコルに従ってください。
-まず2つのリポジトリを識別して環境診断を行い、
-Opus 5.5の長期設計 → Sonnet 5.5の短期計画 →
-Haiku 5.5の実装 → Sonnet 5.5の独立レビュー・動作検証を繰り返し、
-節目にOpus 5.5の監査を行ってください。
-バックグラウンドWorkflowと未完了エージェントがなくなった後、
-現在の作業ツリーで最終の機械的品質ゲートを実行し、そのPASSの証拠を示してください。
-検証できないことをPASSにせず、必要な人間確認を区別してください。
+/goal 開発対象の原要求と完成条件をすべて満たすまで自律開発してください。
+Claude-enhancement-system/START.mdを読み、対象と共通を識別して実行してください。
+Opus 5.5で長期設計と監査、Sonnet 5.5で短期計画・独立レビュー・実行検証、
+Haiku 5.5で実装し、失敗を修正して続行してください。
+原要求は対象の［設計書のパス］です。範囲を縮小しないでください。
+Workflow終了後、現在の成果物に最終verifyを実行し、結果を表示してください。
+確認できない機能はUNVERIFIEDとし、独立に進められる作業は続けてください。
 ```
 
-`/goal`の判定は会話出力を読むだけなので、最後に実際の品質ゲートの実行結果を表示する。ユーザー設計が長い場合は対象の明確なファイルを指定する。初回にこのコマンドだけで設定から実装まで始まるかは、フェーズ0で実測する。
+権限承認は環境設定に依存する。初回承認回数と再起動時の発見動作は未実測。プラグインが自動適用されるとは仮定しない。
 
-**注意**：2リポジトリを選択してもプラグインやスキル・Workflowが自動適用されるわけではない。読取権限とWorkflow起動権限は別で、初回承認が必要な設定もある。`START.md`で指定したファイル/モデルが実際に読まれ呼ばれたことを確認する。
+## ローカルコマンド
 
-## CLIで使う場合（補助的）
+共通にて `npm ci --ignore-scripts`。以下のCOMMON/TARGET/INPUTを実際の絶対パスに置き換える。
 
 ```bash
-cd /path/to/your-project
-claude --model claude-sonnet-5-5 \
-  --add-dir /path/to/Claude-enhancement-system \
-  --plugin-dir /path/to/Claude-enhancement-system
+node COMMON/scripts/doctor.mjs --target TARGET
+node COMMON/scripts/bootstrap.mjs --target TARGET --mission INPUT --profile backend
+node COMMON/scripts/record.mjs --target TARGET --check CHECK_ID
+node COMMON/scripts/verify.mjs --target TARGET
 ```
 
-開始後、上記`/goal`例の完成条件を、開発対象の設計に合わせて送る。
+対象自動選択は `--target` の代わりに `--repositories '["/absolute/common","/absolute/target"]'`。共通以外が1つに定まらなければ拒否する。mission入力はexamples/mission.json形式で原文とID付き要件を渡す。既存状態を上書きしない。新要求は既存原文を消さず、人間の明示的な追記を別途保存し再計画する（自動要件マージは提供しない）。
 
-## 前提条件
+bootstrap後にOpusが `.autodev/contract.json` をschemas/contract.schema.jsonに沿って作る。チェックはid、requirement_refs、kind、command、timeout_ms。backendはtest/api、web-appはtest/build/behavior/visual、gameはtest/build/behavior/visual/playが必須。各コマンドは期待動作をassertし、失敗を非0で返す。検査実行が製品ファイルを書き換える場合、証拠は失効する。テスト時生成物は適切にgitignoreし、製品ソースはignoreしない。
 
-- Claude Codeの対応バージョンとOpus/Sonnet/Haiku 5.5が使用可能なアカウント/プロバイダ。
-- Dynamic Workflowsの利用資格と設定（利用不能なら自走機能の段階的フォールバック）。
-- 対象コードのビルド・実行に必要な実行環境。
-- 実機検証に必要なブラウザ等のツール。無い場合は証拠上の制限を明示する。
-- 外部連携に必要な権限は既存の通常手順に従う。許諾が必要な操作まで自動実行できるとは約束しない。
+`record`は実際にコマンドを実行し、終了コード・signal・ログハッシュ・実行環境・前後指紋を保存する。verifyの出力はJSON、stderrは概要。終了0はCOMPLETE、1は未達/人間レビュー、2は入力不正/診断未検証。
 
-## 進捗の見方
+CLI利用は `claude --model claude-sonnet-5-5 --add-dir COMMON --plugin-dir COMMON`。agents/skillsとworkflowsの発見・ツール制限・モデル適用は起動後に実測する。
 
-- `.autodev/mission.md`：何を作るための開発か。
-- `.autodev/architecture.md`：長期計画。
-- `.autodev/backlog.json`：何が終わり、何が残るか。
-- `.autodev/current-task.json`：現在の工程・失敗回数。
-- `.autodev/handoff.md`：最近の変更と次の一手。
-- `.autodev/evidence/`：実際の試験記録。
+## 状態と再開
 
-Claude Codeの`/goal`、`/tasks`、`/workflows`も、対応環境では現在の状態を確認する助けになる。
+```bash
+node COMMON/scripts/state.mjs --target TARGET --action begin --run RUN_ID --task TASK_ID
+node COMMON/scripts/state.mjs --target TARGET --action transition --run RUN_ID --task TASK_ID --stage ARCHITECTURE
+node COMMON/scripts/state.mjs --target TARGET --action end --run RUN_ID --task TASK_ID
+```
 
-## 予想される中断
+初回はIDLE→ARCHITECTURE→PLAN、以後PLAN→IMPLEMENT→REVIEW→VERIFY→AUDIT→IDLE。修正はREVIEW/VERIFY→IMPLEMENT。次スプリントはVERIFY/AUDIT→PLAN。各writeは直列、run/task所有権を確認する。状態履歴とhandoffを読む。中断でactiveが残ると新規beginは拒否される。ランタイムで旧writerの終了を確認し、終了ログを `--action recover --proof /absolute/stopped-log.txt` へ渡す。BLOCKEDになり、変更指紋が記録される。Git diffと部分編集を観察してからPLAN/REVIEW/VERIFY/AUDITへ再開する。証拠が最新なら不要な再実装はしない。
 
-利用上限、認証、使用不能なモデル、長期作業の途中停止、アプリが使えない実行環境などでは自動継続が止まることがある。停止しても`.autodev`の記録とGit状態から再開できるように実装する。
+プロセスクラッシュで `.autodev/.mutex` が残った場合は、関連プロセスとWorkflowが全て停止したことを確認し、ファイルを退避してからrecoverする。自動で生きたlockを奪わない。別worktree・branch・remoteへ移動すると識別不一致で拒否する。意図的な移行は元状態を保全して再初期化し、証拠を再取得する。
 
-最終的な人間確認が必要な場合は、内容を明示して`READY_FOR_HUMAN_REVIEW`とし、機械的に検証済みの条件と混同しない。
+## レビュー・モデルの記録
+
+`evidence/review.json` / `audit.json` はassessment.schema.json準拠。productはfingerprint、contractはcontracts().digest、identityはhash(JSON.stringify(mission.target))。findingsとrequirement_refsは独立エージェントの出力を保持する。runtime_recordはevidence内の元ランタイムログのbasename、runtime_hashはそのSHA256、expected_model/observed_modelは実際の観測値。ログが無ければ作らず未検証のままにする。
+
+`.autodev/routing.json` は以下の配列を3モデル分保存する。
+
+```json
+[{"expected":"claude-opus-5-5","observed":"claude-opus-5-5","record":"actual-task-detail.txt","hash":"SHA256_OF_ACTUAL_LOG"}]
+```
+
+ゲートはモデル一致とログの現存・ハッシュを確認する。ただし任意形式のランタイムログからモデル名を自動解析するアダプタは未実装。ログと正規化値の照合は親セッションの責任。エージェント自身の「私はOpus」は根拠にならない。
+
+## 判定の限界
+
+この基盤は信頼された親とエージェントを前提に、欠損・古い証拠・通常の誤判定を防ぐ。任意shellの隔離、ログの署名、悪意あるエージェントによる証拠偽造の防止は提供しない。レビューの読み取り専用境界はClaude Codeの実ツール制限で担保する必要があり、実測前にはWorkflowを起動しない。
+
+製品指紋はGitで追跡済み＋ignoreされていない未追跡ファイル（内容・種別・mode・削除）。.autodevは除外。原要求・契約・バックログ構造・共通検証器は別指紋に含む。未追跡でもignoreされたソース、submoduleは未対応（submoduleは拒否）。原要件IDの意味と原文の完全な対応はOpus監査が必要。

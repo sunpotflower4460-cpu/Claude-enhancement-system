@@ -1,5 +1,7 @@
 # 01 — 構成と環境別ブートストラップ
 
+実装状況（2026-10-25）：この文書の役割分担を維持し、v0.1では`develop-sprint.js`へreview/fixを内包した。状態・証拠CLIは`bootstrap/state/record/context/doctor/verify.mjs`、共通処理は`scripts/lib/core.mjs`。実際のSchemaにはmission/backlog/current-task/contract/evidence/assessmentがある。実装上の判断と理由は[feasibility-report.md](feasibility-report.md)、実機未確認項目は[validation-results.md](validation-results.md)。
+
 ## 1. 方式
 
 **外側：Claude Code `/goal` / 中央：Sonnet 5.5親セッション / 内側：Dynamic Workflow + 役割別サブエージェント / 独立：機械的品質ゲート**。

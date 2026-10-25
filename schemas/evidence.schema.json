@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "check_id",
+    "product",
+    "contract",
+    "identity",
+    "started",
+    "ended",
+    "command",
+    "exit_code",
+    "signal",
+    "stable",
+    "log",
+    "log_hash",
+    "environment"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "check_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "product": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contract": {
+      "type": "string",
+      "minLength": 1
+    },
+    "identity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "started": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ended": {
+      "type": "string",
+      "minLength": 1
+    },
+    "command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "exit_code": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "signal": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "stable": {
+      "type": "boolean"
+    },
+    "log": {
+      "type": "string",
+      "minLength": 1
+    },
+    "log_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "checks",
+    "human_review"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "requirement_refs",
+          "kind",
+          "command",
+          "timeout_ms"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requirement_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "kind": {
+            "enum": [
+              "test",
+              "build",
+              "behavior",
+              "visual",
+              "play",
+              "api"
+            ]
+          },
+          "command": {
+            "type": "string",
+            "minLength": 1
+          },
+          "timeout_ms": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3600000
+          }
+        }
+      }
+    },
+    "human_review": {
+      "type": "boolean"
+    }
+  }
+}

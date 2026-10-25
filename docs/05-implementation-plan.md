@@ -4,6 +4,22 @@
 
 Codex 6.1-sol（高推論）で、小さな実装→テスト→レビュー→修正を繰り返す。指示書だけ増えて動かない状態を避けるため、各フェーズは動く成果物と証拠で終える。計画は必要に応じて更新してよいが、`docs/00-requirements.md`の要求を無断で縮小しない。
 
+## 実装進捗（2026-10-25）
+
+チェックリストは各フェーズの実機終了条件まで満たしたときに完了とする。未実測の項目をコードの存在だけでチェックしない。
+
+| フェーズ | 実装済みの範囲 | 終了条件の状態 |
+| --- | --- | --- |
+| 0 | doctor、公式Workflow/SDK資料の再取得、feasibility-report | UNVERIFIED：Claude Codeなし |
+| 1 | bootstrap、JSON Schema、状態遷移、指紋、record、verify、故障テスト | ローカル試験PASS |
+| 2 | 役割定義、直列Workflow、null拒否、修正とSonnet昇格、所有権と再開 | 模擬試験PASS、実モデル試験UNVERIFIED |
+| 3 | Opus計画/監査Workflow、要件対応検査、監査欠損/重大指摘の拒否 | 機械検査PASS、Opus監査UNVERIFIED |
+| 4 | 3プロファイルの必須検査、実コマンド証拠、JSON/概要の最終出力 | 機械検査とHTTP実行PASS、ブラウザ/ゲームUNVERIFIED |
+| 5 | START、対象自動選択、非破壊導入、plugin/skills/agents/workflows | ローカル初期化PASS、Claude発見/起動UNVERIFIED |
+| 6 | 回帰テスト、CLI統合試験、CI設定、証拠と残課題 | ローカルPASS、クラウド総合試験UNVERIFIED |
+
+再現コマンドとT01〜T20の対応・根拠は [validation-results.md](validation-results.md)。次の必須工程はClaude CodeでSTARTの手順4の権限制限probeを実測し、同じ実行記録でT01/T02/T03/T19を検証すること。
+
 ## フェーズ0：前提機能のスモークテスト【最優先】
 
 対象：最小テストリポジトリを用いた、Claude Codeクラウドの2リポジトリ選択とモデル分担の実証。
