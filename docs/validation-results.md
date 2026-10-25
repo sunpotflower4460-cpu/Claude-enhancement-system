@@ -44,6 +44,6 @@
 1. Claude Codeクラウドで/goal、Workflow、共有scriptPath、tools制限、承認条件、モデル実ルーティングを実測。Workflow呼出形式の差があれば公式/workflow-authoringに沿って修正し回帰試験する。
 2. 実レビュー/監査/モデルログを取得し、正規化値と元ログを照合する。任意ログ形式の自動解析は未実装。
 3. Web・既存プロジェクト・ゲームを実Claudeで開発し、実ブラウザ/プレイ・中断再開・故障注入を追試する。画像や操作成功を今回の結果から推測しない。
-4. GitHub ActionsのNode.js v22.23.3でも実行済み。初回CIは22件PASS（[run 40188656451](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40188656451)）。CIログでtimeoutの子プロセス残存を発見したためプロセス群の停止と回帰テストを追加し、ローカルの最終結果は23件PASS。追補CIの結果はPR checksを参照。
+4. GitHub ActionsのNode.js v22.23.3でも最終コードの24件がPASS。push用[run 40188835146](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40188835146)、PR用[run 40188837751](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40188837751)を確認。初回に見つかったtimeout子プロセス残存と、PRのdetached HEADでの識別失敗は修正済み。[CIメタデータ](evidence/github-ci.json)。
 
-ここまでが完了するまでは「V1完成」「クラウドで一指示から動作済み」とは表示しない。実装要求は維持している。
+上記1〜3のClaude実機確認が完了するまでは「V1完成」「クラウドで一指示から動作済み」とは表示しない。実装要求は維持している。
