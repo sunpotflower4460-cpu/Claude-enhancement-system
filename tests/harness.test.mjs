@@ -121,3 +121,15 @@ test('canonical remote rejects shared clones even under SSH URL spelling',t=>{
  const f=fixture(t);f.git('remote','set-url','origin','git@github.com:sunpotflower4460-cpu/Claude-enhancement-system.git');
  assert.throws(()=>bootstrap({target:f.target,mission:f.source}),/shared repository/);
 });
+test('timeout terminates a check process group including child processes',async t=>{
+ const f=fixture(t);const c=read(path.join(f.dir,'contract.json'));
+ fs.writeFileSync(path.join(f.target,'slow.mjs'),`import fs from 'node:fs'; fs.writeFileSync('.autodev/evidence/child-pid.txt',String(process.pid)); setInterval(()=>{},1000);`);
+ c.checks[0].command='node slow.mjs';c.checks[0].timeout_ms=500;json(path.join(f.dir,'contract.json'),c);
+ const e=record({target:f.target,check:'test'});assert.equal(e.exit_code,null);
+ const pid=Number(fs.readFileSync(path.join(f.dir,'evidence','child-pid.txt'),'utf8'));
+ await new Promise(resolve=>setTimeout(resolve,100));
+ // A terminated process can briefly remain a zombie until init reaps it.
+ if(fs.existsSync('/proc/'+pid+'/stat')) {
+  const status=fs.readFileSync('/proc/'+pid+'/stat','utf8');assert.match(status,/\) Z /);
+ }
+});

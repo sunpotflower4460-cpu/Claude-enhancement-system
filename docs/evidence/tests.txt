@@ -2,33 +2,34 @@
 > claude-enhancement-system@0.1.0 test
 > node --test
 
-✔ T01/T10 initialization is idempotent, preserves settings and refuses shared target (221.104912ms)
-✔ schemas reject malformed, unknown properties, duplicate IDs and missing coverage (100.493398ms)
-✔ T04 real faulty code fails, repaired code passes with mock assessments (550.722045ms)
-✔ T05 missing/stale/log-tampered evidence is UNVERIFIED (1156.045773ms)
-✔ T06 build passes but visual failure rejects completion (647.525281ms)
-✔ T07 removed requirement mapping and dependencies rejected (121.431691ms)
-✔ T09/T16 ownership prevents double writers and recovery observes partial edits (151.435485ms)
-✔ T12 all profiles reuse harness with command evidence only (1373.777054ms)
-✔ T13 evidence does not invalidate product; contract edits do (560.972561ms)
-✔ T14 untracked files, deletions, executable bit and symlink target affect fingerprint (65.836598ms)
-✔ T17 substituted models and unresolved reviews cannot complete (388.069979ms)
-✔ T20 in-flight run and command modifying product reject completion (333.072975ms)
-✔ state symlinks rejected; branch mismatch and mission tamper rejected (68.085187ms)
-✔ CLI subprocess: bootstrap auto-select, real HTTP check, context, gate, doctor (1428.702203ms)
-✔ record timeout fails and command contract edits invalidate evidence (206.321263ms)
-✔ canonical remote rejects shared clones even under SSH URL spelling (73.440846ms)
-✔ Opus milestone script compiles and preserves missing requirement findings (2.205895ms)
-✔ T15 null at any stage aborts and never runs later stages (3.974666ms)
-✔ T08 two failed reviews escalate builder to Sonnet (0.701665ms)
-✔ T19 static tools restriction excludes shell, edits, MCP and delegation (0.964789ms)
-✔ blocked results stop; rejected API calls propagate (0.461303ms)
-✔ model definitions agree with workflow requested models and no randomness/imports (0.867626ms)
-ℹ tests 22
+✔ T01/T10 initialization is idempotent, preserves settings and refuses shared target (162.858017ms)
+✔ schemas reject malformed, unknown properties, duplicate IDs and missing coverage (91.313043ms)
+✔ T04 real faulty code fails, repaired code passes with mock assessments (546.283426ms)
+✔ T05 missing/stale/log-tampered evidence is UNVERIFIED (803.447009ms)
+✔ T06 build passes but visual failure rejects completion (560.678189ms)
+✔ T07 removed requirement mapping and dependencies rejected (63.704337ms)
+✔ T09/T16 ownership prevents double writers and recovery observes partial edits (124.464969ms)
+✔ T12 all profiles reuse harness with command evidence only (2052.590626ms)
+✔ T13 evidence does not invalidate product; contract edits do (1123.973007ms)
+✔ T14 untracked files, deletions, executable bit and symlink target affect fingerprint (81.145915ms)
+✔ T17 substituted models and unresolved reviews cannot complete (583.660293ms)
+✔ T20 in-flight run and command modifying product reject completion (706.704274ms)
+✔ state symlinks rejected; branch mismatch and mission tamper rejected (113.805653ms)
+✔ CLI subprocess: bootstrap auto-select, real HTTP check, context, gate, doctor (1895.509142ms)
+✔ record timeout fails and command contract edits invalidate evidence (321.343976ms)
+✔ canonical remote rejects shared clones even under SSH URL spelling (71.633597ms)
+✔ timeout terminates a check process group including child processes (734.03994ms)
+✔ Opus milestone script compiles and preserves missing requirement findings (3.219397ms)
+✔ T15 null at any stage aborts and never runs later stages (8.706198ms)
+✔ T08 two failed reviews escalate builder to Sonnet (0.582013ms)
+✔ T19 static tools restriction excludes shell, edits, MCP and delegation (0.921395ms)
+✔ blocked results stop; rejected API calls propagate (7.435354ms)
+✔ model definitions agree with workflow requested models and no randomness/imports (0.654667ms)
+ℹ tests 23
 ℹ suites 0
-ℹ pass 22
+ℹ pass 23
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 7590.886116
+ℹ duration_ms 10214.489807

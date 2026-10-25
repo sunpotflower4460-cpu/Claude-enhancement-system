@@ -52,7 +52,7 @@ export function contracts(root) {
  return {dir,mission,backlog,contract,digest:hash(JSON.stringify({mission,contract,backlog:backlog.items.map(({status,...x})=>x),validator:verifierVersion()}))};
 }
 export function verifierVersion() {
- return hash(['core.mjs','../verify.mjs','../record.mjs',...fs.readdirSync(path.join(shared,'schemas')).map(n=>'../../schemas/'+n)].map(n=>fs.readFileSync(path.resolve(shared,'scripts/lib',n))).join('\n'));
+ return hash(['core.mjs','run-check.mjs','../verify.mjs','../record.mjs',...fs.readdirSync(path.join(shared,'schemas')).map(n=>'../../schemas/'+n)].map(n=>fs.readFileSync(path.resolve(shared,'scripts/lib',n))).join('\n'));
 }
 export function fingerprint(root) {
  // Git index + untracked nonignored paths. Tracked files remain included even if ignored.

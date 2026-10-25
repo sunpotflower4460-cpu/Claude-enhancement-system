@@ -31,6 +31,10 @@ Workflowはmetaリテラルを先頭に置く。bodyはtop-level awaitとreturn�
 | Workflow権限制限probeを起動前提にする | 公開ページだけではagentのtoolsオプションの実適用を証明できず、未確認のままread-onlyとは言えない | T18/T19 |
 | V1受け入れを保留し独立実装を継続 | P0不可でも作業を止めず、クラウド成功を捏造しない | T01/T02/T03 |
 
+## 実装レビューでの修正
+
+最初のGitHub Actionsは22件PASSだったが、終了ログにtimeout後のnode子プロセス残存が出た。shell単体へのtimeoutでは子を止められないため、検査を独立したプロセス群で起動し、期限/出力量超過/終了時に群を停止するrun-check.mjsを追加した。実PIDを保存して/proc上で実行中でないことを確かめる回帰テストを追加。
+
 ## 現時点での制限
 
 同梱Workflowの`model`/`tools`/`schema`呼び出しは模擬環境で検査した。実ランタイムの`/workflow-authoring`でtools制限の正確な指定を照合し、書込試行が拒否されるまでread-only保証はUNVERIFIED。STARTはこのprobeを必須とする。動的workflowのファイル存在やNodeテスト成功を、標準Claudeランタイムで動作した証拠にはしない。

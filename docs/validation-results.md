@@ -37,13 +37,13 @@
 | T19 | PASS：定義/模擬呼出のtoolsはRead/Grep/Globだけ | UNVERIFIED：実ランタイムで書込拒否probe必要 |
 | T20 | PASS：active runと検査中製品/契約変更で完成拒否 | UNVERIFIED：実Workflow稼働状態の照合なし |
 
-追加：Schema不正・要件ID重複・依存循環・原文改変・branch不一致・状態ディレクトリsymlink・コマンドtimeoutも検査した。
+追加：timeout時の子プロセス停止（/procで実行中でないことを確認）、Schema不正・要件ID重複・依存循環・原文改変・branch不一致・状態ディレクトリsymlink・コマンドtimeoutも検査した。
 
 ## 未解決・次に必要な作業
 
 1. Claude Codeクラウドで/goal、Workflow、共有scriptPath、tools制限、承認条件、モデル実ルーティングを実測。Workflow呼出形式の差があれば公式/workflow-authoringに沿って修正し回帰試験する。
 2. 実レビュー/監査/モデルログを取得し、正規化値と元ログを照合する。任意ログ形式の自動解析は未実装。
 3. Web・既存プロジェクト・ゲームを実Claudeで開発し、実ブラウザ/プレイ・中断再開・故障注入を追試する。画像や操作成功を今回の結果から推測しない。
-4. Node.js 22のGitHub Actionsは設定済みだが、この作業時点でCI実行結果はまだ未確認。
+4. GitHub ActionsのNode.js v22.23.3でも実行済み。初回CIは22件PASS（[run 40188656451](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions/runs/40188656451)）。CIログでtimeoutの子プロセス残存を発見したためプロセス群の停止と回帰テストを追加し、ローカルの最終結果は23件PASS。追補CIの結果はPR checksを参照。
 
 ここまでが完了するまでは「V1完成」「クラウドで一指示から動作済み」とは表示しない。実装要求は維持している。

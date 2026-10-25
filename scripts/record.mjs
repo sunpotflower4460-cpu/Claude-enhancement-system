@@ -1,11 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {contracts,fingerprint,hash,json,validate,mutex,main} from './lib/core.mjs';
+import {contracts,fingerprint,hash,json,validate,mutex,main,shared} from './lib/core.mjs';
 export function record(o) {return mutex(o.target,()=>{
  const c=contracts(o.target),check=c.contract.checks.find(x=>x.id===o.check); if(!check) throw Error('Unknown check');
  const before=fingerprint(o.target), started=new Date().toISOString();
- const result=spawnSync('/bin/sh',['-c',check.command],{cwd:o.target,encoding:'utf8',timeout:check.timeout_ms,maxBuffer:8*1024*1024});
+ const processResult=spawnSync(process.execPath,[path.join(shared,'scripts/lib/run-check.mjs'),check.command,String(check.timeout_ms)],{cwd:o.target,encoding:'utf8',timeout:check.timeout_ms+5000,maxBuffer:24*1024*1024});
+ if(processResult.status!==0) throw Error('Check runner failed: '+(processResult.error?.message||processResult.stderr));
+ const result=JSON.parse(processResult.stdout);
  const output=(result.stdout||'')+(result.stderr||'')+(result.error?.message||''), name=hash(check.id)+'.log';
  fs.writeFileSync(path.join(c.dir,'evidence',name),output);
  const after=contracts(o.target);
