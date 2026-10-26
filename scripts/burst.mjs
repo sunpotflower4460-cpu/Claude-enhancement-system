@@ -15,7 +15,7 @@ import {
   isMain,
 } from "./lib/core.mjs";
 import { terminationProof } from "./lib/recovery.mjs";
-import { streamRunId } from "./lib/runtime.mjs";
+import { streamRunId, condenseSdk } from "./lib/runtime.mjs";
 const recovery =
   "Do not launch another Workflow. Inspect the actual SDK task list and original launch transcript. If it launched, collect correlated termination plus a drained snapshot, then burst finish. A CLAIMED entry without a known launch remains unknown; absence of a result or local process death does not prove no launch. If no native invocation can be established, preserve the journal and obtain explicit administrative reconciliation before clearing it.";
 function parse(raw) {
@@ -143,8 +143,9 @@ function reused(j, e, launch) {
       throw Error("Reused native Workflow identity from an earlier burst");
   }
 }
-function preserveRaw(c, raw) {
-  const sha256 = hash(raw),
+function preserveRaw(c, full) {
+  const raw = condenseSdk(full),
+    sha256 = hash(raw),
     record = "burst-sdk-" + sha256 + ".jsonl",
     file = artifactPath(c.dir, record);
   if (fs.existsSync(file) && hash(fs.readFileSync(file)) !== sha256)

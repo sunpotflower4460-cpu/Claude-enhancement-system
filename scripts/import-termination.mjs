@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { load, read, json, hash, artifactPath, main } from "./lib/core.mjs";
 import { terminationProof } from "./lib/recovery.mjs";
-import { streamRunId } from "./lib/runtime.mjs";
+import { streamRunId, condenseSdk } from "./lib/runtime.mjs";
 export function importTermination(o) {
   return mutex(o.target, () => importTerminationUnlocked(o));
 }
@@ -13,13 +13,15 @@ function importTerminationUnlocked(o) {
     s = read(path.join(c.dir, "current-task.json")),
     // A killed CLI leaves no terminal event; the resumed session reports it. The proof
     // record is the verbatim concatenation: original capture, newline, resumed capture.
-    raw = o.resume_raw
-      ? Buffer.concat([
-          fs.readFileSync(o.raw),
-          Buffer.from("\n"),
-          fs.readFileSync(o.resume_raw),
-        ])
-      : fs.readFileSync(o.raw),
+    raw = condenseSdk(
+      o.resume_raw
+        ? Buffer.concat([
+            fs.readFileSync(o.raw),
+            Buffer.from("\n"),
+            fs.readFileSync(o.resume_raw),
+          ])
+        : fs.readFileSync(o.raw),
+    ),
     es = raw
       .toString()
       .split("\n")

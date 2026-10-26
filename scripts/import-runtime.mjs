@@ -16,6 +16,9 @@ import {
   invocationWindow,
   routingProvenance,
   streamRunId,
+  launchToolUse,
+  newestSdk,
+  condenseSdk,
 } from "./lib/runtime.mjs";
 import { invocationTag } from "./lib/core.mjs";
 export function importRuntime(o) {
@@ -34,17 +37,20 @@ function importRuntimeUnlocked(o) {
             session_id: c.session.session_id,
           }
         : context(c, task);
-  const raw = fs.readFileSync(o.raw),
+  // Inside a Workflow the coordinator knows its burst, not the launch tool_use id or capture path.
+  const rawPath = o.raw || newestSdk(c.dir),
+    raw = condenseSdk(fs.readFileSync(rawPath)),
     events = raw
       .toString()
       .split("\n")
       .filter((x) => x.trim())
       .map(JSON.parse),
+    toolUse = o.tool_use || launchToolUse(events.slice(0), o.burst),
     starts = events.filter(
       (e) =>
         e.type === "system" &&
         e.subtype === "task_started" &&
-        e.tool_use_id === o.tool_use,
+        e.tool_use_id === toolUse,
     );
   if (starts.length !== 1)
     throw Error("Specify a uniquely observed SDK tool_use_id");
@@ -52,16 +58,19 @@ function importRuntimeUnlocked(o) {
     window = invocationWindow(events, {
       sdk_task_id: start.task_id,
       sdk_run_id: start.run_id,
-      tool_use_id: o.tool_use,
+      tool_use_id: toolUse,
       sdk_session_id: start.session_id,
     }),
     // Forwarded subagent messages (Agent tool) or, for native Workflows, the
     // runtime's own workflow_agent progress record carrying this stage's tag.
     msg =
       window.messages.filter((e) => e.message?.model).at(-1) ||
-      window.agents
-        .filter((a) => a.label === invocationTag(c, ctx, o.stage) && a.message.model)
-        .at(-1);
+      (() => {
+        const mine = window.agents.filter(
+          (a) => a.label === invocationTag(c, ctx, o.stage) && a.message.model,
+        );
+        return mine.filter((a) => a.state === "done").at(-1) || mine.at(-1);
+      })();
   if (!msg)
     throw Error(
       "Subagent evidence absent: no forwarded subagent messages and no workflow_agent progress carrying this stage tag (use --forward-subagent-text)",
@@ -70,7 +79,7 @@ function importRuntimeUnlocked(o) {
     record = "sdk-" + digest + ".jsonl",
     name =
       "runtime-" +
-      hash(JSON.stringify({ ...ctx, stage: o.stage, tool_use: o.tool_use })) +
+      hash(JSON.stringify({ ...ctx, stage: o.stage, tool_use: toolUse })) +
       ".json";
   fs.writeFileSync(artifactPath(c.dir, record), raw);
   const r = {
@@ -83,7 +92,7 @@ function importRuntimeUnlocked(o) {
     record,
     sha256: digest,
     sdk_session_id: start.session_id,
-    tool_use_id: o.tool_use,
+    tool_use_id: toolUse,
     message_uuid: msg.uuid,
     ...(msg.agent_type
       ? {

@@ -108,3 +108,46 @@ function sdkRoot(f, s) {
   fs.writeFileSync(p, es.map((e) => JSON.stringify(e)).join("\n"));
   return p;
 }
+
+import { importRuntime } from "../scripts/import-runtime.mjs";
+import { operation } from "../scripts/operation.mjs";
+import { condenseSdk } from "../scripts/lib/runtime.mjs";
+test("A4 import-runtime resolves the launch from the burst and the capture from evidence, ignoring partial stream_event bulk", (t) => {
+  const f = fixture(t);
+  const src = sdk(f, { stage: "implement" });
+  // Newest live-sdk capture, with partial-message noise like a real stream.
+  const noisy = fs.readFileSync(src, "utf8") + "\n" + Array.from({ length: 200 }, () => JSON.stringify({ type: "stream_event", event: { x: "y".repeat(500) } })).join("\n");
+  fs.writeFileSync(path.join(f.dir, "evidence", "live-sdk-test.jsonl"), noisy);
+  const r = importRuntime({ target: f.target, task: "R1", stage: "implement", expected: "claude-sonnet-5-5", burst: "b1" });
+  assert.equal(r.status, "OBSERVED");
+  const stored = fs.readFileSync(artifactPath(f.dir, r.observation.record), "utf8");
+  assert.ok(!stored.includes("stream_event"), "stored record drops partial stream events");
+  assert.ok(stored.length < noisy.length / 5);
+  assert.equal(condenseSdk(Buffer.from(stored)).toString(), stored, "condense is idempotent");
+  // A still-running agent with the same tag does not hide a finished one.
+  const mixed = JSON.parse(fs.readFileSync(src, "utf8").split("\n")[3]);
+  mixed.workflow_progress.push({ ...mixed.workflow_progress[0], agentId: "a2", state: "running" });
+  const lines = fs.readFileSync(src, "utf8").split("\n");
+  lines.push(JSON.stringify(mixed));
+  fs.writeFileSync(path.join(f.dir, "evidence", "live-sdk-test.jsonl"), lines.join("\n"));
+  assert.equal(importRuntime({ target: f.target, task: "R1", stage: "implement", expected: "claude-sonnet-5-5", burst: "b1" }).status, "OBSERVED");
+});
+
+test("A5 operation complete needs a result, and a null-result receipt can be repaired once", (t) => {
+  const f = fixture(t);
+  state({ target: f.target, action: "begin", run: "r1", task: "mission", attempt: "a1" });
+  const op = (o) => operation({ target: f.target, run: "r1", attempt: "a1", task: "R1", id: "op-1", stage: "PLAN", ...o });
+  assert.equal(op({ action: "start" }).status, "STARTED");
+  assert.throws(() => op({ action: "complete" }), /requires --result/);
+  const res = path.join(f.dir, "evidence", "op-result.json");
+  fs.mkdirSync(path.dirname(res), { recursive: true });
+  fs.writeFileSync(res, JSON.stringify({ status: "PASS" }));
+  assert.equal(op({ action: "complete", result: res }).operation.result.status, "PASS");
+  // Legacy/hand-made null receipt becomes repairable with a real result, never silently.
+  const file = fs.readdirSync(path.join(f.dir, "operations")).map((n) => path.join(f.dir, "operations", n))[0];
+  const rec = read(file);
+  rec.result = null;
+  json(file, rec);
+  assert.throws(() => op({ action: "complete" }), /No started operation|requires --result/);
+  assert.equal(op({ action: "complete", result: res }).operation.result.status, "PASS");
+});

@@ -11,6 +11,7 @@ import {
   isMain,
 } from "./lib/core.mjs";
 import { importRuntime } from "./import-runtime.mjs";
+import { launchToolUse, newestSdk } from "./lib/runtime.mjs";
 import { saveAssessment } from "./assessment.mjs";
 
 // Live run 6e: a real coordinator refused to hand-build the v2 assessment envelope (it would
@@ -20,32 +21,6 @@ import { saveAssessment } from "./assessment.mjs";
 // run/task/attempt/executions/requirements come from the current files; the model proof is
 // imported from the live SDK stream (workflow_agent progress for this stage's tag).
 const MODEL = { review: "claude-sonnet-5-5", audit: "claude-opus-5-5" };
-function launchToolUse(events, burst) {
-  const hits = events
-    .filter((e) => e.type === "assistant")
-    .flatMap((e) => e.message?.content || [])
-    .filter(
-      (b) =>
-        b.type === "tool_use" &&
-        b.name === "Workflow" &&
-        b.input?.args?.burst_id === burst,
-    );
-  if (hits.length !== 1)
-    throw Error("Cannot identify the Workflow launch for burst " + burst);
-  return hits[0].id;
-}
-function newestSdk(dir) {
-  const ev = path.join(dir, "evidence");
-  const files = fs.existsSync(ev)
-    ? fs
-        .readdirSync(ev)
-        .filter((n) => /^live-sdk-.*\.jsonl$/.test(n))
-        .map((n) => ({ n, t: fs.statSync(path.join(ev, n)).mtimeMs }))
-        .sort((a, b) => b.t - a.t)
-    : [];
-  if (!files.length) throw Error("No live SDK capture; runtime proof is UNVERIFIED");
-  return path.join(ev, files[0].n);
-}
 export function persistAssessment(o) {
   const kind = o.kind,
     scope = o.scope;
@@ -141,7 +116,11 @@ export function persistAssessment(o) {
     task: task?.id,
     runtime: imported.name,
   });
-  return { status: "PERSISTED", assessment_status: saved.status, runtime_ref: imported.name };
+  return {
+    status: "PERSISTED",
+    assessment_status: saved.status,
+    runtime_ref: imported.name,
+  };
 }
 if (isMain(import.meta.url))
   main((o) => console.log(JSON.stringify(persistAssessment(o), null, 2)));

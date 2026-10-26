@@ -6,7 +6,10 @@ import { artifactPath, read, hash, validate, invocationTag } from "./core.mjs";
 // task_started/task_progress/task_notification. They are unrelated strings, so the
 // stream id must be read from the task_started that carries the same tool_use_id.
 // Absent a task_started (older logs), fall back to the launch result.
-export function streamRunId(events, { session_id, tool_use_id, task_id, launch_run_id }) {
+export function streamRunId(
+  events,
+  { session_id, tool_use_id, task_id, launch_run_id },
+) {
   const starts = events.filter(
     (e) =>
       e.type === "system" &&
@@ -15,7 +18,8 @@ export function streamRunId(events, { session_id, tool_use_id, task_id, launch_r
       e.tool_use_id === tool_use_id &&
       e.task_id === task_id,
   );
-  if (starts.length > 1) throw Error("Ambiguous SDK task_started for Workflow launch");
+  if (starts.length > 1)
+    throw Error("Ambiguous SDK task_started for Workflow launch");
   return starts.length ? starts[0].run_id : launch_run_id;
 }
 // Native Workflow agents are reported by the runtime itself in
@@ -41,6 +45,49 @@ export function workflowAgents(events, window) {
     message: { model: w.model },
   }));
 }
+// Partial-message stream_event records are ~90% of a live capture (20 MB per import in live runs,
+// 1.7 GB of evidence in one probe) and no check reads them. Keep every other record verbatim.
+export function condenseSdk(buf) {
+  const text = Buffer.isBuffer(buf) ? buf.toString("utf8") : String(buf);
+  if (!/"type":\s*"stream_event"/.test(text)) return Buffer.from(text);
+  return Buffer.from(
+    text
+      .split("\n")
+      .filter((l) => l.trim() && !/^\{"type":\s*"stream_event"/.test(l))
+      .join("\n"),
+  );
+}
+
+// The Workflow launch for a burst: the assistant Workflow tool_use whose args carry burst_id.
+export function launchToolUse(events, burst) {
+  const hits = events
+    .filter((e) => e.type === "assistant")
+    .flatMap((e) => e.message?.content || [])
+    .filter(
+      (b) =>
+        b.type === "tool_use" &&
+        b.name === "Workflow" &&
+        b.input?.args?.burst_id === burst,
+    );
+  if (hits.length !== 1)
+    throw Error("Cannot identify the Workflow launch for burst " + burst);
+  return hits[0].id;
+}
+// The live SDK capture of the current probe invocation (newest by mtime).
+export function newestSdk(dir) {
+  const ev = path.join(dir, "evidence");
+  const files = fs.existsSync(ev)
+    ? fs
+        .readdirSync(ev)
+        .filter((n) => /^live-sdk-.*\.jsonl$/.test(n))
+        .map((n) => ({ n, t: fs.statSync(path.join(ev, n)).mtimeMs }))
+        .sort((a, b) => b.t - a.t)
+    : [];
+  if (!files.length)
+    throw Error("No live SDK capture; runtime proof is UNVERIFIED");
+  return path.join(ev, files[0].n);
+}
+
 export function invocationWindow(
   events,
   { sdk_task_id, sdk_run_id, tool_use_id, sdk_session_id },
@@ -224,7 +271,9 @@ export function runtimeObservation(
     if (
       agent.state !== "done" ||
       !/^(autodev-|claude-autodev:)[a-z-]+$/.test(agent.agent_type || "") ||
-      same.some((a) => a.error || a.state !== "done" || a.message.model !== r.expected_model)
+      // Still-running agents with this tag (e.g. the coordinator importing its own stage) are
+      // not evidence, but a wrong model among them still voids the observation.
+      same.some((a) => a.error || a.message.model !== r.expected_model)
     )
       throw Error("Model substituted or runtime error");
   } else if (

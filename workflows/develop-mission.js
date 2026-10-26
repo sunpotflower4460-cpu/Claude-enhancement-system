@@ -124,8 +124,9 @@ const validInspect = (r) =>
   usableInspect(r) &&
   typeof r.snapshot.observation_id === "string" &&
   typeof r.snapshot.architecture_ready === "boolean";
-const base = `Read the ${input.shared}/agents role definition and target's preserved mission. Never modify the common repository. Each writer MUST use scripts/operation.mjs start/complete with stable operation_id, and inspect partial diffs before replay. Return non-PASS when real CLI results or runtime evidence are absent. All task/check/assessment state is schema v2. Read-only roles return their actual status, every finding, current snapshot context and requirement coverage; never delegate or edit. The coordinator persists these verbatim via assessment.mjs; do not stamp an old review with a newer fingerprint. Parent alone confirms runtime drained and invokes final verify after Workflow completion. For action inspect the result.snapshot MUST be built from the real CLI output as an object with exactly these fields: observation_id (string, from context.mjs), architecture_ready (boolean, copy context.mjs architecture_ready verbatim; never infer it), completed_since_audit (integer, copy context.mjs completed_since_audit), tasks (ARRAY copied verbatim from context.mjs tasks: every element keeps id, status, dependencies and execution; never condense it), resume (the inner resume object of next.mjs output, i.e. {stage, task_id, operation_id, ...}; omit when next.mjs has no resume) and failure_state (from failure.mjs summary); never summarize it as prose or rename these fields. Run exactly the command lines in AUTODEV_REQUEST.commands, one simple command per Bash call (no cd, no && or ; chains, no variable assignments), and never drop a flag (next.mjs needs --run, failure.mjs needs --action summary). For inspect copy product, contract and identity (the three hashes) from context.mjs into snapshot. A sonnet-reviewer or opus-auditor result MUST include snapshot with exactly the product, contract and identity values of the snapshot it was given (never recompute them). For persist-review, persist-final-review, persist-final-audit and checkpoint-audit: write the assessor's exact result JSON (payload.result) to AUTODEV_REQUEST.commands.result_file with the Write tool, then run AUTODEV_REQUEST.commands.assess (and for checkpoint-audit, only after it succeeds, AUTODEV_REQUEST.commands.progress to reset the audit cadence); never hand-build or edit an assessment; if assess fails return UNVERIFIED with its error message as a finding. Finding severity: use major or critical only for a defect that makes this very action unsafe or wrong (an unresolved major/critical blocks PASS); work that a later stage has not done yet (independent review, verification, other tasks, milestone audit) is minor, never major. Status semantics for a coordinator action: PASS means the action completed and its CLI output was obtained, even when tasks are still UNVERIFIED; return UNVERIFIED/BLOCKED only if a CLI command failed or evidence is genuinely missing. `;
-const taskContexts = {};
+const base = `Read the ${input.shared}/agents role definition and target's preserved mission. Never modify the common repository. Each writer MUST use scripts/operation.mjs start/complete with stable operation_id, and inspect partial diffs before replay. Return non-PASS when real CLI results or runtime evidence are absent. All task/check/assessment state is schema v2. Read-only roles return their actual status, every finding, current snapshot context and requirement coverage; never delegate or edit. The coordinator persists these verbatim via assessment.mjs; do not stamp an old review with a newer fingerprint. Parent alone confirms runtime drained and invokes final verify after Workflow completion. For action inspect the result.snapshot MUST be built from the real CLI output as an object with exactly these fields: observation_id (string, from context.mjs), architecture_ready (boolean, copy context.mjs architecture_ready verbatim; never infer it), completed_since_audit (integer, copy context.mjs completed_since_audit), tasks (ARRAY copied verbatim from context.mjs tasks: every element keeps id, status, dependencies and execution; never condense it), resume (the inner resume object of next.mjs output, i.e. {stage, task_id, operation_id, ...}; omit when next.mjs has no resume) and failure_state (from failure.mjs summary); never summarize it as prose or rename these fields. Run exactly the command lines in AUTODEV_REQUEST.commands, one simple command per Bash call (no cd, no && or ; chains, no variable assignments), and never drop a flag (next.mjs needs --run, failure.mjs needs --action summary). For inspect copy product, contract and identity (the three hashes) from context.mjs into snapshot. A sonnet-reviewer or opus-auditor result MUST include snapshot with exactly the product, contract and identity values of the snapshot it was given (never recompute them). For persist-review, persist-final-review, persist-final-audit and checkpoint-audit: write the assessor's exact result JSON (payload.result) to AUTODEV_REQUEST.commands.result_file with the Write tool, then run AUTODEV_REQUEST.commands.assess (and for checkpoint-audit, only after it succeeds, AUTODEV_REQUEST.commands.progress to reset the audit cadence); never hand-build or edit an assessment; if assess fails return UNVERIFIED with its error message as a finding. For checkpoint-architecture and close-task, after the main action succeeds run every line of AUTODEV_REQUEST.commands.import_runtime (one simple command per Bash call); these import the live SDK model observation for that stage and, if one fails because the agent has not finished, report UNVERIFIED with its error. Finding severity: use major or critical only for a defect that makes this very action unsafe or wrong (an unresolved major/critical blocks PASS); work that a later stage has not done yet (independent review, verification, other tasks, milestone audit) is minor, never major. Status semantics for a coordinator action: PASS means the action completed and its CLI output was obtained, even when tasks are still UNVERIFIED; return UNVERIFIED/BLOCKED only if a CLI command failed or evidence is genuinely missing. `;
+const taskContexts = {},
+  implementer = {};
 let planEpoch = 0,
   inspectionSequence = 0,
   assessSequence = 0,
@@ -213,6 +214,30 @@ async function call(role, action, task_id = "mission", payload = {}) {
   // failure.mjs without --action. Hand it exact command lines for the read-only inspection.
   const cli = (script, flags) =>
     "node " + input.shared + "/scripts/" + script + ".mjs " + flags;
+  const importCmd = (task, stage, model) =>
+    cli(
+      "import-runtime",
+      "--target " +
+        input.target +
+        " --task " +
+        task +
+        " --stage " +
+        stage +
+        " --expected " +
+        model +
+        (input.burst_id ? " --burst " + input.burst_id : ""),
+    );
+  const importRuntimeFor = (act, id) => {
+    if (!coordinator) return null;
+    if (act === "checkpoint-architecture")
+      return [importCmd("mission", "architecture", "claude-opus-5-5")];
+    if (act === "close-task")
+      return [
+        importCmd("mission", "plan", "claude-sonnet-5-5"),
+        importCmd(id, "implement", roles[implementer[id] || "haiku-builder"]),
+      ];
+    return null;
+  };
   const assessKinds = {
     "persist-review": ["review", "task"],
     "persist-final-review": ["review", "final"],
@@ -254,6 +279,11 @@ async function call(role, action, task_id = "mission", payload = {}) {
                 " --result " +
                 resultFile,
             }
+          : {}),
+        // Model proof for stages the coordinator cannot attest itself (verify.mjs needs a live
+        // Opus architecture, Sonnet plan and Haiku/Sonnet implement observation).
+        ...(importRuntimeFor(action, task_id)
+          ? { import_runtime: importRuntimeFor(action, task_id) }
           : {}),
         context: cli(
           "context",
@@ -578,6 +608,7 @@ for (let sprint = 0; sprint < maxSprints; sprint++) {
       attempt === resumeStart && resume?.task_id === task ? resume.stage : null;
     if (!["REVIEW", "VERIFY"].includes(resumeStage)) {
       const model = attempt >= 2 ? "claude-sonnet-5-5" : "claude-haiku-5-5";
+      implementer[task] = attempt >= 2 ? "sonnet-planner" : "haiku-builder";
       const built = await call(
         attempt >= 2 ? "sonnet-planner" : "haiku-builder",
         "implement",

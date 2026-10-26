@@ -115,8 +115,17 @@ export function operation(o) {
       return { status: "STARTED", operation: op };
     }
     if (o.action === "complete") {
-      if (!existing || existing.state !== "started")
+      // Live run 6e: a coordinator completed close-task without --result; the receipt stayed
+      // result:null and verify.mjs then reports "unfinished/missing operation result" forever.
+      // A result is required, and an already-completed null-result receipt can be repaired once.
+      const repair =
+        existing?.state === "completed" && existing.result === null && o.result;
+      if (!existing || (existing.state !== "started" && !repair))
         throw Error("No started operation");
+      if (!o.result)
+        throw Error(
+          "operation complete requires --result FILE with the actual outcome JSON",
+        );
       existing.state = "completed";
       existing.after = fp;
       existing.result = o.result ? JSON.parse(fs.readFileSync(o.result)) : null;
