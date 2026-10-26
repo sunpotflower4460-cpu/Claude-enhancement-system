@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "status": "READONLY_OBSERVED",
+  "reason": "Runtime-recorded tool lists for read-only roles contain only Read/Grep/Glob (+StructuredOutput); writer roles differ",
+  "contrast_writers_have_write": true,
+  "sentinel_absent": null,
+  "transcript_dir": "/root/.claude/projects/-home-user-probes-dreambox-4/edc58073-4d34-5668-a88d-a39fcad8c675/subagents/workflows/wf_40ab9b59-3f4",
+  "agents": [
+    {
+      "agent_id": "a0864cd69980f2e64",
+      "agent_type": "autodev-opus-architect",
+      "role": "opus-architect",
+      "model": "claude-opus-5-5",
+      "description": "autodev|252b624c-fe3c-4e38-9030-3ed70d41e5b1|6e2bf565-ca1b-491e-8672-031029c5c35a|live-probe-4df6e914-7be9-4010-8e4f-bce77b7863b5|mission|93888ee6-d009-4386-8fab-d46e04454907|probe_architecture",
+      "declared_tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "runtime_tool_names": [
+        "Read",
+        "Bash",
+        "Edit",
+        "Write",
+        "StructuredOutput"
+      ],
+      "expected_readonly": false,
+      "readonly_ok": null,
+      "meta_sha256": "21db3b10eff0a3327f212c42e9ac95d80ab8d36010fed676447a9258189ee150",
+      "prefix_sha256": "23bc61eef29bbd9b7225e34f41e79e5b6090f125cb66aac027de29f644ccfa97",
+      "meta": {
+        "agentType": "autodev-opus-architect",
+        "isBuiltIn": false,
+        "description": "autodev|252b624c-fe3c-4e38-9030-3ed70d41e5b1|6e2bf565-ca1b-491e-8672-031029c5c35a|live-probe-4df6e914-7be9-4010-8e4f-bce77b7863b5|mission|93888ee6-d009-4386-8fab-d46e04454907|probe_architecture",
+        "spawnDepth": 1,
+        "requestShape": "foreground",
+        "requestNonInteractive": true,
+        "model": "claude-opus-5-5"
+      },
+      "prefix_state": {
+        "toolNames": [
+          "Read",
+          "Bash",
+          "Edit",
+          "Write",
+          "StructuredOutput"
+        ],
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "agent_id": "a760cf5a2be68ab7d",
+      "agent_type": "autodev-sonnet-reviewer",
+      "role": "sonnet-reviewer",
+      "model": "claude-sonnet-5-5",
+      "description": "autodev|252b624c-fe3c-4e38-9030-3ed70d41e5b1|6e2bf565-ca1b-491e-8672-031029c5c35a|live-probe-4df6e914-7be9-4010-8e4f-bce77b7863b5|mission|93888ee6-d009-4386-8fab-d46e04454907|probe_review",
+      "declared_tools": [
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "runtime_tool_names": [
+        "Read",
+        "StructuredOutput",
+        "Grep",
+        "Glob"
+      ],
+      "expected_readonly": true,
+      "readonly_ok": true,
+      "meta_sha256": "d1724c7761a5a5dbb0482a996cd3fd0de41660a42fc552f11fb06206105daf30",
+      "prefix_sha256": "763150013e8378ade08b47f57cfe1b00a62070e7a96866bad54cfca314de8ef9",
+      "meta": {
+        "agentType": "autodev-sonnet-reviewer",
+        "isBuiltIn": false,
+        "description": "autodev|252b624c-fe3c-4e38-9030-3ed70d41e5b1|6e2bf565-ca1b-491e-8672-031029c5c35a|live-probe-4df6e914-7be9-4010-8e4f-bce77b7863b5|mission|93888ee6-d009-4386-8fab-d46e04454907|probe_review",
+        "spawnDepth": 1,
+        "requestShape": "foreground",
+        "requestNonInteractive": true,
+        "model": "claude-sonnet-5-5"
+      },
+      "prefix_state": {
+        "toolNames": [
+          "Read",
+          "StructuredOutput",
+          "Grep",
+          "Glob"
+        ],
+        "model": "claude-sonnet-5-5"
+      }
+    },
+    {
+      "agent_id": "aaa6e1c943acd8246",
+      "agent_type": "autodev-haiku-builder",
+      "role": "haiku-builder",
+      "model": "claude-haiku-5-5",
+      "description": "autodev|252b624c-fe3c-4e38-9030-3ed70d41e5b1|6e2bf565-ca1b-491e-8672-031029c5c35a|live-probe-4df6e914-7be9-4010-8e4f-bce77b7863b5|mission|93888ee6-d009-4386-8fab-d46e04454907|probe_implement",
+      "declared_tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "Edit",
+        "Write"
+      ],
+      "runtime_tool_names": [
+        "Read",
+        "Bash",
+        "Edit",
+        "Write",
+        "StructuredOutput"
+      ],
+      "expected_readonly": false,
+      "readonly_ok": null,
+      "meta_sha256": "1e8e3c9720e98e766caab9278509374b4b2d92bde56c980f4907de9311decf70",
+      "prefix_sha256": "08b22217f452043ab0b0c79de4471b3a03187de5c3a3b39e4591daa41f587442",
+      "meta": {
+        "agentType": "autodev-haiku-builder",
+        "isBuiltIn": false,
+        "description": "autodev|252b624c-fe3c-4e38-9030-3ed70d41e5b1|6e2bf565-ca1b-491e-8672-031029c5c35a|live-probe-4df6e914-7be9-4010-8e4f-bce77b7863b5|mission|93888ee6-d009-4386-8fab-d46e04454907|probe_implement",
+        "spawnDepth": 1,
+        "requestShape": "foreground",
+        "requestNonInteractive": true,
+        "model": "claude-haiku-5-5"
+      },
+      "prefix_state": {
+        "toolNames": [
+          "Read",
+          "Bash",
+          "Edit",
+          "Write",
+          "StructuredOutput"
+        ],
+        "model": "claude-haiku-5-5"
+      }
+    }
+  ],
+  "observed_at": "2026-10-26T11:08:35.115Z"
+}

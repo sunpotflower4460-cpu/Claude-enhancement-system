@@ -23,6 +23,7 @@ test("E native controller takes structured args and never supplies unsupported t
     assert.ok(Object.values(agents).includes(opts.agentType));
     return ok({
       snapshot: {
+        observation_id: "obs-1",
         architecture_ready: true,
         tasks: [{ id: "R1", status: "BLOCKED", dependencies: [] }],
       },
@@ -131,4 +132,35 @@ test("F runtime probe supplies parser-compatible correlation tags with diagnosti
   );
   assert.equal(r.status, "UNVERIFIED");
   assert.equal(calls.length, 3);
+});
+
+test("E live inspect: free-form planner snapshot is corrected once, constrained by schema, then fails closed", async () => {
+  // Shape the real Sonnet planner returned in live run 4 (no tasks[]/architecture_ready).
+  const freeForm = ok({ snapshot: { stage: "IDLE", requirements: ["R1"], next_action: "IMPLEMENT" } }),
+    good = ok({
+      snapshot: {
+        observation_id: "obs-1",
+        architecture_ready: true,
+        tasks: [{ id: "R1", status: "BLOCKED", dependencies: [] }],
+      },
+    });
+  const seen = [];
+  const result = await runController(input, async (prompt, opts) => {
+    seen.push({ prompt, opts });
+    return seen.length === 1 ? freeForm : good;
+  });
+  assert.equal(result.status, "BLOCKED");
+  assert.equal(seen.length, 2);
+  assert.ok(seen[0].opts.schema.required.includes("snapshot"));
+  assert.deepEqual(seen[0].opts.schema.properties.snapshot.required, [
+    "observation_id",
+    "tasks",
+    "architecture_ready",
+  ]);
+  assert.match(seen[0].prompt, /tasks \(ARRAY copied from context\.mjs/);
+  assert.match(seen[1].prompt, /Previous snapshot lacked/);
+  await assert.rejects(
+    () => runController(input, async () => freeForm),
+    /Missing persisted snapshot/,
+  );
 });

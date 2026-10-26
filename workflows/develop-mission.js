@@ -52,7 +52,40 @@ const resultSchema = {
     failure: { type: "object" },
   },
 };
-const base = `Read the ${input.shared}/agents role definition and target's preserved mission. Never modify the common repository. Each writer MUST use scripts/operation.mjs start/complete with stable operation_id, and inspect partial diffs before replay. Return non-PASS when real CLI results or runtime evidence are absent. All task/check/assessment state is schema v2. Read-only roles return their actual status, every finding, current snapshot context and requirement coverage; never delegate or edit. The coordinator persists these verbatim via assessment.mjs; do not stamp an old review with a newer fingerprint. Parent alone confirms runtime drained and invokes final verify after Workflow completion. `;
+// Live run 4: the real planner answered `inspect` with PASS and a free-form
+// snapshot (no tasks[] / architecture_ready), which an unconstrained
+// `{type:"object"}` accepted and the controller then rejected. `inspect` is the
+// controller's only source of tasks, so require its documented shape.
+const inspectSchema = {
+  ...resultSchema,
+  required: [...resultSchema.required, "snapshot"],
+  properties: {
+    ...resultSchema.properties,
+    snapshot: {
+      type: "object",
+      required: ["observation_id", "tasks", "architecture_ready"],
+      properties: {
+        observation_id: { type: "string" },
+        architecture_ready: { type: "boolean" },
+        completed_since_audit: { type: "integer" },
+        tasks: {
+          type: "array",
+          items: {
+            type: "object",
+            required: ["id"],
+            properties: { id: { type: "string" } },
+          },
+        },
+      },
+    },
+  },
+};
+const validInspect = (r) =>
+  r?.snapshot &&
+  typeof r.snapshot.observation_id === "string" &&
+  typeof r.snapshot.architecture_ready === "boolean" &&
+  Array.isArray(r.snapshot.tasks);
+const base = `Read the ${input.shared}/agents role definition and target's preserved mission. Never modify the common repository. Each writer MUST use scripts/operation.mjs start/complete with stable operation_id, and inspect partial diffs before replay. Return non-PASS when real CLI results or runtime evidence are absent. All task/check/assessment state is schema v2. Read-only roles return their actual status, every finding, current snapshot context and requirement coverage; never delegate or edit. The coordinator persists these verbatim via assessment.mjs; do not stamp an old review with a newer fingerprint. Parent alone confirms runtime drained and invokes final verify after Workflow completion. For action inspect the result.snapshot MUST be built from the real CLI output as an object with exactly these fields: observation_id (string, from context.mjs), architecture_ready (boolean), completed_since_audit (integer, from progress.json), tasks (ARRAY copied from context.mjs tasks, each with id and execution), resume (from next.mjs) and failure_state (from failure.mjs summary); never summarize it as prose or rename these fields. `;
 const taskContexts = {};
 let planEpoch = 0,
   inspectionSequence = 0,
@@ -159,7 +192,7 @@ async function call(role, action, task_id = "mission", payload = {}) {
       model: roles[role],
       agentType: input.agents[role],
       label: tag,
-      schema: resultSchema,
+      schema: coordinator && action === "inspect" ? inspectSchema : resultSchema,
     },
   );
   if (
@@ -190,8 +223,16 @@ function passed(r) {
     )
   );
 }
-const coordinate = (action, task = "mission", payload = {}) =>
-  call("sonnet-planner", action, task, payload);
+async function coordinate(action, task = "mission", payload = {}) {
+  const r = await call("sonnet-planner", action, task, payload);
+  if (action !== "inspect" || !passed(r) || validInspect(r)) return r;
+  // One explicit correction; a second malformed snapshot fails closed below.
+  return call("sonnet-planner", action, task, {
+    ...payload,
+    snapshot_error:
+      "Previous snapshot lacked observation_id/architecture_ready/tasks[]; return the context.mjs tasks array and the documented fields.",
+  });
+}
 let observed = await coordinate("inspect");
 if (!passed(observed)) return observed;
 if (!observed.snapshot || !Array.isArray(observed.snapshot.tasks))

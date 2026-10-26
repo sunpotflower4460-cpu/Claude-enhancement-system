@@ -1,0 +1,93 @@
+{
+  "version": 2,
+  "mode": "LIVE_PROBE_OBSERVATIONS",
+  "invocation_id": "4df6e914-7be9-4010-8e4f-bce77b7863b5",
+  "checks": [
+    {
+      "id": "two_repositories",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "goal_continuation",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "actual_models",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "sdk-478706bb8b32b2f7552a1404d8d0055607a4fb2bd783a285c79a133d9cc8e537.jsonl",
+          "sha256": "478706bb8b32b2f7552a1404d8d0055607a4fb2bd783a285c79a133d9cc8e537"
+        },
+        {
+          "path": "sdk-be4928a01678dc83cced677aa0615de78df8139966ddbc2348b101026736db8e.jsonl",
+          "sha256": "be4928a01678dc83cced677aa0615de78df8139966ddbc2348b101026736db8e"
+        },
+        {
+          "path": "sdk-c56572dd3bf6ed96c7832d245ecb51dfbe342c48f8a663a9f5ff30815b101187.jsonl",
+          "sha256": "c56572dd3bf6ed96c7832d245ecb51dfbe342c48f8a663a9f5ff30815b101187"
+        }
+      ],
+      "reason": "import-runtime LIVE CURRENT_VALID: workflow_agent progress shows opus-5-5, haiku-5-5, sonnet-5-5 for probe stages (diagnostic only)",
+      "observed_at": "2026-10-26T11:08:56.400Z"
+    },
+    {
+      "id": "native_readonly_denial",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "readonly-5ffd8d9402b6ab24.json",
+          "sha256": "4706d0af22a113fcd3131e115cf058c63c3f444227f00cfdfbbf9f72c81fcd31"
+        }
+      ],
+      "reason": "Runtime-recorded prefix tool list of autodev-sonnet-reviewer = Read/Grep/Glob/StructuredOutput (no Write/Edit/Bash/Agent); writer roles list Write/Edit/Bash; forbidden-sentinel.txt absent. Tool absent rather than a denied call.",
+      "observed_at": "2026-10-26T11:08:59.329Z"
+    },
+    {
+      "id": "workflow_start_wait",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "repair_loop",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "real_verification",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "stop_resume",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "final_gate",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "multi_burst_state",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "checkpoint_reclone",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    }
+  ]
+}
