@@ -204,6 +204,8 @@ export function probePermissions(root) {
         "Bash(wc*)",
         "Bash(grep*)",
         "Bash(pwd)",
+        "Bash(echo*)",
+        "Bash(find*)",
         "Bash(mkdir*)",
         "Bash(sha256sum*)",
         "Bash(realpath*)",
@@ -301,11 +303,13 @@ function prepareAt(source, target, publicTarget) {
     human_review: false,
   });
   const installed = installAgents({ target });
-  // Headless `claude -p` has no approver, so an isolated clone needs a narrow,
-  // explicit allowlist or the first `node` command is denied and /goal stalls
-  // (observed live). Scope: this clone and the shared harness scripts only;
+  // Headless `claude -p` has no approver, so the first `node` command is denied
+  // and /goal stalls (observed live). Claude Code ignores permissions.allow from
+  // a project's .claude/settings.json in an untrusted workspace, so the allowlist
+  // is a launcher-supplied --settings file (not the clone's own settings and not
+  // the user's trust flag). Scope: this clone and the shared harness scripts;
   // pushes and writes into the shared checkout stay denied. No bypass flag.
-  json(path.join(target, ".claude", "settings.json"), probePermissions(publicTarget));
+  json(path.join(dir, "probe-permissions.json"), probePermissions(publicTarget));
   const c = contracts(target);
   const request = {
     target: publicTarget,
@@ -445,6 +449,9 @@ export async function runProbe(o) {
         ...(o.resume ? ["--resume", o.resume] : []),
         "--model",
         "claude-sonnet-5-5",
+        ...(fs.existsSync(path.join(c.dir, "probe-permissions.json"))
+          ? ["--settings", path.join(c.dir, "probe-permissions.json")]
+          : []),
         "--add-dir",
         shared,
         "--plugin-dir",

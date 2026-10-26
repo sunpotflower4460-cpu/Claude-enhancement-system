@@ -120,6 +120,9 @@ test("F one-command live probe prepares isolated clone, all checks UNVERIFIED, s
     1,
     "live probe must exercise parent continuation across multiple bursts",
   );
+  const perms = read(path.join(output, ".autodev/probe-permissions.json"));
+  assert.ok(perms.permissions.allow.includes("Edit(/" + output + "/**)"));
+  assert.ok(perms.permissions.deny.includes("Bash(git push*)"));
   const pending = read(path.join(output, ".autodev/probe-results.json"));
   assert.ok(pending.checks.some((c) => c.id === "multi_burst_state"));
   assert.ok(pending.checks.some((c) => c.id === "checkpoint_reclone"));
