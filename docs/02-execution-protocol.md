@@ -1,5 +1,7 @@
 # 02 — 自律開発実行プロトコル
 
+v0.2の実装契約は[coordinator action定義](../skills/start-development/coordinator.md)と[06-usage.md](06-usage.md)。親rootのtask_id=missionとsprint_task_idを区別し、run/attempt/選択task executionを保存する。CLI nextとWorkflowは構造化resume(stage/task/operation)を共有する。最終検証の失敗も該当taskをresetして実装へ戻す。burst上限は未達のまま親へ返し、progress.jsonの監査間隔は次burstへ引き継ぐ。
+
 ## 1. 実行原則
 
 「毎回モデルに自由に任せる」だけではなく、単一スプリントの進行・結果・次状態を構造化して管理する。長期計画はOpus、直近計画はSonnet、標準実装はHaiku、独立評価はSonnet、節目監査はOpusに分離。文章上のロールプレイではなく、別のモデル呼び出しとして実行する。

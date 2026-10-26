@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "check_id",
+    "kind",
+    "run_id",
+    "task_id",
+    "attempt_id",
+    "session_id",
+    "product",
+    "contract",
+    "identity",
+    "started",
+    "ended",
+    "command",
+    "exit_code",
+    "signal",
+    "stable",
+    "log",
+    "log_hash",
+    "environment",
+    "report",
+    "report_error",
+    "nonce"
+  ],
+  "properties": {
+    "version": {
+      "const": 2
+    },
+    "check_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "product": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "contract": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "identity": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "started": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ended": {
+      "type": "string",
+      "minLength": 1
+    },
+    "command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "exit_code": {
+      "type": ["integer", "null"]
+    },
+    "signal": {
+      "type": ["string", "null"]
+    },
+    "stable": {
+      "type": "boolean"
+    },
+    "log": {
+      "type": "string",
+      "minLength": 1
+    },
+    "log_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "environment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "report": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "media_type"],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "media_type": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "report_error": {
+      "type": ["string", "null"]
+    },
+    "nonce": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

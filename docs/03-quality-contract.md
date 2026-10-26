@@ -1,5 +1,7 @@
 # 03 — 品質コントラクトと証拠の仕様
 
+v0.2は全backlogタスクの状態とcheck_refs、全原要件、kind別report/artifact、現在execution付きの明示的独立評価、SDKモデル記録、Workflow終了/稼働、未観察operationから最終判定を再計算する。旧v1証拠は自動承認しない。SDKの既知構造だけを照合し、未知形式・欠損・モデル自己申告は未検証。TEST FIXTUREは本番COMPLETEに使わない。実形式はschemas/、共通interfaceはscripts/lib/reports.mjs。詳細は[06-usage.md](06-usage.md)と[監査差分](08-deep-audit.md)。
+
 ## 1. 目的
 
 自律開発が陥りやすい「テストを走らせたから完成」「レビュアーが褒めたから完成」「見ていない画面を完成扱い」を防ぐ。条件は初期状態`UNVERIFIED`（未達扱い）。`PASS`へ進めるのは、現在の成果物に一致する検証の証拠が揃った場合だけ。

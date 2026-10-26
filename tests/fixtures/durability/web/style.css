@@ -1,0 +1,45 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0 auto;
+  max-width: 900px;
+  padding: 24px;
+  font: 18px/1.5 system-ui;
+  color: #172a3a;
+  background: #f6f7f4;
+}
+nav {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+main {
+  margin-top: 24px;
+  padding: 24px;
+  background: white;
+  border: 2px solid #355c52;
+  border-radius: 8px;
+}
+label {
+  display: block;
+  margin: 12px 0;
+}
+input,
+button {
+  font: inherit;
+  padding: 10px;
+  max-width: 100%;
+}
+li {
+  margin: 12px 0;
+}
+button {
+  color: white;
+  background: #235c4d;
+  border: 0;
+  border-radius: 4px;
+}
+a {
+  color: #184e70;
+}

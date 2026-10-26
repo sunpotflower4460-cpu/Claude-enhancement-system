@@ -1,0 +1,134 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import {
+  missionSource,
+  agents,
+  input,
+  runController,
+} from "./helpers/controller.mjs";
+const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+const ok = (extra = {}) => ({
+  status: "PASS",
+  summary: "TEST FIXTURE",
+  findings: [],
+  ...extra,
+});
+test("E native controller takes structured args and never supplies unsupported tools option", async () => {
+  let count = 0;
+  const result = await runController(input, async (prompt, opts) => {
+    count++;
+    assert.equal("tools" in opts, false);
+    assert.ok(Object.values(agents).includes(opts.agentType));
+    return ok({
+      snapshot: {
+        architecture_ready: true,
+        tasks: [{ id: "R1", status: "BLOCKED", dependencies: [] }],
+      },
+    });
+  });
+  assert.equal(result.status, "BLOCKED");
+  assert.equal(
+    count,
+    1,
+    "A current blocked snapshot does not need a duplicate inspector call",
+  );
+  await assert.rejects(
+    () => runController(JSON.stringify(input), async () => ok()),
+    /Structured args/,
+  );
+});
+test("E null, error and malformed outputs stop without dropping failed slots", async () => {
+  for (const result of [null, {}, ok({ findings: [{}] })])
+    await assert.rejects(
+      () => runController(input, async () => result),
+      /Missing\/invalid/,
+    );
+  await assert.rejects(
+    () =>
+      runController(input, async () => {
+        throw Error("permission denied");
+      }),
+    /permission denied/,
+  );
+});
+test("E read-only reviewer and auditor use native definitions without writer/delegation tools", () => {
+  for (const role of ["sonnet-reviewer", "opus-auditor"]) {
+    const s = fs.readFileSync(
+      new URL("../agents/" + role + ".md", import.meta.url),
+      "utf8",
+    );
+    assert.match(s, /tools: Read, Grep, Glob\n/);
+    assert.doesNotMatch(s.split("---")[1], /Bash|Write|Edit|Agent|ToolSearch/);
+  }
+  assert.doesNotMatch(missionSource, /Date\.now|Math\.random|import\(/);
+});
+test("E standalone milestone propagates empty NEEDS_FIX and uses agentType", async () => {
+  const source = fs
+      .readFileSync(
+        new URL("../workflows/milestone-audit.js", import.meta.url),
+        "utf8",
+      )
+      .replace("export const meta", "const meta"),
+    fn = new AsyncFunction("args", "agent", source);
+  const r = await fn(
+    {
+      ...input,
+      target: "t",
+      shared: "s",
+      mode: "audit",
+      agentType: "autodev-opus-auditor",
+      registry_verified: true,
+    },
+    async (p, o) => {
+      assert.equal(o.agentType, "autodev-opus-auditor");
+      assert.equal(o.model, "claude-opus-5-5");
+      assert.equal("tools" in o, false);
+      return ok({ status: "NEEDS_FIX" });
+    },
+  );
+  assert.equal(r.status, "NEEDS_FIX");
+});
+test("G miswired read-only role and invalid milestone cadence are rejected before unsafe agent call", async () => {
+  await assert.rejects(
+    () =>
+      runController(
+        {
+          ...input,
+          agents: { ...agents, "sonnet-planner": "general-purpose" },
+        },
+        async () => ok(),
+      ),
+    /Undiscovered/,
+  );
+  for (const n of [0, -1, 1.5])
+    await assert.rejects(
+      () => runController({ ...input, milestone_every: n }, async () => ok()),
+      /cadence/,
+    );
+});
+test("F runtime probe supplies parser-compatible correlation tags with diagnostic-only stages", async () => {
+  const source = fs
+      .readFileSync(
+        new URL("../workflows/runtime-probe.js", import.meta.url),
+        "utf8",
+      )
+      .replace("export const meta", "const meta"),
+    calls = [];
+  const r = await new AsyncFunction("args", "agent", source)(
+    input,
+    async (prompt, opts) => {
+      calls.push(opts);
+      assert.match(opts.label, /^autodev\|/);
+      assert.ok(prompt.includes("AUTODEV_CONTEXT " + opts.label));
+      assert.match(opts.label, /probe_(architecture|implement|review)$/);
+      return {
+        observations: ["TEST FIXTURE mocked transport only"],
+        limitations: ["not real Claude"],
+      };
+    },
+  );
+  assert.equal(r.status, "UNVERIFIED");
+  assert.equal(calls.length, 3);
+});

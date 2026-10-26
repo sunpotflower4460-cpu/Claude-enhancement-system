@@ -4,6 +4,22 @@
 
 Codex 6.1-sol（高推論）で、小さな実装→テスト→レビュー→修正を繰り返す。指示書だけ増えて動かない状態を避けるため、各フェーズは動く成果物と証拠で終える。計画は必要に応じて更新してよいが、`docs/00-requirements.md`の要求を無断で縮小しない。
 
+## 実装進捗（v0.2 深層監査反映）
+
+チェックリストは各フェーズのClaude実機終了条件まで満たしたときに完了とする。コードの存在や模擬モデルだけでチェックしない。
+
+| フェーズ | v0.2で実装・検証する範囲 | 受け入れ状態 |
+| --- | --- | --- |
+| 0 | 現行5公式資料/SDKとCLI 2.1.310 help/version照合、隔離probe | 静的照合済み、Claude実機UNVERIFIED |
+| 1 | Schema v2、原文保護、全task/check/要件gate、非破壊atomic setup、再接続/移行 | ローカル試験、validation-results参照 |
+| 2 | native agentType、null拒否、task/run/attempt/receipt、実テスト中のkill/recover | ローカル/模擬試験、実モデル未検証 |
+| 3 | 長期計画、永続milestone、再計画、全execution付き最終監査 | 模擬統合試験、実Opus未検証 |
+| 4 | 6kind report、実HTTP/Chromium、artifact鮮度、FAIL/UNVERIFIED分離 | ローカル実行、Claude開発の実機追試未検証 |
+| 5 | START、agent-only事前setup、原要求入力、隔離probe生成とSDK import | ローカルCLI試験、cloud起動/権限未検証 |
+| 6 | 正常/故障/複数burst/回帰/独立監査/CI | 最新結果と残項目はvalidation-results |
+
+ユーザー追加Phase A〜Gの対応、Before/After、独立監査の追加指摘と修正は[08-deep-audit.md](08-deep-audit.md)。実機専用の残試験は[live-probe.md](live-probe.md)へ集約。元のT01〜T20は維持する。
+
 ## フェーズ0：前提機能のスモークテスト【最優先】
 
 対象：最小テストリポジトリを用いた、Claude Codeクラウドの2リポジトリ選択とモデル分担の実証。

@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "kind",
+    "product",
+    "contract",
+    "identity",
+    "findings",
+    "requirement_refs",
+    "runtime_record",
+    "runtime_hash",
+    "expected_model",
+    "observed_model"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "kind": {
+      "enum": ["review", "audit"]
+    },
+    "product": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contract": {
+      "type": "string",
+      "minLength": 1
+    },
+    "identity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["severity", "message", "resolved"],
+        "properties": {
+          "severity": {
+            "enum": ["critical", "major", "minor"]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resolved": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "requirement_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "runtime_record": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expected_model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observed_model": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "stage",
+    "run_id",
+    "task_id",
+    "attempt",
+    "active",
+    "failures",
+    "fingerprint",
+    "history"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "stage": {
+      "enum": [
+        "IDLE",
+        "ARCHITECTURE",
+        "PLAN",
+        "IMPLEMENT",
+        "REVIEW",
+        "VERIFY",
+        "AUDIT",
+        "BLOCKED"
+      ]
+    },
+    "run_id": {
+      "type": ["string", "null"]
+    },
+    "task_id": {
+      "type": ["string", "null"]
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "failures": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "fingerprint": {
+      "type": ["string", "null"]
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stage", "at", "fingerprint", "note"],
+        "properties": {
+          "stage": {
+            "type": "string",
+            "minLength": 1
+          },
+          "at": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fingerprint": {
+            "type": "string",
+            "minLength": 1
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

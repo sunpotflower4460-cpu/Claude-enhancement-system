@@ -2,6 +2,8 @@
 
 調査基準日：2026-10-25。Claude Code側の仕様は変わり得るため、実装時にもう一度公式資料と稼働環境を照合する。
 
+v0.2実装時の現行仕様照合は[runtime-spec-audit.md](runtime-spec-audit.md)。特にargsのactual JSON、agentTypeのnative権限、/goalの背景評価延期、SDKモデル/Workflow結果、agents再発見条件を修正した。資料の記述と実機試験の成功は区別する。
+
 ## 1. 公式機能 — 何を使うか
 
 | 機能 | 参照 | 今回の使い方・注意 |

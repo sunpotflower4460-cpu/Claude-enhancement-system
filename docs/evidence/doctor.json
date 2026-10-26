@@ -1,0 +1,20 @@
+{
+  "status": "UNVERIFIED",
+  "node": "v24.19.0",
+  "shared": {
+    "root": "/workspace/Claude-enhancement-system",
+    "gitDir": "/workspace/Claude-enhancement-system/.git",
+    "remote": "https://github.com/sunpotflower4460-cpu/Claude-enhancement-system.git",
+    "branch": "feat/claude-autonomous-harness"
+  },
+  "target": null,
+  "claude": null,
+  "checks": {
+    "cli": "BLOCKED",
+    "goal": "UNVERIFIED",
+    "workflow": "UNVERIFIED",
+    "cloud_two_repositories": "UNVERIFIED",
+    "actual_model_routing": "UNVERIFIED"
+  },
+  "next": "In Claude Code use /workflow-authoring, probe Workflow scriptPath and tools restrictions, inspect /tasks model records; preserve runtime logs. Node execution does not prove Workflow support."
+}

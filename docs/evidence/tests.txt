@@ -1,0 +1,36 @@
+
+> claude-enhancement-system@0.1.0 test
+> node --test
+
+✔ T01/T10 initialization is idempotent, preserves settings and refuses shared target (167.66047ms)
+✔ schemas reject malformed, unknown properties, duplicate IDs and missing coverage (91.602873ms)
+✔ T04 real faulty code fails, repaired code passes with mock assessments (611.589234ms)
+✔ T05 missing/stale/log-tampered evidence is UNVERIFIED (753.904169ms)
+✔ T06 build passes but visual failure rejects completion (524.5973ms)
+✔ T07 removed requirement mapping and dependencies rejected (69.084237ms)
+✔ T09/T16 ownership prevents double writers and recovery observes partial edits (122.412114ms)
+✔ T12 all profiles reuse harness with command evidence only (1622.933316ms)
+✔ T13 evidence does not invalidate product; contract edits do (737.01362ms)
+✔ T14 untracked files, deletions, executable bit and symlink target affect fingerprint (72.334884ms)
+✔ T17 substituted models and unresolved reviews cannot complete (395.030759ms)
+✔ T20 in-flight run and command modifying product reject completion (552.077558ms)
+✔ state symlinks rejected; branch mismatch and mission tamper rejected (71.483695ms)
+✔ CLI subprocess: bootstrap auto-select, real HTTP check, context, gate, doctor (1479.133454ms)
+✔ record timeout fails and command contract edits invalidate evidence (284.050584ms)
+✔ canonical remote rejects shared clones even under SSH URL spelling (64.339873ms)
+✔ timeout terminates a check process group including child processes (755.056439ms)
+✔ read-only common sources and target identity support detached checkout (91.060548ms)
+✔ Opus milestone script compiles and preserves missing requirement findings (2.346766ms)
+✔ T15 null at any stage aborts and never runs later stages (3.418991ms)
+✔ T08 two failed reviews escalate builder to Sonnet (0.576933ms)
+✔ T19 static tools restriction excludes shell, edits, MCP and delegation (1.163133ms)
+✔ blocked results stop; rejected API calls propagate (0.718144ms)
+✔ model definitions agree with workflow requested models and no randomness/imports (0.608718ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8611.573748

@@ -1,0 +1,87 @@
+{
+  "version": 2,
+  "run_id": "run",
+  "task_id": "R1",
+  "attempt_id": "attempt",
+  "session_id": "054d1586-6a85-45b6-bedf-64416c1be912",
+  "kind": "visual",
+  "check_id": "R1-visual",
+  "nonce": "6f29585b-460e-4028-a680-881ba219e018",
+  "tool": {
+    "name": "Playwright Chromium durability",
+    "version": "156.0.8078.4"
+  },
+  "assertions": [
+    {
+      "name": "Heading visible",
+      "status": "PASS",
+      "expected": "true",
+      "actual": "true"
+    },
+    {
+      "name": "New note navigates back to list",
+      "status": "PASS",
+      "expected": "\"Inspect the northern trail\"",
+      "actual": "\"Inspect the northern trail\""
+    },
+    {
+      "name": "Completion summary updates",
+      "status": "PASS",
+      "expected": "\"1/1 complete\"",
+      "actual": "\"1/1 complete\""
+    },
+    {
+      "name": "Note and completion survive reload",
+      "status": "PASS",
+      "expected": "\"1/1 complete\"",
+      "actual": "\"1/1 complete\""
+    },
+    {
+      "name": "Settings persist independently",
+      "status": "PASS",
+      "expected": "\"Mika's notes\"",
+      "actual": "\"Mika's notes\""
+    },
+    {
+      "name": "Mobile layout does not overflow",
+      "status": "PASS",
+      "expected": "true",
+      "actual": "true"
+    },
+    {
+      "name": "All navigation remains visible",
+      "status": "PASS",
+      "expected": "true",
+      "actual": "true"
+    },
+    {
+      "name": "No browser runtime errors",
+      "status": "PASS",
+      "expected": "[]",
+      "actual": "[]"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "R1-visual-6f29585b-460e-4028-a680-881ba219e018-screen.png",
+      "sha256": "bf29a39b56d0035e69ec9c4acfc7210ba0305e0d6d09c9b96989a90074d62f6b",
+      "media_type": "image/png"
+    }
+  ],
+  "details": {
+    "browser": "Chromium 156.0.8078.4",
+    "viewport": {
+      "width": 375,
+      "height": 700
+    },
+    "captures": [
+      "R1-visual-6f29585b-460e-4028-a680-881ba219e018-screen.png"
+    ],
+    "inspections": [
+      "Heading and navigation visible",
+      "Useful layout bounds",
+      "Real interactions and persistence",
+      "No browser runtime errors"
+    ]
+  }
+}

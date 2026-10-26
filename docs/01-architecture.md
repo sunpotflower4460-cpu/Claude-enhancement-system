@@ -1,5 +1,7 @@
 # 01 — 構成と環境別ブートストラップ
 
+実装v0.2では、親/goalが`develop-mission.js`を呼び、複数スプリントを直列制御する。`develop-sprint.js`は1スプリントburstの入口。persistent missionにはcanonical repository ID、sessionにはパス/worktree/branchを分離。backlog/contract/assessment/recordはSchema v2、operation/progressとSDKモデル・終了記録を別管理する。元の役割分担と要求は維持する。詳細は[深層監査](08-deep-audit.md)、[実際のコマンド](06-usage.md)、[実証範囲](validation-results.md)。
+
 ## 1. 方式
 
 **外側：Claude Code `/goal` / 中央：Sonnet 5.5親セッション / 内側：Dynamic Workflow + 役割別サブエージェント / 独立：機械的品質ゲート**。

@@ -1,0 +1,281 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "mission_id", "entries"],
+  "properties": {
+    "version": {
+      "const": 2
+    },
+    "mission_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "burst_id",
+          "session_id",
+          "run_id",
+          "task_id",
+          "attempt_id",
+          "claimed_at",
+          "observation_id",
+          "script_path",
+          "owner",
+          "status",
+          "launch",
+          "termination"
+        ],
+        "properties": {
+          "burst_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "session_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "task_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attempt_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "claimed_at": {
+            "type": "string",
+            "minLength": 1
+          },
+          "observation_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "script_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/definitions/owner"
+              }
+            ]
+          },
+          "status": {
+            "enum": ["CLAIMED", "ATTACHED", "FINISHED"]
+          },
+          "launch": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/definitions/launch"
+              }
+            ]
+          },
+          "termination": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/definitions/termination"
+              }
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "CLAIMED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "launch": {
+                  "type": "null"
+                },
+                "termination": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "ATTACHED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "launch": {
+                  "$ref": "#/definitions/launch"
+                },
+                "termination": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "FINISHED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "launch": {
+                  "$ref": "#/definitions/launch"
+                },
+                "termination": {
+                  "$ref": "#/definitions/termination"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pid", "host", "start"],
+      "properties": {
+        "pid": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "host": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "launch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "sdk_session_id",
+        "sdk_tool_use_id",
+        "sdk_task_id",
+        "sdk_run_id",
+        "record",
+        "sha256"
+      ],
+      "properties": {
+        "source": {
+          "enum": ["parent-runtime-observation", "TEST_FIXTURE"]
+        },
+        "sdk_session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sdk_tool_use_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sdk_task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sdk_run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "termination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "sdk_session_id",
+        "sdk_tool_use_id",
+        "sdk_task_id",
+        "sdk_run_id",
+        "state",
+        "observed_at",
+        "proof",
+        "proof_sha256",
+        "raw_sha256"
+      ],
+      "properties": {
+        "source": {
+          "enum": ["parent-runtime-observation", "TEST_FIXTURE"]
+        },
+        "sdk_session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sdk_tool_use_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sdk_task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sdk_run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "enum": ["completed", "stopped", "failed"]
+        },
+        "observed_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proof": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proof_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "raw_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}

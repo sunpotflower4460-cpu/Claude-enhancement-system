@@ -1,0 +1,48 @@
+# v0.1実現可能性調査（履歴）— 2026-10-25
+
+これは初回PR実装の履歴。モデルparserやargs等についての当時の制限・説明は現行実装と異なる。v0.2の現在仕様/実証状況は[runtime-spec-audit.md](runtime-spec-audit.md)、[08-deep-audit.md](08-deep-audit.md)、[validation-results.md](validation-results.md)を参照。
+
+## 実測環境
+
+Linux managed cloud、Node.js v24.19.0、Git、GitHub CLI。`command -v claude`は出力なし。Claude Code用の認証・アカウント・ブラウザセッションは本作業に提供されていない。外部のClaude Codeクラウドをこの環境から操作したという主張はしない。
+
+`node scripts/doctor.mjs`の実出力は[evidence/doctor.json](evidence/doctor.json)。終了コード2（UNVERIFIED）、cliはBLOCKED、/goal・Workflow・クラウド2repo・実モデルはUNVERIFIED。
+
+## 公式資料の再確認
+
+2026-10-25にHTTPS GETで以下を取得（成功）。OSSのコード転用は行っていない。
+
+- https://code.claude.com/docs/en/workflows.md
+- https://code.claude.com/docs/en/agent-sdk/typescript.md
+
+Workflowはmetaリテラルを先頭に置く。bodyはtop-level awaitとreturnを用い、agent()、args、log等を使う。Date.now/Math.randomは禁止なのでrun/task IDは親から渡す。nullは捨てずに中断する。WorkflowのscriptPathとargs、resumeFromRunIdはSDK資料のWorkflowInputに記載されている。
+
+モデル指定はリクエストにすぎず、ポリシーによる置換があり得る。実モデルはtask詳細/ログによる確認が必要。今回の環境ではモデル自体の存在・利用資格・実ルーティングを検証できない。
+
+## 実装判断と設計差分
+
+| 判断 | 理由 | 影響する試験 |
+| --- | --- | --- |
+| Node.js標準機能＋Ajvのみ | OS常駐サーバー/DB不要でCLIとSchemaを検査可能にする | T01/T05/T07/T10/T13/T14 |
+| contract.jsonを別ファイルとし、原要求・バックログ構造・共通検証器を契約指紋へ含める | 状態の変更で証拠が自己失効せず、判定条件変更で確実に失効する | T05/T07/T13/T20 |
+| Git tracked＋非ignore未追跡、モード・symlink・削除をハッシュ | HEADだけでは未コミットの製品変更を検出できない | T14/T20 |
+| writer所有権は永続状態、CLI操作は排他ファイル | エージェント間でプロセスが変わっても二重起動を防止する | T09/T16 |
+| レビュー・監査は読取専用、実コマンドは別verifier | Bashや委任経由の編集をレビュアーから除く | T19 |
+| 単一のdevelop-sprintにreview/fixを内包 | review-and-fix.jsを別途重複実装しない | T04/T08/T15 |
+| profilesを必須kind検査で強制 | buildだけでUI/ゲーム検査済みとしない | T06/T12 |
+| Workflow権限制限probeを起動前提にする | 公開ページだけではagentのtoolsオプションの実適用を証明できず、未確認のままread-onlyとは言えない | T18/T19 |
+| V1受け入れを保留し独立実装を継続 | P0不可でも作業を止めず、クラウド成功を捏造しない | T01/T02/T03 |
+
+## 実装レビューでの修正
+
+最初のGitHub Actionsは22件PASSだったが、終了ログにtimeout後のnode子プロセス残存が出た。shell単体へのtimeoutでは子を止められないため、検査を独立したプロセス群で起動し、期限/出力量超過/終了時に群を停止するrun-check.mjsを追加した。実PIDを保存して/proc上で実行中でないことを確かめる回帰テストを追加。
+
+PR用CIでは共通側がdetached HEADでcheckoutされ、初期実装がsymbolic branchのみを想定して失敗した。共通/対象の識別にdetached commit SHAを含める形式へ修正。既に初期化済みの対象でbranch/commitが変わる場合は引き続き拒否する。
+
+## 現時点での制限
+
+同梱Workflowの`model`/`tools`/`schema`呼び出しは模擬環境で検査した。実ランタイムの`/workflow-authoring`でtools制限の正確な指定を照合し、書込試行が拒否されるまでread-only保証はUNVERIFIED。STARTはこのprobeを必須とする。動的workflowのファイル存在やNodeテスト成功を、標準Claudeランタイムで動作した証拠にはしない。
+
+自動のモデルログ解析は提供していない。親が実際のtaskログから正規化した値を記録し、ゲートはモデル一致・元ログの存在/ハッシュを確認する。このログの信頼性は親セッションに依存する。
+
+クラウドでの承認回数・新規agent再読込・共有scriptPath許可・/goal継続・モデル置換・ゲーム/ブラウザ体験は未実測。これらは要求から削除せず、受け入れに残す。

@@ -1,0 +1,117 @@
+{
+  "version": 2,
+  "run_id": "run",
+  "task_id": "R1",
+  "attempt_id": "attempt",
+  "session_id": "aa3e79ce-29e9-4a36-8565-b9469c8a799f",
+  "kind": "play",
+  "check_id": "R1-play",
+  "nonce": "5d692557-556e-43a2-ae03-1bb4442aa496",
+  "tool": {
+    "name": "Playwright Chromium durability",
+    "version": "156.0.8078.4"
+  },
+  "assertions": [
+    {
+      "name": "Heading visible",
+      "status": "PASS",
+      "expected": "true",
+      "actual": "true"
+    },
+    {
+      "name": "Hazard produces loss",
+      "status": "PASS",
+      "expected": "\"Lost\"",
+      "actual": "\"Lost\""
+    },
+    {
+      "name": "Restart clears loss",
+      "status": "PASS",
+      "expected": "\"Playing\"",
+      "actual": "\"Playing\""
+    },
+    {
+      "name": "Collecting three parcels wins",
+      "status": "PASS",
+      "expected": "\"Won\"",
+      "actual": "\"Won\""
+    },
+    {
+      "name": "Progress is not blocked",
+      "status": "PASS",
+      "expected": "\"3\"",
+      "actual": "\"3\""
+    },
+    {
+      "name": "Restart clears score",
+      "status": "PASS",
+      "expected": "\"0\"",
+      "actual": "\"0\""
+    },
+    {
+      "name": "Forty bounded inputs complete within ten seconds",
+      "status": "PASS",
+      "expected": "<10000ms",
+      "actual": "60ms"
+    },
+    {
+      "name": "Boundary inputs preserve playable state",
+      "status": "PASS",
+      "expected": "\"Playing\"",
+      "actual": "\"Playing\""
+    },
+    {
+      "name": "A second game can finish",
+      "status": "PASS",
+      "expected": "\"Won\"",
+      "actual": "\"Won\""
+    },
+    {
+      "name": "Playfield has useful visible size",
+      "status": "PASS",
+      "expected": "true",
+      "actual": "true"
+    },
+    {
+      "name": "No browser runtime errors",
+      "status": "PASS",
+      "expected": "[]",
+      "actual": "[]"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "R1-play-5d692557-556e-43a2-ae03-1bb4442aa496-screen.png",
+      "sha256": "30fadb3d4e3325465abec66b25d438da583ec4dccf9568f27b2611257f301c64",
+      "media_type": "image/png"
+    }
+  ],
+  "details": {
+    "engine": "Chromium 156.0.8078.4",
+    "inputs": [
+      "ArrowDown",
+      "Restart",
+      "ArrowRight",
+      "ArrowRight",
+      "ArrowRight",
+      "Restart",
+      "ArrowRight",
+      "ArrowRight",
+      "ArrowRight"
+    ],
+    "progress": [
+      "Lost:0",
+      "Playing:1",
+      "Playing:2",
+      "Won:3",
+      "Playing:1",
+      "Playing:2",
+      "Won:3"
+    ],
+    "outcome": "Won",
+    "expected_outcome": "Won",
+    "captures": [
+      "R1-play-5d692557-556e-43a2-ae03-1bb4442aa496-screen.png"
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "scope": "Actual browser fixture; no Claude/model/Workflow acceptance",
+  "source_commit": "17825ccf66413bbf6241f7b1090e83eda510565f",
+  "verifier_version": "d4fec77a15b478cd1c428d26bf7742c8334ba502f1b7acdb4a32469cf4ae9848",
+  "version": 2,
+  "check_id": "R1-play",
+  "kind": "play",
+  "nonce": "5d692557-556e-43a2-ae03-1bb4442aa496",
+  "run_id": "run",
+  "task_id": "R1",
+  "attempt_id": "attempt",
+  "session_id": "aa3e79ce-29e9-4a36-8565-b9469c8a799f",
+  "product": "78f0e7b88e42e21a441f72eb00e33e1a9818337d24a85b4b2b1d9532746bb556",
+  "contract": "dbf05e39bfc4af1d61571411e4f3598262013f5ef3a3da5733993a265d4c0772",
+  "identity": "ffbfdeb656e7b86744b70b2d145747715e69fa1edcfa9c0efff05577c0621d30",
+  "started": "2026-10-25T17:03:26.483Z",
+  "ended": "2026-10-25T17:03:27.529Z",
+  "command": "\"$AUTODEV_NODE\" '/workspace/Claude-enhancement-system/tests/fixtures/durability/check.mjs' '/tmp/autodev-audit-i6bORY/target/project' 'game'",
+  "exit_code": 0,
+  "signal": null,
+  "stable": true,
+  "log": "ce0037ccef0c009d8787afcee2571a43d097cd9cf5599fcd9f5e4612fade53c8.log",
+  "log_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "environment": "linux/x64 node v24.19.0",
+  "report": {
+    "path": "ce0037ccef0c009d8787afcee2571a43d097cd9cf5599fcd9f5e4612fade53c8.report.json",
+    "sha256": "bab0096b01492b629dc72563142de7a4cca751c3a59606ba4338dd085ab96b96",
+    "media_type": "application/json"
+  },
+  "report_error": null,
+  "check_status": "PASS"
+}

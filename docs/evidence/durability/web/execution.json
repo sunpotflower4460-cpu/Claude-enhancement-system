@@ -1,0 +1,32 @@
+{
+  "scope": "Actual browser fixture; no Claude/model/Workflow acceptance",
+  "source_commit": "17825ccf66413bbf6241f7b1090e83eda510565f",
+  "verifier_version": "d4fec77a15b478cd1c428d26bf7742c8334ba502f1b7acdb4a32469cf4ae9848",
+  "version": 2,
+  "check_id": "R1-visual",
+  "kind": "visual",
+  "nonce": "6f29585b-460e-4028-a680-881ba219e018",
+  "run_id": "run",
+  "task_id": "R1",
+  "attempt_id": "attempt",
+  "session_id": "054d1586-6a85-45b6-bedf-64416c1be912",
+  "product": "bd3035a7947216037aad2f8bc6442e71f890b6b6da06950bc5198f34347659fe",
+  "contract": "bcb2254cd74deffdb7cdad4a1359a873a708fa8f0c3616a46d821a8b96fcf7d2",
+  "identity": "496cd43ddbae515daa36f6f5f0407a69ea24ca79001916e82b459fc4dea8911f",
+  "started": "2026-10-25T17:03:24.936Z",
+  "ended": "2026-10-25T17:03:26.277Z",
+  "command": "\"$AUTODEV_NODE\" '/workspace/Claude-enhancement-system/tests/fixtures/durability/check.mjs' '/tmp/autodev-audit-Y8gF7V/target/project' 'web'",
+  "exit_code": 0,
+  "signal": null,
+  "stable": true,
+  "log": "d6710f3f69143b734b16c23bd240e547da45d41c0455e9936fca067c75d443f4.log",
+  "log_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "environment": "linux/x64 node v24.19.0",
+  "report": {
+    "path": "d6710f3f69143b734b16c23bd240e547da45d41c0455e9936fca067c75d443f4.report.json",
+    "sha256": "1d470fb2e2acb355b399623e3939f9ce1aa0150742c92efb07af3eeb54f63142",
+    "media_type": "application/json"
+  },
+  "report_error": null,
+  "check_status": "PASS"
+}

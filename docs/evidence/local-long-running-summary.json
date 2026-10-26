@@ -1,0 +1,27 @@
+{
+  "recorded_at": "2026-10-25T17:03:26.062023+00:00",
+  "source_commit": "17825ccf66413bbf6241f7b1090e83eda510565f",
+  "verifier_version": "d4fec77a15b478cd1c428d26bf7742c8334ba502f1b7acdb4a32469cf4ae9848",
+  "node": "v24.19.0",
+  "local_platform": "linux/x64",
+  "tests": 177,
+  "passed": 177,
+  "failed": 0,
+  "skipped": 0,
+  "duration_ms": 269258.563497,
+  "log_sha256": "0e9e39b6a506c5b1385d08ff7dec0e5442e29c4f83bf99a7ca83bf85dd11eaac",
+  "actual_operations": [
+    "Git push to local bare remote, original checkout deletion, new clone",
+    "Real HTTP assertions",
+    "Real Chromium render/input/storage/win/lose/restart",
+    "SIGKILL/SIGTERM and process-group recovery",
+    "UID1000 EACCES"
+  ],
+  "agent_and_workflow_assurance": "TEST_FIXTURE: native model/Workflow loops simulated",
+  "claude_live_acceptance": "UNVERIFIED",
+  "claude_authentication": "Official 2.1.310 auth status loggedIn=false",
+  "macos_source_of_truth": "PR #1 same-head macos-latest CI; local Darwin observation is adapter simulation",
+  "ci_source_of_truth": "https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/pull/1/checks",
+  "first_macos_ci": "34bff31: 165 passed/9 failed; actual-path/fixture-command failures fixed; current same-head CI is authoritative",
+  "probe_remote_publication": "UNVERIFIED; source origin push is disabled in isolated probe. Probe checkpoint tests use LOCAL save and clone."
+}
