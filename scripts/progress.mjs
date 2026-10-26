@@ -20,15 +20,39 @@ export function checkpointAudit(o) {
         attempt_id: s.attempt_id,
         session_id: c.session.session_id,
       },
-      a = assessment(
-        c,
-        "audit",
-        "milestone",
-        c.backlog.items.map((t) => t.id),
-        ctx,
-        fingerprint(o.target),
-        { fixture: o.fixture === true || o.fixture === "true" },
-      );
+      // Live run 6e: a mid-run milestone audit can only cover tasks that have an execution, but
+      // this demanded every backlog task, so cadence could never reset before the last task
+      // started. Accept an explicit list or the audit of the tasks passed so far; keep the
+      // whole-backlog audit as the fallback.
+      ids = c.backlog.items.map((t) => t.id),
+      passed = c.backlog.items
+        .filter((t) => t.status === "PASS")
+        .map((t) => t.id),
+      candidates = o.task_ids
+        ? [o.task_ids.split(",")]
+        : [passed, ids].filter((x) => x.length),
+      attempt = (taskIds) =>
+        assessment(
+          c,
+          "audit",
+          "milestone",
+          taskIds,
+          ctx,
+          fingerprint(o.target),
+          {
+            fixture: o.fixture === true || o.fixture === "true",
+          },
+        );
+    let a, firstError;
+    for (const taskIds of candidates) {
+      try {
+        a = attempt(taskIds);
+        break;
+      } catch (e) {
+        firstError ||= e;
+      }
+    }
+    if (!a) throw firstError || Error("Milestone audit not performed");
     if (!["PASS", "NEEDS_FIX"].includes(a.status))
       throw Error("Milestone audit not performed");
     const p = path.join(c.dir, "progress.json"),

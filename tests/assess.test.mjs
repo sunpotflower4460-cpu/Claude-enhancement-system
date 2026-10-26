@@ -66,3 +66,45 @@ test("A2 assess refuses a review of an older product, a missing snapshot, an unf
   assert.throws(() => run(f, { result: result(f), raw: sdk(f), burst: "other" }), /Cannot identify the Workflow launch/);
   assert.throws(() => run(f, { result: result(f, { status: "MAYBE" }), raw: sdk(f) }), /valid status/);
 });
+
+import { checkpointAudit } from "../scripts/progress.mjs";
+import { state } from "../scripts/state.mjs";
+test("A3 mid-run milestone audit of the passed tasks resets cadence even while other tasks have no execution (live run 6e)", (t) => {
+  const f = fixture(t);
+  // Two tasks: R1 passed with execution; R2 not started (no execution) - the live shape.
+  const b = read(path.join(f.dir, "backlog.json"));
+  const base = b.items[0];
+  b.items[0].status = "PASS";
+  const ct = read(path.join(f.dir, "contract.json")),
+    mine = ct.checks.filter((k) => k.task_id === base.id).map((k) => ({ ...structuredClone(k), id: k.id + "-r2", task_id: "R2" }));
+  ct.checks.push(...mine);
+  json(path.join(f.dir, "contract.json"), ct);
+  b.items.push({ ...structuredClone(base), id: "R2", status: "UNVERIFIED", execution: null, requirement_refs: base.requirement_refs, check_refs: mine.map((k) => k.id) });
+  json(path.join(f.dir, "backlog.json"), b);
+  json(path.join(f.dir, "progress.json"), { version: 2, completed_since_audit: 2, last_audit_product: null });
+  const s = read(path.join(f.dir, "current-task.json"));
+  const audit = run(f, {
+    kind: "audit",
+    scope: "milestone",
+    result: result(f),
+    raw: sdkRoot(f, s),
+  });
+  assert.equal(audit.status, "PERSISTED");
+  const p = checkpointAudit({ target: f.target });
+  assert.equal(p.completed_since_audit, 0);
+  assert.ok(p.last_audit_product);
+});
+function sdkRoot(f, s) {
+  const c = contracts(f.target),
+    ctx = { run_id: s.run_id, task_id: s.task_id, attempt_id: s.attempt_id, session_id: c.session.session_id };
+  const es = [
+    { type: "system", subtype: "init", session_id: "sdk-session", cwd: c.session.root },
+    { type: "assistant", session_id: "sdk-session", message: { content: [{ type: "tool_use", name: "Workflow", id: "toolu-live", input: { args: { burst_id: "b1" } } }] } },
+    { type: "system", subtype: "task_started", session_id: "sdk-session", task_id: "wtask", run_id: "0stream", tool_use_id: "toolu-live", workflow_name: "develop-mission" },
+    { type: "system", subtype: "task_progress", session_id: "sdk-session", task_id: "wtask", run_id: "0stream", workflow_progress: [{ type: "workflow_agent", index: 1, label: invocationTag(c, ctx, "audit"), agentId: "a1", agentType: "autodev-opus-auditor", model: "claude-opus-5-5", state: "done", startedAt: Date.now() }] },
+  ];
+  const p = path.join(f.dir, "evidence", "assess-sdk-root.jsonl");
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  fs.writeFileSync(p, es.map((e) => JSON.stringify(e)).join("\n"));
+  return p;
+}
