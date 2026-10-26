@@ -261,3 +261,20 @@ test("L6 resumed termination fails closed: unaccounted task, task started after 
   // Without --resume_raw the original alone is still not terminal.
   assert.throws(() => importTermination({ target: f.target, raw: interrupted(f).raw, tool_use: "workflow-tool", mode: "TEST_FIXTURE" }), /terminal notification/i);
 });
+
+test("L7 a task started right after the last pre-kill snapshot is accounted for, not mistaken for post-resume work", (t) => {
+  const f = fixture(t);
+  allPass(f);
+  const r = interrupted(f);
+  // Shape seen live: snapshot lists only the Workflow, then the watcher starts, then the kill.
+  const rows = fs.readFileSync(r.raw, "utf8").split("\n").map(JSON.parse);
+  const snap = rows.findIndex((e) => e.subtype === "background_tasks_changed");
+  rows[snap].tasks = [{ task_id: "workflow" }];
+  rows.splice(snap + 1, 0, { type: "system", subtype: "task_started", session_id: rows[snap].session_id, task_id: "watcher", run_id: "w1", tool_use_id: "w-tool" });
+  const p = path.join(f.dir, "evidence", "orig-l7.jsonl");
+  fs.writeFileSync(p, rows.map((e) => JSON.stringify(e)).join("\n"));
+  assert.equal(imp2(f, { raw: p, resume_raw: r.resume_raw }).status, "TERMINATION_OBSERVED");
+  // The watcher not reported terminal by the resume -> still not drained.
+  const only = interrupted(f, { resumeEvents: (sid, stopped) => [stopped("workflow", "workflow-tool"), { type: "system", subtype: "init", session_id: sid, cwd: "x" }] });
+  assert.throws(() => imp2(f, { raw: p, resume_raw: only.resume_raw }), /did not account for task watcher/);
+});

@@ -108,18 +108,24 @@ export function terminationProof(
     // re-init) and emits no snapshot. Accept that only as complete accounting: a later
     // re-init of this session, the last pre-stop snapshot listing the Workflow, and
     // every task in it reported terminal after that snapshot. Else "not drained".
-    const stoppedAt = es.findIndex(
-      (e) =>
+    const marker = /previous session ended/i,
+      isResumeNotice = (e) =>
         e.type === "system" &&
         e.subtype === "task_notification" &&
         e.session_id === proof.sdk_session_id &&
+        !e.run_id &&
+        marker.test(e.summary || "");
+    const stoppedAt = es.findIndex(
+      (e) =>
+        isResumeNotice(e) &&
         e.task_id === proof.sdk_task_id &&
         e.tool_use_id === proof.sdk_tool_use_id &&
-        !e.run_id &&
         e.status === proof.state,
     );
     if (stoppedAt < 0) throw Error("No matching SDK terminal notification");
     const prior = snapshots.filter((x) => x.i < stoppedAt).at(-1),
+      // The runtime's own "previous session ended" notices mark where the resume began.
+      resumeStart = es.findIndex(isResumeNotice),
       reinit = es.findIndex(
         (e, i) =>
           i > (prior?.i ?? Infinity) &&
@@ -134,25 +140,36 @@ export function terminationProof(
       reinit < 0
     )
       throw Error("Resumed termination lacks prior task list or session re-init");
+    // Everything alive at the kill: the last snapshot's tasks plus any task started
+    // after that snapshot but before the resume began. Each needs a terminal notice.
+    const live = new Set(prior.e.tasks.map((t) => t.task_id));
+    for (const [i, e] of es.entries())
+      if (
+        i > prior.i &&
+        i < resumeStart &&
+        e.type === "system" &&
+        e.subtype === "task_started" &&
+        e.session_id === proof.sdk_session_id
+      )
+        live.add(e.task_id);
     let accounted = stoppedAt;
-    for (const t of prior.e.tasks) {
+    for (const id of live) {
       const n = es.findIndex(
         (e, i) =>
           i > prior.i &&
           e.type === "system" &&
           e.subtype === "task_notification" &&
           e.session_id === proof.sdk_session_id &&
-          e.task_id === t.task_id &&
+          e.task_id === id &&
           ["completed", "failed", "stopped"].includes(e.status),
       );
-      if (n < 0)
-        throw Error("Resumed session did not account for task " + t.task_id);
+      if (n < 0) throw Error("Resumed session did not account for task " + id);
       accounted = Math.max(accounted, n);
     }
     if (
       es.some(
         (e, i) =>
-          i > prior.i &&
+          i > resumeStart &&
           e.type === "system" &&
           e.subtype === "task_started" &&
           e.session_id === proof.sdk_session_id,
