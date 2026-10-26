@@ -178,7 +178,27 @@ test("E live inspect: request carries exact CLI command lines (next needs --run,
     });
   });
   assert.equal(req.action, "inspect");
+  assert.match(req.commands.next, /^node .+\/scripts\/next\.mjs /);
   assert.match(req.commands.next, /next\.mjs --target .+ --run /);
   assert.match(req.commands.failure_summary, /failure\.mjs --action summary --target /);
   assert.match(req.commands.context, /context\.mjs --target .+ --run /);
+});
+
+test("E live: every coordinator action (not only inspect) receives exact command lines and PASS semantics", async () => {
+  const prompts = [];
+  await runController(input, async (prompt, opts) => {
+    prompts.push(prompt);
+    return ok({
+      snapshot: {
+        observation_id: "obs-1",
+        architecture_ready: false,
+        tasks: [{ id: "R1", status: "UNVERIFIED", dependencies: [] }],
+      },
+    });
+  }).catch(() => {});
+  const reqs = prompts.map((p) => JSON.parse(p.split("AUTODEV_REQUEST ")[1]));
+  const cp = reqs.find((r) => r.action === "checkpoint-architecture");
+  assert.ok(cp?.commands?.context, "checkpoint-architecture carries commands");
+  assert.match(prompts[0], /PASS means the action completed/);
+  assert.match(prompts[0], /no cd, no && or ;/);
 });

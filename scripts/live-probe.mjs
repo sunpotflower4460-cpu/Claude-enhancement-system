@@ -180,6 +180,8 @@ export function probePermissions(root) {
         "Write(" + abs(root) + "/**)",
         "Bash(node " + sh + "/scripts/*)",
         "Bash(node " + sh + "/examples/*)",
+        "Bash(node scripts/*)",
+        "Bash(node ./scripts/*)",
         "Bash(node --test*)",
         "Bash(node --check*)",
         "Bash(git status*)",
