@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "kind": "review",
+  "scope": "final",
+  "status": "PASS",
+  "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+  "task_id": "mission",
+  "attempt_id": "3c8a5e14-9b27-4d60-8f13-c2e7a0d9b6f8",
+  "session_id": "d6530eba-f475-4a3a-b843-442f8a0b4e90",
+  "task_ids": [
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+  ],
+  "product": "b1d615938b71677059fec00f5682b10b75d261e31bc62321aaae1ce551b10a48",
+  "contract": "1fee181b412fe856df23d63ef76879c88fde7bb1a039dd65e23e7dea47867548",
+  "identity": "1cd56572e3442f19d1b83cd05ed3885a26e73a51870fd2ae94eaafa93681675e",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "The shared api-check adapter's HTTP handler only serves add and greet. The R2 and R4 api checks therefore prove only the task assertions plus a generic HTTP 200 response, not divide or clamp over HTTP. This is a limit of the shared adapter and the acceptance tests were not weakened. Reproduce by reading examples/api-check.mjs lines 59-65.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "clamp does not validate min <= max or NaN inputs, and add does not validate types. This is outside R1-R4 text and acceptance assertions.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The R1/R2 and R3/R4 backlog executions use two different attempt_ids (c6861861... and 9a1f3c52...), consistent with an interruption and resume. Whether the SDK runtime records for both attempts were imported is for the parent's final verify to confirm. The Read-only tools gave no way to correlate them.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Runtime drain, burst finish, state end and the final Opus audit are later steps. This review does not cover them.",
+      "resolved": false
+    }
+  ],
+  "requirement_refs": [
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+  ],
+  "runtime_ref": "runtime-b3ea0e5b62d0d436ee8661cb9a2b712cbeaac07fd13d5ea725c66b21344770f9.json",
+  "executions": [
+    {
+      "task_id": "R1",
+      "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+      "attempt_id": "c6861861-11d1-4784-88b9-33ddc6c31450"
+    },
+    {
+      "task_id": "R2",
+      "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+      "attempt_id": "c6861861-11d1-4784-88b9-33ddc6c31450"
+    },
+    {
+      "task_id": "R3",
+      "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+      "attempt_id": "9a1f3c52-7d44-4e0b-b1d6-2f5a8c0e7b11"
+    },
+    {
+      "task_id": "R4",
+      "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+      "attempt_id": "9a1f3c52-7d44-4e0b-b1d6-2f5a8c0e7b11"
+    }
+  ]
+}

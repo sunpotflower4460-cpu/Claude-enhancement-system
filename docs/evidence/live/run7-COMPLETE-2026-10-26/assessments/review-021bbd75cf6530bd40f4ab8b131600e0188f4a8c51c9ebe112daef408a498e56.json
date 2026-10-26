@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "kind": "review",
+  "scope": "task",
+  "status": "PASS",
+  "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+  "task_id": "R3",
+  "attempt_id": "9a1f3c52-7d44-4e0b-b1d6-2f5a8c0e7b11",
+  "session_id": "d6530eba-f475-4a3a-b843-442f8a0b4e90",
+  "task_ids": [
+    "R3"
+  ],
+  "product": "e3aecac831f24315d0bfb3dc999e1b2fba97019d02231aecb8ed5409934bba53",
+  "contract": "1fee181b412fe856df23d63ef76879c88fde7bb1a039dd65e23e7dea47867548",
+  "identity": "1cd56572e3442f19d1b83cd05ed3885a26e73a51870fd2ae94eaafa93681675e",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "R3 runtime behavior is not verified. No R3-test or R3-api execution was observed in this review, so the pass is based on reading the source only. The Sonnet verifier must run the checks. Requirement: R3.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "clamp in autodev-probe/app.mjs is still a stub (always returns 0), so R4 is unimplemented. This is outside R3 and a later task is expected to handle it. It does not block R3. Requirement: R4.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The resume state shows RETAINED_IMPLEMENTATION with changed=true and observe_required=true. The partial implementation diff was not inspected through the operation receipts here. The coordinator should confirm the implement operation receipt for R3 (operation_id ...|implement|1). Requirement: R3.",
+      "resolved": false
+    }
+  ],
+  "requirement_refs": [
+    "R3"
+  ],
+  "runtime_ref": "runtime-bf14422f575d96ff15b62993ae8b6d171c1f0224681839a699229c2fffc90c2c.json",
+  "executions": [
+    {
+      "task_id": "R3",
+      "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+      "attempt_id": "9a1f3c52-7d44-4e0b-b1d6-2f5a8c0e7b11"
+    }
+  ]
+}

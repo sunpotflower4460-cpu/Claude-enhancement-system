@@ -1,0 +1,73 @@
+{
+  "version": 2,
+  "items": [
+    {
+      "id": "R1",
+      "requirement_refs": [
+        "R1"
+      ],
+      "status": "PASS",
+      "dependencies": [],
+      "check_refs": [
+        "R1-test",
+        "R1-api"
+      ],
+      "execution": {
+        "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+        "attempt_id": "c6861861-11d1-4784-88b9-33ddc6c31450",
+        "started_at": "2026-10-26T15:40:03.651Z"
+      }
+    },
+    {
+      "id": "R2",
+      "requirement_refs": [
+        "R2"
+      ],
+      "status": "PASS",
+      "dependencies": [],
+      "check_refs": [
+        "R2-test",
+        "R2-api"
+      ],
+      "execution": {
+        "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+        "attempt_id": "c6861861-11d1-4784-88b9-33ddc6c31450",
+        "started_at": "2026-10-26T15:44:35.668Z"
+      }
+    },
+    {
+      "id": "R3",
+      "requirement_refs": [
+        "R3"
+      ],
+      "status": "PASS",
+      "dependencies": [],
+      "check_refs": [
+        "R3-test",
+        "R3-api"
+      ],
+      "execution": {
+        "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+        "attempt_id": "9a1f3c52-7d44-4e0b-b1d6-2f5a8c0e7b11",
+        "started_at": "2026-10-26T15:57:43.338Z"
+      }
+    },
+    {
+      "id": "R4",
+      "requirement_refs": [
+        "R4"
+      ],
+      "status": "PASS",
+      "dependencies": [],
+      "check_refs": [
+        "R4-test",
+        "R4-api"
+      ],
+      "execution": {
+        "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+        "attempt_id": "9a1f3c52-7d44-4e0b-b1d6-2f5a8c0e7b11",
+        "started_at": "2026-10-26T16:04:03.831Z"
+      }
+    }
+  ]
+}

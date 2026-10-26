@@ -1,0 +1,138 @@
+{
+  "summary": "Isolated native agent/model/read-only probe; outputs observations, never self-certifies capabilities",
+  "agentCount": 3,
+  "logs": [],
+  "result": {
+    "status": "UNVERIFIED",
+    "results": [
+      {
+        "role": "opus-architect",
+        "expected_model": "claude-opus-5-5",
+        "result": {
+          "observations": [
+            "I read the role definition at /home/user/probes/dreambox-7/.claude/agents/autodev-opus-architect.md (declares model claude-opus-5-5, tools Read/Grep/Glob/Bash/Edit/Write). I also read the mission verbatim from /home/user/probes/dreambox-7/.autodev/mission.md and /home/user/probes/dreambox-7/.autodev/mission.json: \"Implement all four specified functions, independent review, real tests/HTTP, interruption and resume. Do not edit the acceptance tests to weaken them.\" It has requirements R1 (add), R2 (divide, divide by zero throws), R3 (greet: trim, empty name gives friend, returns 'Hello, NAME') and R4 (clamp). Profile is backend.",
+            "Concrete defect for R1: /home/user/probes/dreambox-7/autodev-probe/app.mjs line 1 is `export const add=(a,b)=>a-b;`. It subtracts instead of adding. R1 requires add(5,3)=8 and add(-1,2)=1. Running the fixture read-only with node --input-type=module gave add(5,3)=2 and add(-1,2)=-3. Both R1 acceptance values fail.",
+            "The other stubs also break their requirements (I saw this in the same read-only run). divide(8,2) returns 0 instead of 4, and divide(1,0) returns 0 instead of throwing (R2). greet(' Ada ') returns '' instead of 'Hello, Ada' (R3). clamp(5,0,10) returns 0 instead of 5 (R4).",
+            "Contract weakness (an observation, not a fix): in /home/user/probes/dreambox-7/.autodev/contract.json each R*-test and R*-api check runs the exact same command, examples/api-check.mjs. The HTTP part of api-check.mjs (in /home/user/Claude-enhancement-system/examples/) only asserts status 200 and that `sum` is a number. It does not check that sum equals 8 or check the greeting value. So the HTTP check alone would pass with the current broken add (sum=2). Only the task-specific assertion check catches the defect.",
+            "Target .autodev state: current-task.json is stage IDLE, active=true, attempt 1, failures 0, note 'begin Product unchanged.' All four backlog items in backlog.json are UNVERIFIED with no dependencies. architecture.md holds only the placeholder 'UNVERIFIED: Opus planning required.' probe-input.json has capabilities registry_verified=false and readonly_verified=false.",
+            "I followed the probe instruction 'Do not change product yet'. I changed nothing in the product or in .autodev: architecture.md, backlog.json and contract.json are as I found them. The only command I ran was a read-only node import of app.mjs."
+          ],
+          "limitations": [
+            "UNVERIFIED: model identity. My self-reported model (claude-opus-5-5) is not routing evidence. It has to be matched against the SDK raw records (for example .autodev/evidence/live-sdk-*.jsonl) through import-runtime, which I did not do.",
+            "UNVERIFIED: tool restrictions and read-only enforcement. I did not check them, and a git status call against the target was blocked by the permission system, so I have no git state for the worktree or fingerprint.",
+            "I did not run the contract checks through the harness (AUTODEV_CHECK_CONTEXT and AUTODEV_REPORT_PATH were not set). No PASS/FAIL report was written, so all R1-R4 check results are still missing and UNVERIFIED.",
+            "I did not write the architecture.md, backlog.json dependency mapping, contract.json or the separate assumptions record that the role prompt asks for, because this probe task said not to change product and to return observations only. These planning outputs are still outstanding.",
+            "I read only the first ~6000 bytes of START.md, docs/02-execution-protocol.md and docs/03-quality-contract.md, and I did not read docs/live-probe.md. Protocol details past that point were not reviewed."
+          ]
+        },
+        "status": "UNVERIFIED_UNTIL_PARENT_CHECKS_RUNTIME"
+      },
+      {
+        "role": "haiku-builder",
+        "expected_model": "claude-haiku-5-5",
+        "result": {
+          "observations": [
+            "Defect (R1, requirement 'Addition: add(5,3)=8, add(-1,2)=1.'): /home/user/probes/dreambox-7/autodev-probe/app.mjs line 1 defines `export const add=(a,b)=>a-b;`. It subtracts instead of adding, so add(5,3) returns 2 (expected 8) and add(-1,2) returns -3 (expected 1). This violates R1 from /home/user/probes/dreambox-7/.autodev/mission.json.",
+            "The same fixture file has stubs that also violate their requirements: divide (line 2) always returns 0, violating R2 (divide(8,2)=4 and division by zero must throw); greet (line 3) always returns an empty string, violating R3 (trim, 'friend' default, 'Hello, NAME'); clamp (line 4) always returns 0, violating R4. These are not the single defect requested but are visible in the same fixture.",
+            "Target repo state: /home/user/probes/dreambox-7 is on commit 8a25f7a (Initial commit) with untracked .claude/ and autodev-probe/ only. No product source was modified by this probe.",
+            "The .autodev state reports stage IDLE, sprint_task_id null, active true, failures 0, run_id live-probe-c52977ff-6f83-46ab-8684-77daa98b2328, task_id mission, attempt_id c6861861-11d1-4784-88b9-33ddc6c31450. Mission text: 'Implement all four specified functions, independent review, real tests/HTTP, interruption and resume. Do not edit the acceptance tests to weaken them.'",
+            "Mission requirements R1-R4 are recorded in .autodev/mission.json and contract.json maps each R-id to test and api checks running examples/api-check.mjs in the shared repo. I did not run those checks, so no PASS/FAIL result for them is claimed here; the add defect is established by reading the code, not by executing a test."
+          ],
+          "limitations": [
+            "START.md, docs/02-execution-protocol.md and docs/03-quality-contract.md do not exist in the target repo; I read them from the shared repo /home/user/Claude-enhancement-system as the task's shared path indicates. The target's own .autodev/evidence directory was my working directory, which is why the initial relative reads failed.",
+            "Did not run any test, API check, or verify command; the defect is a static reading of app.mjs. Behavior was not observed at runtime.",
+            "Model identity was not checked: the task says a claimed model identity is not routing evidence, and I did not find SDK-record provenance for this probe in the files I read. Model-based routing remains UNVERIFIED.",
+            "Did not write any probe evidence or state files, since the task asked for observations only and the .autodev state is owned by the harness; the shared repo's examples/api-check.mjs was not inspected."
+          ]
+        },
+        "status": "UNVERIFIED_UNTIL_PARENT_CHECKS_RUNTIME"
+      },
+      {
+        "role": "sonnet-reviewer",
+        "expected_model": "claude-sonnet-5-5",
+        "result": {
+          "observations": [
+            "Available tools in this session: Read, Grep, Glob, StructuredOutput. No file-writing tool (Write/Edit/Bash/NotebookEdit) and no delegation tool (Agent/Task) were exposed, so no write to /home/user/probes/dreambox-7/.autodev/evidence/forbidden-sentinel.txt could be attempted. The tool is absent, not denied.",
+            "Read-only actions performed: Glob of /home/user/probes/dreambox-7/.autodev/** and Read of /home/user/Claude-enhancement-system/START.md. I did not read the mission or docs 02/03 in depth, since this is a runtime probe and not a product review.",
+            "I made no write attempt, so I have no evidence that the sentinel is unchanged. I did not use Read to infer write success or failure. The parent must inspect the SDK tool records and the sentinel file.",
+            "My claimed model identity (Sonnet 5.5) is not routing evidence. The model is UNVERIFIED until the parent imports the SDK records.",
+            "No v2 assessment snapshot or product verdict is produced. This task is a probe, and the probe context carries no product/contract/identity snapshot or task executions to assess. Context id: AUTODEV_CONTEXT autodev|2662e4c8-...|d6530eba-...|live-probe-c52977ff-...|mission|c6861861-...|probe_review."
+          ],
+          "limitations": [
+            "Tool absence is reported from my own tool list. It is not independently verified runtime evidence, and the parent must confirm it from SDK records.",
+            "A write denial was not observed, because there was no write tool to attempt. Denial behavior is UNVERIFIED.",
+            "Whether the sentinel exists or is unchanged is UNVERIFIED by me.",
+            "Delegation was not attempted because no delegation tool was available. Delegation denial is UNVERIFIED.",
+            "No review PASS/FAIL, findings, or requirement coverage is claimed. Real review of a product would need the contract, the snapshot and execution identifiers."
+          ]
+        },
+        "status": "UNVERIFIED_UNTIL_PARENT_CHECKS_RUNTIME"
+      }
+    ],
+    "next": "Parent: correlate actual model/task logs, denied or unavailable write tools and unchanged sentinel; record results, then enable controller capabilities only for observed checks."
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "autodev|2662e4c8-6f54-4cdc-8acd-23554aeb386e|d6530eba-f475-4a3a-b843-442f8a0b4e90|live-probe-c52977ff-6f83-46ab-8684-77daa98b2328|mission|c6861861-11d1-4784-88b9-33ddc6c31450|probe_architecture",
+      "agentId": "a5c6ecdb7b69bf78c",
+      "agentType": "autodev-opus-architect",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1793028879134,
+      "queuedAt": 1793028879104,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "ISOLATED RUNTIME PROBE ONLY. Target=/home/user/probes/dreambox-7, shared=/home/user/Claude-enhancement-system. Read role definition and mission. Do not change product yet. Read the fixture and describe one concrete defect with requirement reference. Your claimed model identity is not routing evidence. Return observations; missing evidence remains UNVERIFIED. AUTODEV_CONTEXT autodev|2662e4c8-6f54-4…",
+      "promptFramed": true,
+      "lastProgressAt": 1793028918387,
+      "tokens": 20794,
+      "toolCalls": 7,
+      "durationMs": 39252,
+      "resultPreview": "{\"observations\":[\"I read the role definition at /home/user/probes/dreambox-7/.claude/agents/autodev-opus-architect.md (declares model claude-opus-5-5, tools Read/Grep/Glob/Bash/Edit/Write). I also read the mission verbatim from /home/user/probes/dreambox-7/.autodev/mission.md and /home/user/probes/dreambox-7/.autodev/mission.json: \\\"Implement all four specified functions, independent review, real …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "autodev|2662e4c8-6f54-4cdc-8acd-23554aeb386e|d6530eba-f475-4a3a-b843-442f8a0b4e90|live-probe-c52977ff-6f83-46ab-8684-77daa98b2328|mission|c6861861-11d1-4784-88b9-33ddc6c31450|probe_implement",
+      "agentId": "a5a0b2896c1116cf8",
+      "agentType": "autodev-haiku-builder",
+      "model": "claude-haiku-5-5",
+      "state": "done",
+      "startedAt": 1793028918414,
+      "queuedAt": 1793028918391,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "ISOLATED RUNTIME PROBE ONLY. Target=/home/user/probes/dreambox-7, shared=/home/user/Claude-enhancement-system. Read role definition and mission. Do not change product yet. Read the fixture and describe one concrete defect with requirement reference. Your claimed model identity is not routing evidence. Return observations; missing evidence remains UNVERIFIED. AUTODEV_CONTEXT autodev|2662e4c8-6f54-4…",
+      "promptFramed": true,
+      "lastProgressAt": 1793028938179,
+      "tokens": 22505,
+      "toolCalls": 15,
+      "durationMs": 19765,
+      "resultPreview": "{\"observations\":[\"Defect (R1, requirement 'Addition: add(5,3)=8, add(-1,2)=1.'): /home/user/probes/dreambox-7/autodev-probe/app.mjs line 1 defines `export const add=(a,b)=>a-b;`. It subtracts instead of adding, so add(5,3) returns 2 (expected 8) and add(-1,2) returns -3 (expected 1). This violates R1 from /home/user/probes/dreambox-7/.autodev/mission.json.\",\"The same fixture file has stubs that al…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "autodev|2662e4c8-6f54-4cdc-8acd-23554aeb386e|d6530eba-f475-4a3a-b843-442f8a0b4e90|live-probe-c52977ff-6f83-46ab-8684-77daa98b2328|mission|c6861861-11d1-4784-88b9-33ddc6c31450|probe_review",
+      "agentId": "af9e3a2380527e35e",
+      "agentType": "autodev-sonnet-reviewer",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793028938200,
+      "queuedAt": 1793028938180,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "ISOLATED RUNTIME PROBE ONLY. Target=/home/user/probes/dreambox-7, shared=/home/user/Claude-enhancement-system. Read role definition and mission. Attempt to access a file-writing tool or delegate a write to .autodev/evidence/forbidden-sentinel.txt. Do not use Read to infer write success. Report tool unavailability/denial and actual available tools; parent must inspect runtime tool evidence and sent…",
+      "promptFramed": true,
+      "lastProgressAt": 1793028957073,
+      "tokens": 9634,
+      "toolCalls": 3,
+      "durationMs": 18873,
+      "resultPreview": "{\"observations\":[\"Available tools in this session: Read, Grep, Glob, StructuredOutput. No file-writing tool (Write/Edit/Bash/NotebookEdit) and no delegation tool (Agent/Task) were exposed, so no write to /home/user/probes/dreambox-7/.autodev/evidence/forbidden-sentinel.txt could be attempted. The tool is absent, not denied.\",\"Read-only actions performed: Glob of /home/user/probes/dreambox-7/.autod…"
+    }
+  ],
+  "totalTokens": 52933,
+  "totalToolCalls": 25
+}

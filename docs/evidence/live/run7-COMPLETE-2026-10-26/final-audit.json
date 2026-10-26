@@ -1,0 +1,100 @@
+{
+  "version": 2,
+  "kind": "audit",
+  "scope": "final",
+  "status": "PASS",
+  "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+  "task_id": "mission",
+  "attempt_id": "3c8a5e14-9b27-4d60-8f13-c2e7a0d9b6f8",
+  "session_id": "d6530eba-f475-4a3a-b843-442f8a0b4e90",
+  "task_ids": [
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+  ],
+  "product": "b1d615938b71677059fec00f5682b10b75d261e31bc62321aaae1ce551b10a48",
+  "contract": "1fee181b412fe856df23d63ef76879c88fde7bb1a039dd65e23e7dea47867548",
+  "identity": "1cd56572e3442f19d1b83cd05ed3885a26e73a51870fd2ae94eaafa93681675e",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "Coverage of the original requirements: R1 (add) PASS, R2 (divide) PASS, R3 (greet) PASS and R4 (clamp) PASS against /home/user/probes/dreambox-7/autodev-probe/app.mjs at product b1d615938b71677059fec00f5682b10b75d261e31bc62321aaae1ce551b10a48. Every check (R1-test/api, R2-test/api, R3-test/api, R4-test/api) has a current check record in /home/user/probes/dreambox-7/.autodev/evidence/ bound to that product, contract 1fee181b412fe856df23d63ef76879c88fde7bb1a039dd65e23e7dea47867548 and identity 1cd56572e3442f19d1b83cd05ed3885a26e73a51870fd2ae94eaafa93681675e, each with exit_code 0 and stable=true. Process requirements P1-P4 are covered; P5 is covered only by reading the current files (see the next finding). No requirement was dropped or narrowed. Affected executions: R1/R2 c6861861-11d1-4784-88b9-33ddc6c31450 and R3/R4 9a1f3c52-7d44-4e0b-b1d6-2f5a8c0e7b11.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "P5 (acceptance tests not weakened) is checked only by reading the current files. /home/user/Claude-enhancement-system/examples/api-check.mjs still asserts add(5,3)===8, add(-1,2)===1, divide(8,2)===4, divide(1,0) throws, greet(' Ada ')==='Hello, Ada', greet(' ')==='Hello, friend', clamp(12,0,10)===10, clamp(-1,0,10)===0, clamp(5,0,10)===5, and HTTP status 200. /home/user/probes/dreambox-7/.autodev/contract.json still points all 8 checks at that file. This role is read-only and cannot compare against git history. The parent or verify step should confirm with git that both files are unchanged since their original revision.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The HTTP evidence is generic. The adapter's server serves only {sum: add(5,3), greeting: greet(' Ada ')} (api-check.mjs lines 59-65), so the real HTTP call for R2-api and R4-api never exercises divide or clamp. R2's error handling and R4's behaviour rest on the node:assert checks. Architecture assumption A5 and rule P5 accept this. If a product-owned endpoint were ever required, it must be added as a new task, not by editing the acceptance script.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The existing /home/user/probes/dreambox-7/.autodev/evidence/final-verify.json (COMPLETE, LIVE) was produced after the earlier state end at 16:33:26, for attempt 5d2e8b17-3c90-4f6a-a7e1-0b94c3d8f2a6. Since then:\n- Attempt e7c41a90-52b3-4d18-9f6e-3a1b8d70c4f5 was started, its run 667ccd04 terminated 'stopped', and recovery set the stage to BLOCKED.\n- The current attempt 3c8a5e14-9b27-4d60-8f13-c2e7a0d9b6f8 began, and its run 259295ad-940d-4a99-961b-b6cc32130d2f is ATTACHED with termination null.\nSo the old verify result must not be reused. The parent must confirm that run has stopped with no agents still running, run burst finish and state end, and then run verify.mjs again.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "/home/user/probes/dreambox-7/.autodev/current-task.json shows stage BLOCKED with active=true (left by recovering the stopped e7c41a90 run), and handoff.md says to inspect operations before resuming. There are zero recorded failures, and all 15 receipts in /home/user/probes/dreambox-7/.autodev/operations/ are 'completed', so no unobserved writer is in progress. This is a state-closing step for the parent, not a product defect.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The previous final audit (/home/user/probes/dreambox-7/.autodev/evidence/audit.json, attempt 5d2e8b17) said there were 17 receipts in operations/. Only 15 receipt files exist now, and all are completed. Either the earlier audit miscounted or receipts were removed. The coordinator should reconcile this so that no receipt history was dropped.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Checkpoint publication is not proven. /home/user/probes/dreambox-7/.autodev/evidence/checkpoint-reclone-1.json shows a RESTORED clone with next action RESUME at REVIEW for R2, which is evidence for resume. But the checkpoint is SAVED_LOCAL, published=false, remote_publication UNVERIFIED (push was disabled in the probe clone). The parent should publish the checkpoint or record why it was not published.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "verify.mjs marks some model-run records as UNVERIFIED (missing or stale historical role provenance): the three probe-era records runtime-736b0764..., runtime-b853e86e... and runtime-8a18588f..., plus runtime-68334b14... (an R3-era milestone audit for attempt 9a1f3c52). Later audits for the current snapshot (runtime-5037c9d9..., runtime-924da279...) supersede them. These records stay visible and must not be counted as current-run evidence.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "No Sonnet verifier (verify stage) model-run records exist. Verification rests on the CLI runner's check records (real exit codes, hashed reports, HTTP response files), not on recorded model runs of a verifier agent.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The per-task reviews for R1-R3 were recorded against older product fingerprints (9e15d32e..., e3aecac8...), and later tasks edited the same file. The final Sonnet review (/home/user/probes/dreambox-7/.autodev/evidence/review.json, scope final, attempt 3c8a5e14, PASS, all findings minor) and all 8 check records are bound to the current snapshot, so the current product is covered.",
+      "resolved": false
+    }
+  ],
+  "requirement_refs": [
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+  ],
+  "runtime_ref": "runtime-401962b63e12d7bd6a31f71c022e548565bb4acd71a2eb30f2fb399e1a1426e8.json",
+  "executions": [
+    {
+      "task_id": "R1",
+      "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+      "attempt_id": "c6861861-11d1-4784-88b9-33ddc6c31450"
+    },
+    {
+      "task_id": "R2",
+      "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+      "attempt_id": "c6861861-11d1-4784-88b9-33ddc6c31450"
+    },
+    {
+      "task_id": "R3",
+      "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+      "attempt_id": "9a1f3c52-7d44-4e0b-b1d6-2f5a8c0e7b11"
+    },
+    {
+      "task_id": "R4",
+      "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+      "attempt_id": "9a1f3c52-7d44-4e0b-b1d6-2f5a8c0e7b11"
+    }
+  ]
+}

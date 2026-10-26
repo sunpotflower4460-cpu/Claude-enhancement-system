@@ -76,6 +76,7 @@ export function persistAssessment(o) {
     expected: MODEL[kind],
     raw,
     tool_use,
+    wait: o.wait ?? 45,
   });
   const a = {
     version: 2,

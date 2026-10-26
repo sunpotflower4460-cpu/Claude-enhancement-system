@@ -151,3 +151,25 @@ test("A5 operation complete needs a result, and a null-result receipt can be rep
   assert.throws(() => op({ action: "complete" }), /No started operation|requires --result/);
   assert.equal(op({ action: "complete", result: res }).operation.result.status, "PASS");
 });
+
+import { spawn } from "node:child_process";
+test("A6 import-runtime --wait retries only the transient 'agent record not written yet' case (live run 7)", (t) => {
+  const f = fixture(t);
+  const full = sdk(f, { stage: "implement" }),
+    lines = fs.readFileSync(full, "utf8").split("\n"),
+    live = path.join(f.dir, "evidence", "live-sdk-late.jsonl");
+  // Capture lacks the agent progress record at first; a helper process appends it 1.5s later.
+  fs.writeFileSync(live, lines.slice(0, 3).join("\n"));
+  const progress = lines[3].replace(/'/g, "'\\''");
+  spawn("sh", ["-c", `sleep 1.5; printf '\\n%s' '${progress}' >> ${live}`], { detached: true, stdio: "ignore" }).unref();
+  const o = { target: f.target, task: "R1", stage: "implement", expected: "claude-sonnet-5-5", burst: "b1" };
+  assert.throws(() => importRuntime({ ...o, wait: 0 }), /Subagent evidence absent/);
+  const t0 = Date.now();
+  assert.equal(importRuntime({ ...o, wait: 15 }).status, "OBSERVED");
+  assert.ok(Date.now() - t0 < 14000);
+  // A wrong model is not transient: it fails immediately even with a long wait.
+  fs.writeFileSync(live, fs.readFileSync(sdk(f, { stage: "implement", model: "claude-haiku-5-5" }), "utf8"));
+  const t1 = Date.now();
+  assert.throws(() => importRuntime({ ...o, wait: 30 }), /substituted|mismatch/i);
+  assert.ok(Date.now() - t1 < 5000);
+});

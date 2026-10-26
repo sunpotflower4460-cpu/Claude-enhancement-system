@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "kind": "review",
+  "scope": "task",
+  "status": "PASS",
+  "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+  "task_id": "R1",
+  "attempt_id": "c6861861-11d1-4784-88b9-33ddc6c31450",
+  "session_id": "d6530eba-f475-4a3a-b843-442f8a0b4e90",
+  "task_ids": [
+    "R1"
+  ],
+  "product": "0abf58d135f152a8086453413e2be1c4ed200c15280b575121056e4a02873d6d",
+  "contract": "1fee181b412fe856df23d63ef76879c88fde7bb1a039dd65e23e7dea47867548",
+  "identity": "1cd56572e3442f19d1b83cd05ed3885a26e73a51870fd2ae94eaafa93681675e",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "Runtime not executed by the reviewer. R1-test and R1-api have no real CLI or HTTP result from this review, so the verifier must run them. Reproduction: run the R1-test and R1-api commands in contract.json with AUTODEV_CHECK_CONTEXT set. Coverage: R1 is checked by source only.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "divide, greet and clamp in /home/user/probes/dreambox-7/autodev-probe/app.mjs are still stubs. They return 0, an empty string and 0. R2, R3 and R4 are pending, so the mission is not complete. The tasks stay UNVERIFIED and the later tasks are not yet done.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The api-check HTTP handler only exercises add and greet. The api check for R1 therefore asserts only that sum is a number, which is weak. This is the fixed acceptance adapter and must not be weakened or edited.",
+      "resolved": false
+    }
+  ],
+  "requirement_refs": [
+    "R1"
+  ],
+  "runtime_ref": "runtime-c57fca370a8a55022df3cf53d20f59defbeac4af839f7221123818a8740bb4fb.json",
+  "executions": [
+    {
+      "task_id": "R1",
+      "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+      "attempt_id": "c6861861-11d1-4784-88b9-33ddc6c31450"
+    }
+  ]
+}

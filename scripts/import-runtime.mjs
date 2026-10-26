@@ -21,8 +21,24 @@ import {
   condenseSdk,
 } from "./lib/runtime.mjs";
 import { invocationTag } from "./lib/core.mjs";
+const sleep = (ms) =>
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+// Live run 7: the coordinator imported a stage's model proof moments before the runtime wrote the
+// agent's `done` progress record and got "Subagent evidence absent" (one extra final-audit
+// NEEDS_FIX round). With o.wait seconds, re-read the live capture until the record appears.
+// Only that transient absence is retried; substitution, wrong model or ambiguity fail at once.
+const TRANSIENT =
+  /Subagent evidence absent|Cannot identify the Workflow launch|uniquely observed SDK tool_use_id|Missing SDK assistant model observation/;
 export function importRuntime(o) {
-  return mutex(o.target, () => importRuntimeUnlocked(o));
+  const deadline = Date.now() + Math.max(0, Number(o.wait) || 0) * 1000;
+  for (;;) {
+    try {
+      return mutex(o.target, () => importRuntimeUnlocked(o));
+    } catch (e) {
+      if (!TRANSIENT.test(e.message) || Date.now() >= deadline) throw e;
+      sleep(2000);
+    }
+  }
 }
 function importRuntimeUnlocked(o) {
   const c = observationContext(o.target),

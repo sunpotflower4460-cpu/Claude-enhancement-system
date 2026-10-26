@@ -295,9 +295,9 @@ test("E live: architecture and close-task requests carry exact import-runtime co
     return ok({ snapshot: snap });
   }).catch(() => {});
   const arch = seen.find((r) => r.action === "checkpoint-architecture");
-  assert.match(arch.commands.import_runtime[0], /import-runtime\.mjs --target \/target --task mission --stage architecture --expected claude-opus-5-5 --burst burst-3/);
+  assert.match(arch.commands.import_runtime[0], /import-runtime\.mjs --target \/target --task mission --stage architecture --expected claude-opus-5-5 --wait 45 --burst burst-3/);
   const close = seen.find((r) => r.action === "close-task");
   assert.ok(close, JSON.stringify(seen.map((r) => r.action)));
   assert.match(close.commands.import_runtime[0], /--stage plan --expected claude-sonnet-5-5/);
-  assert.match(close.commands.import_runtime[1], /--task R1 --stage implement --expected claude-haiku-5-5 --burst burst-3/);
+  assert.match(close.commands.import_runtime[1], /--task R1 --stage implement --expected claude-haiku-5-5 --wait 45 --burst burst-3/);
 });

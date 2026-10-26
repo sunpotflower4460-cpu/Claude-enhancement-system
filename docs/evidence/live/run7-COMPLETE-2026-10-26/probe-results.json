@@ -1,0 +1,142 @@
+{
+  "version": 2,
+  "mode": "LIVE_PROBE_OBSERVATIONS",
+  "invocation_id": "c52977ff-6f83-46ab-8684-77daa98b2328",
+  "checks": [
+    {
+      "id": "two_repositories",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Session cwd was the isolated clone with the shared repo as an extra working dir, but a cloud two-repository selection was not observed (local isolated run); source remote read-only check in source-remote-unchanged.json",
+      "observed_at": "2026-10-26T16:43:19.381Z"
+    },
+    {
+      "id": "goal_continuation",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "goal-continuation.json",
+          "sha256": "b06d6a529c4da74ea1613175e026bc0ae8b224d3f6346053f5ef6001529c9a4a"
+        }
+      ],
+      "reason": "Active goal events in the live SDK stream; Stop hook blocked ending twice and the same session continued work to close gaps",
+      "observed_at": "2026-10-26T16:43:15.846Z"
+    },
+    {
+      "id": "actual_models",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "runtime-736b0764bdeaf0524f302ca1c864691ea6749df4c48e01656ba83eece530f2a9.json",
+          "sha256": "343a652d6688ce28cc5064ba1b73463cda358b5ce8862d001f5ebc1e8a05f92a"
+        },
+        {
+          "path": "runtime-b853e86e1e5ec119f4fb19ff736cf139fa0538b835af5213202a78d345ff6dc0.json",
+          "sha256": "1765780f52d6becdef6766c0bd536b758186e4d194c31f5a0b4026ed5cc05c6f"
+        },
+        {
+          "path": "runtime-8a18588f9e117d51c3d4dbf3d9aac1186f7bccb0be16f9d50d55de10cf2954e6.json",
+          "sha256": "951034abf4bad94a4c99794a5ea1044bce880b0a6c76e0b61f9f3db4c50d5fc5"
+        }
+      ],
+      "reason": "import-runtime from live SDK workflow_agent progress: opus-5-5, haiku-5-5, sonnet-5-5 CURRENT_VALID",
+      "observed_at": "2026-10-26T15:36:46.039Z"
+    },
+    {
+      "id": "native_readonly_denial",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "readonly-e58211ebbde413ac.json",
+          "sha256": "b711fb1f66ea66f397f7b3f8af25e2841abc288fc7b83062c264da083eeeb832"
+        }
+      ],
+      "reason": "Runtime-recorded tool list of sonnet-reviewer is Read/Grep/Glob/StructuredOutput only (write/Bash/delegation absent, not merely denied); writers have Write/Edit/Bash; forbidden-sentinel.txt absent. No write attempt was made by the reviewer, so a tool-level denial message is not observed.",
+      "observed_at": "2026-10-26T15:36:48.606Z"
+    },
+    {
+      "id": "workflow_start_wait",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "multi-burst-summary.json",
+          "sha256": "f0d8d2acd090c7957bf5d2f93f2d13c1064fdcfc3fd4abc3a821ecbf95e71f1f"
+        }
+      ],
+      "reason": "Each native Workflow was launched via the Workflow tool, attached from the live SDK stream, and waited to its task notification; terminal+drained proven by import-termination before every burst finish",
+      "observed_at": "2026-10-26T16:34:12.922Z"
+    },
+    {
+      "id": "repair_loop",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "multi-burst-summary.json",
+          "sha256": "f0d8d2acd090c7957bf5d2f93f2d13c1064fdcfc3fd4abc3a821ecbf95e71f1f"
+        }
+      ],
+      "reason": "All four initially faulty functions were repaired by Haiku, independently reviewed by Sonnet and verified by real checks; failure_state records 0 failures so Sonnet/Opus escalation paths were NOT exercised",
+      "observed_at": "2026-10-26T16:34:19.386Z"
+    },
+    {
+      "id": "real_verification",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "final-verify.json",
+          "sha256": "9e8ece9f59232510846bd24d0a0d6912a935a50bd7168025642093160f8a1d4f"
+        }
+      ],
+      "reason": "8/8 contract checks executed real node:assert and HTTP 200 fetches; verify.mjs COMPLETE after runtime drained. Caveat: the shared api adapter's HTTP only exercises add/greet",
+      "observed_at": "2026-10-26T16:34:14.937Z"
+    },
+    {
+      "id": "stop_resume",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "stop-resume-midflight.json",
+          "sha256": "01e40c07ea6c0c5e32c57092a0f660ce343d64d8075a3c470e8e5c75e7a1758d"
+        }
+      ],
+      "reason": "Native develop-mission Workflow w6jyuucim stopped mid-flight via TaskStop (SDK status stopped); import-termination, burst finish, state recover, new attempt, next.mjs and relaunched burst resumed to READY_FOR_PARENT_GATE. Stop occurred before any product edit, so partial-edit reconciliation after a mid-flight stop was not exercised (that path was only seen at drained boundaries)",
+      "observed_at": "2026-10-26T16:43:13.849Z"
+    },
+    {
+      "id": "final_gate",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "final-verify-2.json",
+          "sha256": "d400267e78c32606bfc557643517086a385d82caa1ad9321b64e7e05a7e254ab"
+        }
+      ],
+      "reason": "verify.mjs COMPLETE 4/4 tasks 8/8 checks, issues empty, recomputed after the mid-flight-stop recovery, burst finish, state end with runtime drained",
+      "observed_at": "2026-10-26T16:43:17.964Z"
+    },
+    {
+      "id": "multi_burst_state",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "multi-burst-summary.json",
+          "sha256": "f0d8d2acd090c7957bf5d2f93f2d13c1064fdcfc3fd4abc3a821ecbf95e71f1f"
+        }
+      ],
+      "reason": "1 probe burst + 11 mission bursts (max_sprints=1), each claimed, attached to the live SDK launch, waited to terminal, import-termination proof, burst finish; two pause/new-root-attempt cycles; milestone audit cadence persisted in progress.json",
+      "observed_at": "2026-10-26T16:34:10.359Z"
+    },
+    {
+      "id": "checkpoint_reclone",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "checkpoint-reclone-1.json",
+          "sha256": "e609dde3e5231a4a61fec971a898dd77de6bce725729c2a16d7a746021e40902"
+        }
+      ],
+      "reason": "LOCAL checkpoint saved (no publish) at drained boundary after burst 2; second local clone with original fetch URL and own pushurl guard restored RESTORED; next.mjs in clone returns same RESUME REVIEW R2. Remote publication UNVERIFIED.",
+      "observed_at": "2026-10-26T15:49:21.947Z"
+    }
+  ]
+}

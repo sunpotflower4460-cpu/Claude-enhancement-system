@@ -225,6 +225,7 @@ async function call(role, action, task_id = "mission", payload = {}) {
         stage +
         " --expected " +
         model +
+        " --wait 45" +
         (input.burst_id ? " --burst " + input.burst_id : ""),
     );
   const importRuntimeFor = (act, id) => {

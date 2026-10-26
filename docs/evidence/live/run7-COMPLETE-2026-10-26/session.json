@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "session_id": "d6530eba-f475-4a3a-b843-442f8a0b4e90",
+  "repository": "github.com/sunpotflower4460-cpu/dream-box",
+  "root": "/home/user/probes/dreambox-7",
+  "gitDir": "/home/user/probes/dreambox-7/.git",
+  "commonDir": "/home/user/probes/dreambox-7/.git",
+  "remote": "https://github.com/sunpotflower4460-cpu/Dream-box",
+  "branch": "claude/enhancement-system-acceptance-test-ux80sk",
+  "head": "8a25f7a2fa039f5f7850904b00ee36a12545c202",
+  "bound_at": "2026-10-26T15:33:43.123Z",
+  "product": "cd4547d59f99e1ea83ed809ee03700d8a9ec74d3966f23f32e7ec4d0d694c3bc"
+}

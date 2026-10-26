@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "kind": "review",
+  "scope": "task",
+  "status": "PASS",
+  "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+  "task_id": "R4",
+  "attempt_id": "9a1f3c52-7d44-4e0b-b1d6-2f5a8c0e7b11",
+  "session_id": "d6530eba-f475-4a3a-b843-442f8a0b4e90",
+  "task_ids": [
+    "R4"
+  ],
+  "product": "b1d615938b71677059fec00f5682b10b75d261e31bc62321aaae1ce551b10a48",
+  "contract": "1fee181b412fe856df23d63ef76879c88fde7bb1a039dd65e23e7dea47867548",
+  "identity": "1cd56572e3442f19d1b83cd05ed3885a26e73a51870fd2ae94eaafa93681675e",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "No R4-test or R4-api runtime evidence exists yet. A grep for R4 under the target found only autodev-probe/mission-input.json. The Sonnet verifier must run the real checks (assertions plus the HTTP fetch) before the task gate. Reproduce with: node $AUTODEV_COMMON/examples/api-check.mjs under the check context for R4.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "clamp does not validate min <= max or NaN inputs. This is outside the R4 text and does not affect the acceptance assertions.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The api check's HTTP handler only exercises add and greet, not clamp. The R4-api check therefore proves only the clamp assertions plus a generic HTTP 200 response. This is a limit of the shared adapter and does not block this review.",
+      "resolved": false
+    }
+  ],
+  "requirement_refs": [
+    "R4"
+  ],
+  "runtime_ref": "runtime-4992e40b3d4519da82ed238ea840fb86b7b22e9a96dee6272b31ea2d69c64ac4.json",
+  "executions": [
+    {
+      "task_id": "R4",
+      "run_id": "live-probe-c52977ff-6f83-46ab-8684-77daa98b2328",
+      "attempt_id": "9a1f3c52-7d44-4e0b-b1d6-2f5a8c0e7b11"
+    }
+  ]
+}
