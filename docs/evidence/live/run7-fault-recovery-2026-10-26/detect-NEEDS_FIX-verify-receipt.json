@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "operation_id": "live-probe-842521ee-11d5-47a5-abd2-06196345d4fc|mission|4e6a1695-1b3e-421b-8743-197d154d4148|final-verification|95c3daf3223be69e5186c49a2f46d2ab27d84f41f19f583e5c0bcb9b06d6b664",
+  "run_id": "live-probe-842521ee-11d5-47a5-abd2-06196345d4fc",
+  "task_id": "mission",
+  "attempt_id": "4e6a1695-1b3e-421b-8743-197d154d4148",
+  "session_id": "d6530eba-f475-4a3a-b843-442f8a0b4e90",
+  "stage": "VERIFY",
+  "state": "completed",
+  "before": "ca6e5bc3602f1d59b3a7f2f1825753103b5ba9f55198a9deb8e912ba72d13090",
+  "after": "ca6e5bc3602f1d59b3a7f2f1825753103b5ba9f55198a9deb8e912ba72d13090",
+  "result": {
+    "status": "NEEDS_FIX",
+    "summary": "Refreshed all 8 checks at current product ca6e5bc3. R1-test, R1-api, R4-test, R4-api PASS. R2-test, R2-api FAIL (divide(a,0) does not throw: Missing expected exception). R3-test, R3-api FAIL (greet does not trim: got 'Hello,  Ada ' expected 'Hello, Ada'). Product autodev-probe/app.mjs regressed relative to tasks R2 and R3 marked PASS.",
+    "findings": [
+      {
+        "severity": "major",
+        "message": "R2 checks fail: divide in autodev-probe/app.mjs is a/b with no zero-division error (R2-test, R2-api: Missing expected exception)."
+      },
+      {
+        "severity": "major",
+        "message": "R3 checks fail: greet in autodev-probe/app.mjs does not trim names (R3-test, R3-api: 'Hello,  Ada ' vs 'Hello, Ada'). Tasks R2/R3 are marked PASS in backlog but current evidence FAILS; they need reset and re-implementation."
+      }
+    ]
+  },
+  "updated_at": "2026-10-26T20:50:21.093Z"
+}

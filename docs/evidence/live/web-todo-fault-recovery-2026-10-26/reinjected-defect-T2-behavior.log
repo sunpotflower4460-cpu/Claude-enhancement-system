@@ -1,0 +1,1 @@
+{"check":"T2-behavior","assertions":20,"failed":["[375x700] press the delete button of \"Read book\"","[375x700] press the delete button of done task \"Water plants\"","[375x700] tick \"Call mom\"","[375x700] press the delete button of \"Call mom\""],"served":3}

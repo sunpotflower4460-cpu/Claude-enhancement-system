@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "check_id": "T2-behavior",
+  "kind": "behavior",
+  "nonce": "3743ac1e-cecf-4112-b0bc-e8003a36bab6",
+  "run_id": "run3",
+  "task_id": "T2",
+  "attempt_id": "root3:78e2aec5-5f8f-423e-a4ca-4863a0392e07",
+  "session_id": "8c68fb96-a017-4d2b-a70b-a2d7a9bd8888",
+  "product": "1c8e296f13e21189c0ca4a3b321ba7cc8f4df3d2c826ab374fceb87e21ff0be3",
+  "contract": "161448e6312e8ba128d2fe7e844d7aa4b378466054c430d2cf69a14fcf9203fa",
+  "identity": "4e79fed650bd896d8a243038b500e8f1d9286b30ebe6147b8dfe2a0ae6131271",
+  "started": "2026-10-26T22:20:40.855Z",
+  "ended": "2026-10-26T22:20:43.563Z",
+  "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+  "exit_code": 1,
+  "signal": null,
+  "stable": true,
+  "log": "b96714b0f9e2664935b132d2c7fd3aaeb85495195a5eb6fb51c91d2ce157cf9c.log",
+  "log_hash": "9f7c7c883889b2816bfabec6be3b167a5dca45794e827fbe7740ff6221cbaef8",
+  "environment": "linux/x64 node v22.22.0",
+  "report": {
+    "path": "b96714b0f9e2664935b132d2c7fd3aaeb85495195a5eb6fb51c91d2ce157cf9c.report.json",
+    "sha256": "ea30d82a52484c5de1a8ed5a64b2fbc2f87239867e9ecf733477e1fcd4961255",
+    "media_type": "application/json"
+  },
+  "report_error": null
+}

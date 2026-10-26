@@ -1,0 +1,372 @@
+{
+  "status": "COMPLETE",
+  "assurance": "LIVE",
+  "routing_history": [
+    "runtime-736b0764bdeaf0524f302ca1c864691ea6749df4c48e01656ba83eece530f2a9.json",
+    "runtime-b853e86e1e5ec119f4fb19ff736cf139fa0538b835af5213202a78d345ff6dc0.json",
+    "runtime-8a18588f9e117d51c3d4dbf3d9aac1186f7bccb0be16f9d50d55de10cf2954e6.json",
+    "runtime-bce7b036a615809a2011599f287195c8bbe79abd98e347fd31610d86a9dc0dbf.json",
+    "runtime-c57fca370a8a55022df3cf53d20f59defbeac4af839f7221123818a8740bb4fb.json",
+    "runtime-7e2f52b0b9ea65367b859e091fa928441e78b75f6c2baf10533a5fef985a68aa.json",
+    "runtime-ddf6f2627e29d49f795d164e1a4a9db1e83cc90bb41973ced0e4f02932629a33.json",
+    "runtime-dbd586f3b62969fb6891f1b7aa6d086c3992650908c3a8b90b48c0f1b5c73253.json",
+    "runtime-3573e9dbb5dae5a7be767c714dff59d2ec5944c049820dd74d56196ee7dfe881.json",
+    "runtime-35bf779c06baf96f1ddee7ffff6e43808197b5b63798faab6c03ff17bf79cc2d.json",
+    "runtime-ab4dda7a11c0628634e97cea1bbe763e551ae9f2b3ebe5ca5dd3882e0af8eed7.json",
+    "runtime-bcc6de548b70c3577a3808bfbfbe76b255185c2cc637bf744fb6e0abb7d7ddf9.json",
+    "runtime-68334b140343fc78fd8273a9c18f2b0637b1363abc2f909501944b9e41240b6c.json",
+    "runtime-bf14422f575d96ff15b62993ae8b6d171c1f0224681839a699229c2fffc90c2c.json",
+    "runtime-7f975c42e1b87a0ae89fdf99e88d433d1ed8834a2f5e5461244b786a7a4f0b07.json",
+    "runtime-24b6763d2ed6ede637bffa6ed80ebd938fbef323cf9c73bbddfb75832970ef01.json",
+    "runtime-e67ff6ad530f4a8fb63dd295693c6fede8ee01b9c2c4ec5c12091bca5b0627cb.json",
+    "runtime-3bddce2d7ed8f193b96341c008d18ec6ee6fce1c5a5a831b7786fae6264c634b.json",
+    "runtime-4992e40b3d4519da82ed238ea840fb86b7b22e9a96dee6272b31ea2d69c64ac4.json",
+    "runtime-c78e86a74d99512a593d1b5f3a504480b57ca2cb0a96b01e904541606a1895c3.json",
+    "runtime-5037c9d9ec029321504b301a191ea7d8da4cbbd89774cc54d300f262288e267c.json",
+    "runtime-a8bdc60c53b374f738e06fd2702263470f6cbdb9b4b06ba97e24bbe82d899f6f.json",
+    "runtime-31cd588c2297e5d8749615bece46b6bd96409e5ddd78634cd2e4957ff096cabd.json",
+    "runtime-88fd1ee6744d1e53a8a4527a057cdb7cbd9761ba9ae66f05c69abae7d2cd7c4f.json",
+    "runtime-b02f1824f2630f7100f1db184c54191c0041b8ee6196ed47bdade3640b44e4f7.json",
+    "runtime-924da27963612d9a1c238ef5e9bd066cf3d1d9441d576706b8f008f92f28cc58.json",
+    "runtime-b3ea0e5b62d0d436ee8661cb9a2b712cbeaac07fd13d5ea725c66b21344770f9.json",
+    "runtime-401962b63e12d7bd6a31f71c022e548565bb4acd71a2eb30f2fb399e1a1426e8.json",
+    "runtime-d98fa24fe372f19cc573e7c9fa6036b8780c21f4d148aa88af6875622d61604f.json",
+    "runtime-7fd0f933eeca548c374ce2fcc466d729e45e18ad0cd731c75895ea0f9bd92922.json",
+    "runtime-7c07188fd75e826c7503488cafab871428ff38b7fa6918f4480a0d4cd98e58f9.json",
+    "runtime-57aea5103186adbf70ae4ea5a1670579592646a89523fb2277f49fe31cc9a96a.json",
+    "runtime-1ef04ee39afb720a3a1907d717123f473945704e8ece164ad4db06284b64f4ca.json",
+    "runtime-a965a25c666cf95b40a4d40afb7f1ddc11d22bccd17931171d466168c513fd1f.json",
+    "runtime-144a49a6c48956dae105fe3f28e3cf3c48a30b183a5c45c2f6e729456e0370e3.json",
+    "runtime-9ad18780c024bc539e1fc7fba34701b26692ff62718f9a02a9fba04146094e8f.json"
+  ],
+  "routing_provenance": [
+    {
+      "name": "runtime-736b0764bdeaf0524f302ca1c864691ea6749df4c48e01656ba83eece530f2a9.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-b853e86e1e5ec119f4fb19ff736cf139fa0538b835af5213202a78d345ff6dc0.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-8a18588f9e117d51c3d4dbf3d9aac1186f7bccb0be16f9d50d55de10cf2954e6.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-bce7b036a615809a2011599f287195c8bbe79abd98e347fd31610d86a9dc0dbf.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "architecture",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-c57fca370a8a55022df3cf53d20f59defbeac4af839f7221123818a8740bb4fb.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-7e2f52b0b9ea65367b859e091fa928441e78b75f6c2baf10533a5fef985a68aa.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-ddf6f2627e29d49f795d164e1a4a9db1e83cc90bb41973ced0e4f02932629a33.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "implement",
+      "task_id": "R1"
+    },
+    {
+      "name": "runtime-dbd586f3b62969fb6891f1b7aa6d086c3992650908c3a8b90b48c0f1b5c73253.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-3573e9dbb5dae5a7be767c714dff59d2ec5944c049820dd74d56196ee7dfe881.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-35bf779c06baf96f1ddee7ffff6e43808197b5b63798faab6c03ff17bf79cc2d.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Historical implementation execution no longer selected"
+    },
+    {
+      "name": "runtime-ab4dda7a11c0628634e97cea1bbe763e551ae9f2b3ebe5ca5dd3882e0af8eed7.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-bcc6de548b70c3577a3808bfbfbe76b255185c2cc637bf744fb6e0abb7d7ddf9.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-68334b140343fc78fd8273a9c18f2b0637b1363abc2f909501944b9e41240b6c.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-bf14422f575d96ff15b62993ae8b6d171c1f0224681839a699229c2fffc90c2c.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-7f975c42e1b87a0ae89fdf99e88d433d1ed8834a2f5e5461244b786a7a4f0b07.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-24b6763d2ed6ede637bffa6ed80ebd938fbef323cf9c73bbddfb75832970ef01.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Historical implementation execution no longer selected"
+    },
+    {
+      "name": "runtime-e67ff6ad530f4a8fb63dd295693c6fede8ee01b9c2c4ec5c12091bca5b0627cb.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-3bddce2d7ed8f193b96341c008d18ec6ee6fce1c5a5a831b7786fae6264c634b.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-4992e40b3d4519da82ed238ea840fb86b7b22e9a96dee6272b31ea2d69c64ac4.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-c78e86a74d99512a593d1b5f3a504480b57ca2cb0a96b01e904541606a1895c3.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-5037c9d9ec029321504b301a191ea7d8da4cbbd89774cc54d300f262288e267c.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-a8bdc60c53b374f738e06fd2702263470f6cbdb9b4b06ba97e24bbe82d899f6f.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-31cd588c2297e5d8749615bece46b6bd96409e5ddd78634cd2e4957ff096cabd.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-88fd1ee6744d1e53a8a4527a057cdb7cbd9761ba9ae66f05c69abae7d2cd7c4f.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "implement",
+      "task_id": "R4"
+    },
+    {
+      "name": "runtime-b02f1824f2630f7100f1db184c54191c0041b8ee6196ed47bdade3640b44e4f7.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-924da27963612d9a1c238ef5e9bd066cf3d1d9441d576706b8f008f92f28cc58.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-b3ea0e5b62d0d436ee8661cb9a2b712cbeaac07fd13d5ea725c66b21344770f9.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-401962b63e12d7bd6a31f71c022e548565bb4acd71a2eb30f2fb399e1a1426e8.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-d98fa24fe372f19cc573e7c9fa6036b8780c21f4d148aa88af6875622d61604f.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-7fd0f933eeca548c374ce2fcc466d729e45e18ad0cd731c75895ea0f9bd92922.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-7c07188fd75e826c7503488cafab871428ff38b7fa6918f4480a0d4cd98e58f9.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-738fdb7461e095599ce10a25f2e9b0eed1e42df40171d55757d10d13bee257a1.json",
+      "assurance": "CURRENT_VALID",
+      "stage": "review",
+      "task_id": "R2"
+    },
+    {
+      "name": "runtime-57aea5103186adbf70ae4ea5a1670579592646a89523fb2277f49fe31cc9a96a.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-ee81cfa0c22e059a069f7d8d47f5a34fdc9f7711e4ac8aa66aa39b826cbf99a5.json",
+      "assurance": "CURRENT_VALID",
+      "stage": "implement",
+      "task_id": "R2"
+    },
+    {
+      "name": "runtime-8d96fed1e0eb9f55734cd460cbc63dcf9a15ad3e753d448e175aab715c83f4e4.json",
+      "assurance": "CURRENT_VALID",
+      "stage": "review",
+      "task_id": "R3"
+    },
+    {
+      "name": "runtime-1ef04ee39afb720a3a1907d717123f473945704e8ece164ad4db06284b64f4ca.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-9ea75c932be2c4389d2605646e9d77ab11bd79bee299b0158d62656595ce6b43.json",
+      "assurance": "CURRENT_VALID",
+      "stage": "implement",
+      "task_id": "R3"
+    },
+    {
+      "name": "runtime-a965a25c666cf95b40a4d40afb7f1ddc11d22bccd17931171d466168c513fd1f.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-144a49a6c48956dae105fe3f28e3cf3c48a30b183a5c45c2f6e729456e0370e3.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-9ad18780c024bc539e1fc7fba34701b26692ff62718f9a02a9fba04146094e8f.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-79a61e54061e0a9183ff6b2fcb83c34d3df43fd7cf5a15e6996c18f023a50f8f.json",
+      "assurance": "CURRENT_VALID",
+      "stage": "review",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-555e3a81b67354644d797141fb9c664c27cc29822cc52628ef4942d8cf24a298.json",
+      "assurance": "CURRENT_VALID",
+      "stage": "audit",
+      "task_id": "mission"
+    }
+  ],
+  "product": "81aecf9cfa9b5db43843c75bc922a8a6c85e24b90f0675cd50966e65b24b83fb",
+  "contract": "1fee181b412fe856df23d63ef76879c88fde7bb1a039dd65e23e7dea47867548",
+  "tasks": [
+    {
+      "id": "R1",
+      "declared": "PASS",
+      "status": "PASS",
+      "checks": [
+        "R1-test",
+        "R1-api"
+      ]
+    },
+    {
+      "id": "R2",
+      "declared": "PASS",
+      "status": "PASS",
+      "checks": [
+        "R2-test",
+        "R2-api"
+      ]
+    },
+    {
+      "id": "R3",
+      "declared": "PASS",
+      "status": "PASS",
+      "checks": [
+        "R3-test",
+        "R3-api"
+      ]
+    },
+    {
+      "id": "R4",
+      "declared": "PASS",
+      "status": "PASS",
+      "checks": [
+        "R4-test",
+        "R4-api"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "status": "PASS"
+    },
+    {
+      "id": "R2",
+      "status": "PASS"
+    },
+    {
+      "id": "R3",
+      "status": "PASS"
+    },
+    {
+      "id": "R4",
+      "status": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "R1-test",
+      "status": "PASS",
+      "reason": "Executed test assertions"
+    },
+    {
+      "id": "R1-api",
+      "status": "PASS",
+      "reason": "Executed api assertions"
+    },
+    {
+      "id": "R2-test",
+      "status": "PASS",
+      "reason": "Executed test assertions"
+    },
+    {
+      "id": "R2-api",
+      "status": "PASS",
+      "reason": "Executed api assertions"
+    },
+    {
+      "id": "R3-test",
+      "status": "PASS",
+      "reason": "Executed test assertions"
+    },
+    {
+      "id": "R3-api",
+      "status": "PASS",
+      "reason": "Executed api assertions"
+    },
+    {
+      "id": "R4-test",
+      "status": "PASS",
+      "reason": "Executed test assertions"
+    },
+    {
+      "id": "R4-api",
+      "status": "PASS",
+      "reason": "Executed api assertions"
+    }
+  ],
+  "issues": []
+}
+COMPLETE: 4/4 tasks, 8/8 checks

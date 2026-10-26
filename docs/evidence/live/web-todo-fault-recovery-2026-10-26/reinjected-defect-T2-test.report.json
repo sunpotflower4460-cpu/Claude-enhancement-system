@@ -1,0 +1,143 @@
+{
+  "version": 2,
+  "run_id": "run3",
+  "task_id": "T2",
+  "attempt_id": "root3:78e2aec5-5f8f-423e-a4ca-4863a0392e07",
+  "session_id": "8c68fb96-a017-4d2b-a70b-a2d7a9bd8888",
+  "kind": "test",
+  "check_id": "T2-test",
+  "nonce": "23f9ecdd-93aa-45e5-b61e-24fce01fd7f0",
+  "tool": {
+    "name": "Playwright Chromium",
+    "version": "playwright 1.64.1 / Chromium 153.0.8010.12"
+  },
+  "assertions": [
+    {
+      "name": "Real Chromium launched",
+      "status": "PASS",
+      "expected": "a launched Chromium binary",
+      "actual": "Chromium 153.0.8010.12 via AUTODEV_CHROMIUM_EXECUTABLE: /opt/pw-browsers/chromium"
+    },
+    {
+      "name": "[1280x800] index.html served with HTTP 200",
+      "status": "PASS",
+      "expected": "200",
+      "actual": "200"
+    },
+    {
+      "name": "[1280x800] #new-todo is a visible text input",
+      "status": "PASS",
+      "expected": "INPUT/text/true",
+      "actual": "INPUT/text/true"
+    },
+    {
+      "name": "[1280x800] #add-btn is a visible button",
+      "status": "PASS",
+      "expected": "BUTTON/true",
+      "actual": "BUTTON/true"
+    },
+    {
+      "name": "[1280x800] type \"Read book\" and press Enter",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book; filter=all; counter=1 item left",
+      "actual": "visible: [ ] Read book; filter=all; counter=1 item left"
+    },
+    {
+      "name": "[1280x800] type \"Water plants\" and press Enter",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book | [ ] Water plants; filter=all; counter=2 items left",
+      "actual": "visible: [ ] Read book | [ ] Water plants; filter=all; counter=2 items left"
+    },
+    {
+      "name": "[1280x800] type \"Call mom\" and press Enter",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left",
+      "actual": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left"
+    },
+    {
+      "name": "[1280x800] each task has one checkbox and one named delete button",
+      "status": "PASS",
+      "expected": "[\"1 checkbox/1 delete/named=true\",\"1 checkbox/1 delete/named=true\",\"1 checkbox/1 delete/named=true\"]",
+      "actual": "[\"1 checkbox/1 delete/named=true\",\"1 checkbox/1 delete/named=true\",\"1 checkbox/1 delete/named=true\"]"
+    },
+    {
+      "name": "[1280x800] tick the checkbox of \"Water plants\"",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left"
+    },
+    {
+      "name": "[1280x800] li.done class matches checkbox state for every task",
+      "status": "PASS",
+      "expected": "[true,true,true]",
+      "actual": "[true,true,true]"
+    },
+    {
+      "name": "[1280x800] a done task is visually distinguishable from an active one (computed style)",
+      "status": "PASS",
+      "expected": "computed styles differ",
+      "actual": "active={\"textDecorationLine\":\"none\",\"color\":\"rgb(26, 26, 26)\",\"opacity\":\"1\",\"fontStyle\":\"normal\",\"backgroundColor\":\"rgba(0, 0, 0, 0)\"} done={\"textDecorationLine\":\"line-through\",\"color\":\"rgb(91, 91, 91)\",\"opacity\":\"1\",\"fontStyle\":\"normal\",\"backgroundColor\":\"rgba(0, 0, 0, 0)\"}"
+    },
+    {
+      "name": "[1280x800] untick the checkbox of \"Water plants\"",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left",
+      "actual": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left"
+    },
+    {
+      "name": "[1280x800] an un-ticked task looks like an active task again",
+      "status": "PASS",
+      "expected": "{\"textDecorationLine\":\"none\",\"color\":\"rgb(26, 26, 26)\",\"opacity\":\"1\",\"fontStyle\":\"normal\",\"backgroundColor\":\"rgba(0, 0, 0, 0)\"}",
+      "actual": "{\"textDecorationLine\":\"none\",\"color\":\"rgb(26, 26, 26)\",\"opacity\":\"1\",\"fontStyle\":\"normal\",\"backgroundColor\":\"rgba(0, 0, 0, 0)\"}"
+    },
+    {
+      "name": "[1280x800] tick \"Water plants\" again",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left"
+    },
+    {
+      "name": "[1280x800] press the delete button of \"Read book\"",
+      "status": "FAIL",
+      "expected": "visible: [x] Water plants | [ ] Call mom; filter=all; counter=1 item left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left"
+    },
+    {
+      "name": "[1280x800] press the delete button of done task \"Water plants\"",
+      "status": "FAIL",
+      "expected": "visible: [ ] Call mom; filter=all; counter=1 item left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left"
+    },
+    {
+      "name": "[1280x800] tick \"Call mom\"",
+      "status": "FAIL",
+      "expected": "visible: [x] Call mom; filter=all; counter=0 items left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [x] Call mom; filter=all; counter=1 item left"
+    },
+    {
+      "name": "[1280x800] press the delete button of \"Call mom\"",
+      "status": "FAIL",
+      "expected": "visible: (none); filter=all; counter=0 items left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [x] Call mom; filter=all; counter=1 item left"
+    },
+    {
+      "name": "[1280x800] li.done class matches checkbox state for every task",
+      "status": "PASS",
+      "expected": "[true,true,true]",
+      "actual": "[true,true,true]"
+    },
+    {
+      "name": "[1280x800] complete: zero console errors, page errors and failed requests",
+      "status": "PASS",
+      "expected": "none",
+      "actual": "none"
+    }
+  ],
+  "artifacts": [],
+  "details": {
+    "total": 20,
+    "passed": 16,
+    "failed": 4,
+    "skipped": 0
+  }
+}

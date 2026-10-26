@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "operation_id": "live-probe-842521ee-11d5-47a5-abd2-06196345d4fc|mission|4e6a1695-1b3e-421b-8743-197d154d4148|final-verification|46b2b80d6a06039289ba9bd864256066f348db5b6294d126b883e8fed38aa6ac",
+  "run_id": "live-probe-842521ee-11d5-47a5-abd2-06196345d4fc",
+  "task_id": "mission",
+  "attempt_id": "4e6a1695-1b3e-421b-8743-197d154d4148",
+  "session_id": "d6530eba-f475-4a3a-b843-442f8a0b4e90",
+  "stage": "VERIFY",
+  "state": "completed",
+  "before": "81aecf9cfa9b5db43843c75bc922a8a6c85e24b90f0675cd50966e65b24b83fb",
+  "after": "81aecf9cfa9b5db43843c75bc922a8a6c85e24b90f0675cd50966e65b24b83fb",
+  "result": {
+    "status": "PASS",
+    "summary": "Refreshed all 8 contract checks via record.mjs at product 81aecf9c. All PASS (exit 0, stable, real assertions + HTTP for api kind): R1-test, R1-api, R2-test, R2-api, R3-test, R3-api, R4-test, R4-api. app.mjs inspected: divide throws on zero, greet trims with friend default. Independent review and Opus audit not yet done for this fingerprint.",
+    "findings": [
+      {
+        "severity": "minor",
+        "message": "Final independent Sonnet review and Opus audit for the current product fingerprint (81aecf9c) are still pending; earlier assessments predate this product."
+      },
+      {
+        "severity": "minor",
+        "message": "Product hash changed from ca6e5bc3 (previous verification, which had R2/R3 FAIL) to 81aecf9c; prior operation results are historical only."
+      }
+    ],
+    "snapshot": {
+      "product": "81aecf9cfa9b5db43843c75bc922a8a6c85e24b90f0675cd50966e65b24b83fb",
+      "contract": "1fee181b412fe856df23d63ef76879c88fde7bb1a039dd65e23e7dea47867548",
+      "identity": "1cd56572e3442f19d1b83cd05ed3885a26e73a51870fd2ae94eaafa93681675e"
+    }
+  },
+  "updated_at": "2026-10-26T21:07:14.633Z"
+}

@@ -1,0 +1,201 @@
+{
+  "version": 2,
+  "run_id": "run3",
+  "task_id": "T2",
+  "attempt_id": "root3:78e2aec5-5f8f-423e-a4ca-4863a0392e07",
+  "session_id": "8c68fb96-a017-4d2b-a70b-a2d7a9bd8888",
+  "kind": "behavior",
+  "check_id": "T2-behavior",
+  "nonce": "3743ac1e-cecf-4112-b0bc-e8003a36bab6",
+  "tool": {
+    "name": "Playwright Chromium",
+    "version": "playwright 1.64.1 / Chromium 153.0.8010.12"
+  },
+  "assertions": [
+    {
+      "name": "Real Chromium launched",
+      "status": "PASS",
+      "expected": "a launched Chromium binary",
+      "actual": "Chromium 153.0.8010.12 via AUTODEV_CHROMIUM_EXECUTABLE: /opt/pw-browsers/chromium"
+    },
+    {
+      "name": "[375x700] index.html served with HTTP 200",
+      "status": "PASS",
+      "expected": "200",
+      "actual": "200"
+    },
+    {
+      "name": "[375x700] #new-todo is a visible text input",
+      "status": "PASS",
+      "expected": "INPUT/text/true",
+      "actual": "INPUT/text/true"
+    },
+    {
+      "name": "[375x700] #add-btn is a visible button",
+      "status": "PASS",
+      "expected": "BUTTON/true",
+      "actual": "BUTTON/true"
+    },
+    {
+      "name": "[375x700] type \"Read book\" and press Enter",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book; filter=all; counter=1 item left",
+      "actual": "visible: [ ] Read book; filter=all; counter=1 item left"
+    },
+    {
+      "name": "[375x700] type \"Water plants\" and press Enter",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book | [ ] Water plants; filter=all; counter=2 items left",
+      "actual": "visible: [ ] Read book | [ ] Water plants; filter=all; counter=2 items left"
+    },
+    {
+      "name": "[375x700] type \"Call mom\" and press Enter",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left",
+      "actual": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left"
+    },
+    {
+      "name": "[375x700] each task has one checkbox and one named delete button",
+      "status": "PASS",
+      "expected": "[\"1 checkbox/1 delete/named=true\",\"1 checkbox/1 delete/named=true\",\"1 checkbox/1 delete/named=true\"]",
+      "actual": "[\"1 checkbox/1 delete/named=true\",\"1 checkbox/1 delete/named=true\",\"1 checkbox/1 delete/named=true\"]"
+    },
+    {
+      "name": "[375x700] tick the checkbox of \"Water plants\"",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left"
+    },
+    {
+      "name": "[375x700] li.done class matches checkbox state for every task",
+      "status": "PASS",
+      "expected": "[true,true,true]",
+      "actual": "[true,true,true]"
+    },
+    {
+      "name": "[375x700] a done task is visually distinguishable from an active one (computed style)",
+      "status": "PASS",
+      "expected": "computed styles differ",
+      "actual": "active={\"textDecorationLine\":\"none\",\"color\":\"rgb(26, 26, 26)\",\"opacity\":\"1\",\"fontStyle\":\"normal\",\"backgroundColor\":\"rgba(0, 0, 0, 0)\"} done={\"textDecorationLine\":\"line-through\",\"color\":\"rgb(91, 91, 91)\",\"opacity\":\"1\",\"fontStyle\":\"normal\",\"backgroundColor\":\"rgba(0, 0, 0, 0)\"}"
+    },
+    {
+      "name": "[375x700] untick the checkbox of \"Water plants\"",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left",
+      "actual": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left"
+    },
+    {
+      "name": "[375x700] an un-ticked task looks like an active task again",
+      "status": "PASS",
+      "expected": "{\"textDecorationLine\":\"none\",\"color\":\"rgb(26, 26, 26)\",\"opacity\":\"1\",\"fontStyle\":\"normal\",\"backgroundColor\":\"rgba(0, 0, 0, 0)\"}",
+      "actual": "{\"textDecorationLine\":\"none\",\"color\":\"rgb(26, 26, 26)\",\"opacity\":\"1\",\"fontStyle\":\"normal\",\"backgroundColor\":\"rgba(0, 0, 0, 0)\"}"
+    },
+    {
+      "name": "[375x700] tick \"Water plants\" again",
+      "status": "PASS",
+      "expected": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left"
+    },
+    {
+      "name": "[375x700] press the delete button of \"Read book\"",
+      "status": "FAIL",
+      "expected": "visible: [x] Water plants | [ ] Call mom; filter=all; counter=1 item left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left"
+    },
+    {
+      "name": "[375x700] press the delete button of done task \"Water plants\"",
+      "status": "FAIL",
+      "expected": "visible: [ ] Call mom; filter=all; counter=1 item left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left"
+    },
+    {
+      "name": "[375x700] tick \"Call mom\"",
+      "status": "FAIL",
+      "expected": "visible: [x] Call mom; filter=all; counter=0 items left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [x] Call mom; filter=all; counter=1 item left"
+    },
+    {
+      "name": "[375x700] press the delete button of \"Call mom\"",
+      "status": "FAIL",
+      "expected": "visible: (none); filter=all; counter=0 items left",
+      "actual": "visible: [ ] Read book | [x] Water plants | [x] Call mom; filter=all; counter=1 item left"
+    },
+    {
+      "name": "[375x700] li.done class matches checkbox state for every task",
+      "status": "PASS",
+      "expected": "[true,true,true]",
+      "actual": "[true,true,true]"
+    },
+    {
+      "name": "[375x700] complete: zero console errors, page errors and failed requests",
+      "status": "PASS",
+      "expected": "none",
+      "actual": "none"
+    }
+  ],
+  "artifacts": [],
+  "details": {
+    "actions": [
+      {
+        "input": "[375x700] type \"Read book\" and press Enter",
+        "before": "visible: (none); filter=all; counter=0 items left",
+        "after": "visible: [ ] Read book; filter=all; counter=1 item left",
+        "expected": "visible: [ ] Read book; filter=all; counter=1 item left"
+      },
+      {
+        "input": "[375x700] type \"Water plants\" and press Enter",
+        "before": "visible: [ ] Read book; filter=all; counter=1 item left",
+        "after": "visible: [ ] Read book | [ ] Water plants; filter=all; counter=2 items left",
+        "expected": "visible: [ ] Read book | [ ] Water plants; filter=all; counter=2 items left"
+      },
+      {
+        "input": "[375x700] type \"Call mom\" and press Enter",
+        "before": "visible: [ ] Read book | [ ] Water plants; filter=all; counter=2 items left",
+        "after": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left",
+        "expected": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left"
+      },
+      {
+        "input": "[375x700] tick the checkbox of \"Water plants\"",
+        "before": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left",
+        "after": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+        "expected": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left"
+      },
+      {
+        "input": "[375x700] untick the checkbox of \"Water plants\"",
+        "before": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+        "after": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left",
+        "expected": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left"
+      },
+      {
+        "input": "[375x700] tick \"Water plants\" again",
+        "before": "visible: [ ] Read book | [ ] Water plants | [ ] Call mom; filter=all; counter=3 items left",
+        "after": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+        "expected": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left"
+      },
+      {
+        "input": "[375x700] press the delete button of \"Read book\"",
+        "before": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+        "after": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+        "expected": "visible: [x] Water plants | [ ] Call mom; filter=all; counter=1 item left"
+      },
+      {
+        "input": "[375x700] press the delete button of done task \"Water plants\"",
+        "before": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+        "after": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+        "expected": "visible: [ ] Call mom; filter=all; counter=1 item left"
+      },
+      {
+        "input": "[375x700] tick \"Call mom\"",
+        "before": "visible: [ ] Read book | [x] Water plants | [ ] Call mom; filter=all; counter=2 items left",
+        "after": "visible: [ ] Read book | [x] Water plants | [x] Call mom; filter=all; counter=1 item left",
+        "expected": "visible: [x] Call mom; filter=all; counter=0 items left"
+      },
+      {
+        "input": "[375x700] press the delete button of \"Call mom\"",
+        "before": "visible: [ ] Read book | [x] Water plants | [x] Call mom; filter=all; counter=1 item left",
+        "after": "visible: [ ] Read book | [x] Water plants | [x] Call mom; filter=all; counter=1 item left",
+        "expected": "visible: (none); filter=all; counter=0 items left"
+      }
+    ]
+  }
+}

@@ -65,6 +65,10 @@ run 6（`dreambox-6`）は修正を重ねながら同じ工程を通した探索
 - **run 7：`TaskStop`によるnative Workflowの実停止**（SDK status `stopped`）→ import-termination → burst finish → state recover → 新attempt → 再起動burstが`READY_FOR_PARENT_GATE`まで完走 → 再度`verify`が`COMPLETE`。
 - **Git checkpoint**：run 6/7ともLOCAL保存（`--publish`なし）→ 隔離cloneから第2cloneへ復元。第2cloneはfetch URLを元repoのまま保持し`pushurl`をclone自身の存在しないpathに固定。mission_id一致、製品・backlog（PASS済みtask）を復元、`next.mjs`が同じ再開地点を返すことを私が独立に確認。GitHub上に`autodev/checkpoint/*`は作られていない。
 - 過去のモデルログは新しい工程の証拠として使われていない（再開後にruntime-probeと必要な検査をやり直し、旧invocationのPASSは持ち越されない）。
+- **故障注入の復旧run（dreambox-7とweb-todo）**：両方とも`COMPLETE LIVE`の後に製品へ外部から故障を注入。独立verifyは`UNVERIFIED`/`FAIL`になり（古い証拠・実検査FAIL）、同じ`claude --resume`で実モデルを再開した。
+  - dreambox-7：`divide`の0除算エラーと`greet`のtrimを削除。実Sonnet検証が実test/APIを再実行して`R2`・`R3`のFAILを検出（既存PASSを覆し`NEEDS_FIX`）→実Haiku/Sonnetが修正→全8検査PASS→最終review/audit→`state end`→独立verify `COMPLETE: 4/4 tasks, 8/8 checks`、`assurance: LIVE`（[証拠](evidence/live/run7-fault-recovery-2026-10-26/)）。
+  - web-todo：削除ハンドラを`remove(null)`にしたまま見た目はbuildされる欠陥。実Sonnetレビューが211行目を指摘→実Haikuが`remove(li.getAttribute("data-id"))`へ修正→6タスクを順に再検査→独立verify `COMPLETE: 6/6 tasks, 23/23 checks`、`assurance: LIVE`。後から同じ欠陥を再注入した確認では実Chromiumの`T2-test/behavior`がFAILし、独立verifyも`FAIL`。復元後は再び`COMPLETE`（[証拠](evidence/live/web-todo-fault-recovery-2026-10-26/)）。
+  - 観測した限界：web-todoでは実Chromium検査より先にレビュアーが欠陥を見つけたため、実検査のFAIL自体は再注入で確認した（モデルを使わない機械検査）。復旧は1タスクあたり約10分、バースト約5本を要した。
 
 ## 4. 原T01〜T20の照合
 
@@ -75,27 +79,27 @@ run 6（`dreambox-6`）は修正を重ねながら同じ工程を通した探索
 | T01 | **PASS（範囲限定）** | 共通＋対象の2repoが選ばれたcloud sessionから隔離初期化。元repo無変更、push不能。クラウド親session自身のcwd/agent再発見は使っていない（子CLIは隔離cwd）ためその部分はUNVERIFIED |
 | T02 | **PASS** | 14 burstがユーザー指示なしに継続。stop hookが止めても同じ`/goal`が再開（`active_goal`イベント） |
 | T03 | **PASS** | opus-5-5/sonnet-5-5/haiku-5-5をworkflow_agent進捗で実測、`CURRENT_VALID`、`verify`のrouting_provenanceに反映 |
-| T04 | **UNVERIFIED** | 実Haikuは初回から正しいコードを出し、実レビューが「コード欠陥を検出→修正」する場面は起きなかった。NEEDS_FIXは全て証拠の失効・不足 |
+| T04 | **PASS（故障注入）** | 完了済みdreambox-7の`app.mjs`へ故障（`divide`の0除算エラー削除、`greet`のtrim削除）を外から注入。再開した実Sonnet検証が実test/APIを再実行して`R2-test/api`・`R3-test/api`のFAILを検出（`NEEDS_FIX`、タスクの既存PASSを覆した）→実Haikuが`divide`を修正、実Sonnetが`greet`を修正→全8検査PASS→Opus最終監査→独立verify `COMPLETE LIVE`。[証拠](evidence/live/run7-fault-recovery-2026-10-26/)。web-todoでも実Sonnetレビューが`remove(null)`を指摘しHaikuが修正（下記T06） |
 | T05 | **PASS** | 実機の初回`verify`が`UNVERIFIED`で、失効run_id・null結果・Opus観測欠落を列挙。Opus auditも失効証拠を指摘 |
-| T06 | **UNVERIFIED** | 実機のweb開発で実Chromiumの視覚・操作検査は合格したが、「UI失敗なのに完成にしない」拒否の場面は実機で起きていない |
-| T07 | **UNVERIFIED** | 要件削除の注入は実機未実施（Opus auditは「要件が落ちていない」ことを毎回確認） |
+| T06 | **PASS** | 完了済みweb-todoの削除ハンドラを`remove(null)`へ注入（buildとT1の追加検査は通るがUIは壊れる）。実Chromiumの`T2-test`/`T2-behavior`が`press the delete button`等のassertionでFAIL（削除されない）。同じ状態で独立verifyが`FAIL`（0/6 tasks）。実Sonnetレビューが同じ欠陥を`app.js`211行目と指摘し実Haikuが修正、6タスク23検査をやり直して`COMPLETE LIVE`。復元後も再verify合格。[証拠](evidence/live/web-todo-fault-recovery-2026-10-26/) |
+| T07 | **PASS（機械ゲート）** | 実機のbacklogから要件R4のタスクを削除すると`verify`が`Missing requirement coverage`で`UNVERIFIED`（[証拠](evidence/live/gate-and-install-tests-2026-10-26/)）。Opus auditが自然言語で要件の抜けを見つける場面は自発的には起きていない |
 | T08 | **UNVERIFIED** | コード由来の連続失敗が起きずSonnet診断/Opus再計画は未発火。permission分類の失敗は昇格回数に加算されず保留されることのみ確認 |
 | T09 | **PASS** | SIGTERM×2、TaskStop×1から二重実装なしで再開。完了済みimplement receiptは`ALREADY_APPLIED`で再編集されない |
-| T10 | **UNVERIFIED** | 対象に既存`.claude/`が無い（ローカル試験のみ） |
+| T10 | **PASS** | 既存`.claude/settings.json`と自前agentを持つgit repoへ導入しても既存ファイルはバイト一致、同名衝突は`Agent definition conflict`で拒否、実`claude -p`のinitが既存agentと`autodev-*` 6役の両方を発見（[証拠](evidence/live/gate-and-install-tests-2026-10-26/)） |
 | T11 | **PASS** | ヘッドレス権限不足を子が`UNVERIFIED/permission`と報告し、偽の成功や証拠の手書きをしなかった（複数run） |
 | T12 | **PASS（web-app）** | 同じ共通基盤で、backend fixtureに加えweb-app profileの新規プロジェクトを通常手順で完走（`verify` COMPLETE LIVE）。game・既存アプリは未実施 |
 | T13 | **PASS** | evidenceだけの更新で製品指紋は不変、共通repo更新で契約ダイジェストが変わり既存レビュー/証拠が失効 |
 | T14 | **PASS（範囲限定）** | 未追跡の`autodev-probe/app.mjs`編集で製品指紋が変わり証拠が失効。削除・mode変更は実機未確認 |
 | T15 | **UNVERIFIED** | Workflow agentのnull/stallは実機で発生せず（`TypeError`でのWorkflow失敗は失敗burstとして記録され、捨てられなかった） |
-| T16 | **UNVERIFIED** | 停止は製品編集の前/後の境界で起き、編集の途中は実機で再現していない |
-| T17 | **UNVERIFIED** | 方針によるモデル置換は発生せず（置換の拒否はローカルの単体試験のみ） |
+| T16 | **PASS（範囲限定）** | 再開時に外部の製品変更（burst間に注入した欠陥）を実Sonnetが`before≠after`の指紋差として観測し、旧PASSを持ち越さず再検査・修正した。実装編集の最中のkillで残る部分編集そのものは実機で再現していない |
+| T17 | **PASS（改変拒否）/ UNVERIFIED（実置換）** | 実機の記録の`expected_model`やraw SDKのモデル名を書き換えると`verify`が拒否（`Role/model routing mismatch`、`Routing history log changed`）。方針による本物のモデル置換は発生していない |
 | T18 | **PASS** | `permission_denied`イベントと未信頼workspaceのsettings無視を観測し、承認待ちを実行済みと誤表示しなかった |
 | T19 | **PASS** | reviewerのruntime記録toolNamesに書込・委任・Bashが無く、sentinelは不在（試みて拒否ではなく「不在」） |
 | T20 | **PASS** | R4の編集後にOpus最終監査がNEEDS_FIX、共通repo更新後に旧レビューが失効し`COMPLETE`が拒否された |
 
 ## 5. 未検証・外部条件
 
-- **UNVERIFIED（実機未実施）**：上表のT04, T06, T07, T08, T10, T15, T16, T17、T01/T14の範囲外。game・既存アプリを実Claudeで開発する追試。`import-runtime --wait`の実機再検証。
+- **UNVERIFIED（実機未実施）**：上表のT08（コード由来の連続失敗によるSonnet診断/Opus再計画）、T15（Workflow agentのnull/stall）、T17の実モデル置換、T01/T14の範囲外。game・既存アプリを実Claudeで開発する追試。`import-runtime --wait`の実機再検証。
 - **BLOCKED（明示承認待ち）**：checkpointのGitHub公開（検証用の公開先が許可されていない。probeは元repoへpush禁止）。クラウド親sessionでのagent再発見とcwd束縛の実証（子CLIは隔離cwdで起動）。
 - 設計上の制限：共通repoの変更は契約ダイジェストを変えるため、実行中に共通repoを更新すると全証拠が失効する（意図どおり）。受け入れ`COMPLETE`は共通repo `4cad18f`時点のscript状態で得たもので、より新しいcommitでは再検証が必要。
 - 同じ`/goal`が目標未達のまま繰り返し報告する場合、生きた実行は止める（今回の子はその間も証拠を偽造しなかった）。
@@ -111,9 +115,9 @@ node scripts/live-probe.mjs --mode run --target NEW_DIR --resume SDK_SESSION_ID 
 
 CLIが死んだ場合：`claude --resume SESSION --settings NEW_DIR/.autodev/probe-permissions.json --max-turns 1 -p "Observation only"`で再開ログを採取し、`import-termination.mjs --raw ORIGINAL --resume_raw RESUMED --tool_use ID`→`burst.mjs --action finish`→`state.mjs --action recover`。
 
-次の自律実行点：(1) game・既存アプリの実機追試、(2) T04/T08/T16の故障注入（意図的に誤ったコードや実装途中のkillを入れた実run）、(3) 許可された公開先でのcheckpoint publishと新session復元。
+次の自律実行点：(1) game・既存アプリの実機追試、(2) T08（連続失敗によるSonnet診断/Opus再計画）と実装編集中のkillの故障注入、(3) 許可された公開先でのcheckpoint publishと新session復元。
 
 ## 7. 証拠
 
 `docs/evidence/live/`配下。各runに圧縮済みSDK capture（部分streamを除去、元ファイルのsha256付き）、manifest、probe-results、assessment、agentのmeta/prefix/journal、独立verify出力。
-[run3](evidence/live/run3-2026-10-26) / [run4](evidence/live/run4-2026-10-26) / [run5](evidence/live/run5-2026-10-26) / [run6中断・復元](evidence/live/run6-2026-10-26-interrupted) / [run6 R1 PASS](evidence/live/run6e-R1-PASS-2026-10-26) / [run6最終ゲート](evidence/live/run6f-final-gate-first-verify-2026-10-26) / [**run7 COMPLETE**](evidence/live/run7-COMPLETE-2026-10-26) / [**web-todo COMPLETE**](evidence/live/web-todo-COMPLETE-2026-10-26)
+[run3](evidence/live/run3-2026-10-26) / [dreambox-7故障注入復旧](evidence/live/run7-fault-recovery-2026-10-26) / [web-todo故障注入復旧](evidence/live/web-todo-fault-recovery-2026-10-26) / [run4](evidence/live/run4-2026-10-26) / [run5](evidence/live/run5-2026-10-26) / [run6中断・復元](evidence/live/run6-2026-10-26-interrupted) / [run6 R1 PASS](evidence/live/run6e-R1-PASS-2026-10-26) / [run6最終ゲート](evidence/live/run6f-final-gate-first-verify-2026-10-26) / [**run7 COMPLETE**](evidence/live/run7-COMPLETE-2026-10-26) / [**web-todo COMPLETE**](evidence/live/web-todo-COMPLETE-2026-10-26)

@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "check_id": "T2-test",
+  "kind": "test",
+  "nonce": "23f9ecdd-93aa-45e5-b61e-24fce01fd7f0",
+  "run_id": "run3",
+  "task_id": "T2",
+  "attempt_id": "root3:78e2aec5-5f8f-423e-a4ca-4863a0392e07",
+  "session_id": "8c68fb96-a017-4d2b-a70b-a2d7a9bd8888",
+  "product": "1c8e296f13e21189c0ca4a3b321ba7cc8f4df3d2c826ab374fceb87e21ff0be3",
+  "contract": "161448e6312e8ba128d2fe7e844d7aa4b378466054c430d2cf69a14fcf9203fa",
+  "identity": "4e79fed650bd896d8a243038b500e8f1d9286b30ebe6147b8dfe2a0ae6131271",
+  "started": "2026-10-26T22:20:37.874Z",
+  "ended": "2026-10-26T22:20:40.487Z",
+  "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+  "exit_code": 1,
+  "signal": null,
+  "stable": true,
+  "log": "fbb19b378acc6c3fc3399bbaa60f938b5fd194e0a9cabe8629a816717aa9591d.log",
+  "log_hash": "cc3c1a12ec0e8c6f52c6d144cfad67055e2926d91d1799c46326bb88eaf0a6f2",
+  "environment": "linux/x64 node v22.22.0",
+  "report": {
+    "path": "fbb19b378acc6c3fc3399bbaa60f938b5fd194e0a9cabe8629a816717aa9591d.report.json",
+    "sha256": "45ff4cca616e1bcd0b03c804d2a453bcce8fc53446a1b0677ed071ba274893ce",
+    "media_type": "application/json"
+  },
+  "report_error": null
+}
