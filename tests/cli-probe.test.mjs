@@ -14,7 +14,7 @@ import {
   allPass,
 } from "./helpers/fixture.mjs";
 import { importRuntime } from "../scripts/import-runtime.mjs";
-import { prepareProbe, recoverPrepare } from "../scripts/live-probe.mjs";
+import { prepareProbe, recoverPrepare, probePermissions } from "../scripts/live-probe.mjs";
 import { observationId as coreObservationId } from "../scripts/lib/core.mjs";
 import { saveAssessment } from "../scripts/assessment.mjs";
 const falseCLI = execFileSync("which", ["false"], { encoding: "utf8" }).trim();
@@ -628,4 +628,15 @@ test("C1 isolated probe preserves source fetch identity but blocks every default
   assert.match(prepared.prompt, /Never push to the source remote/);
   assert.match(prepared.prompt, /save a LOCAL checkpoint/);
   assert.match(prepared.prompt, /remote publication remains UNVERIFIED/);
+});
+
+test("G live probe clone ships a scoped headless allowlist: no push, no shared writes, no bypass", () => {
+  const settings = probePermissions("/tmp/probe-root");
+  const { allow, deny } = settings.permissions;
+  assert.ok(allow.includes("Edit(//tmp/probe-root/**)"));
+  assert.ok(allow.some((r) => r.startsWith("Bash(node ") && r.includes("/scripts/")));
+  assert.ok(deny.includes("Bash(git push*)"));
+  assert.ok(deny.some((r) => r.startsWith("Edit(//") && !r.includes("probe-root")));
+  assert.ok(!allow.includes("Bash"), "no blanket Bash allow");
+  assert.ok(!allow.includes("Bash(node *)"), "no blanket node allow");
 });

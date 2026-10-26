@@ -168,6 +168,55 @@ export function prepareProbe(o) {
     );
   }
 }
+export function probePermissions(root) {
+  const abs = (p) => "/" + p; // Claude permission syntax: // = absolute path
+  const sh = shared;
+  return {
+    permissions: {
+      allow: [
+        "Read",
+        "Workflow",
+        "Edit(" + abs(root) + "/**)",
+        "Write(" + abs(root) + "/**)",
+        "Bash(node " + sh + "/scripts/*)",
+        "Bash(node " + sh + "/examples/*)",
+        "Bash(node --test*)",
+        "Bash(node --check*)",
+        "Bash(git status*)",
+        "Bash(git diff*)",
+        "Bash(git log*)",
+        "Bash(git show*)",
+        "Bash(git rev-parse*)",
+        "Bash(git branch*)",
+        "Bash(git add*)",
+        "Bash(git commit*)",
+        "Bash(git checkout*)",
+        "Bash(git switch*)",
+        "Bash(git clone --no-hardlinks --local*)",
+        "Bash(git config*)",
+        "Bash(git remote*)",
+        "Bash(git -C*)",
+        "Bash(cd *)",
+        "Bash(ls*)",
+        "Bash(cat*)",
+        "Bash(head*)",
+        "Bash(tail*)",
+        "Bash(wc*)",
+        "Bash(grep*)",
+        "Bash(pwd)",
+        "Bash(mkdir*)",
+        "Bash(sha256sum*)",
+        "Bash(realpath*)",
+      ],
+      deny: [
+        "Bash(git push*)",
+        "Bash(git -C* push*)",
+        "Edit(" + abs(sh) + "/**)",
+        "Write(" + abs(sh) + "/**)",
+      ],
+    },
+  };
+}
 function prepareAt(source, target, publicTarget) {
   // Local clone only. Never edit source checkout, settings, branch or worktree.
   execFileSync(
@@ -252,6 +301,11 @@ function prepareAt(source, target, publicTarget) {
     human_review: false,
   });
   const installed = installAgents({ target });
+  // Headless `claude -p` has no approver, so an isolated clone needs a narrow,
+  // explicit allowlist or the first `node` command is denied and /goal stalls
+  // (observed live). Scope: this clone and the shared harness scripts only;
+  // pushes and writes into the shared checkout stay denied. No bypass flag.
+  json(path.join(target, ".claude", "settings.json"), probePermissions(publicTarget));
   const c = contracts(target);
   const request = {
     target: publicTarget,
