@@ -167,3 +167,48 @@ test("L3 launch runId (wf_...) differs from the SDK stream run_id: termination b
     /ambiguous/i,
   );
 });
+
+import { readonlyEvidence } from "../scripts/readonly-evidence.mjs";
+function transcript(f, agents) {
+  const dir = path.join(f.base || f.dir, "wf-transcripts-" + hash(JSON.stringify(agents)).slice(0, 8));
+  fs.mkdirSync(dir, { recursive: true });
+  agents.forEach(([agentType, model, toolNames], i) => {
+    fs.writeFileSync(path.join(dir, `agent-a${i}.meta.json`), JSON.stringify({ agentType, model, description: "autodev|x" }));
+    fs.writeFileSync(path.join(dir, `agent-a${i}.prefix.json`), JSON.stringify({ v: 1, state: { toolNames, model } }));
+  });
+  const raw = path.join(f.dir, "evidence", "ro-" + hash(dir).slice(0, 8) + ".jsonl");
+  fs.mkdirSync(path.dirname(raw), { recursive: true });
+  fs.writeFileSync(
+    raw,
+    JSON.stringify({
+      type: "user",
+      session_id: "sdk-session",
+      message: { content: [{ type: "tool_result", tool_use_id: "toolu-live" }] },
+      tool_use_result: { status: "async_launched", taskId: "wtask", runId: "wf_x", transcriptDir: dir },
+    }),
+  );
+  return raw;
+}
+test("L4 read-only roles are proven from runtime-recorded tool lists, not self-report", (t) => {
+  const f = fixture(t);
+  allPass(f);
+  const ro = ["autodev-sonnet-reviewer", "claude-sonnet-5-5", ["Read", "StructuredOutput", "Grep", "Glob"]],
+    rw = ["autodev-haiku-builder", "claude-haiku-5-5", ["Read", "Bash", "Edit", "Write", "StructuredOutput"]];
+  const ok = readonlyEvidence({ target: f.target, raw: transcript(f, [ro, rw]), tool_use: "toolu-live" });
+  assert.equal(ok.status, "READONLY_OBSERVED");
+  assert.equal(ok.contrast_writers_have_write, true);
+  const bad = readonlyEvidence({
+    target: f.target,
+    tool_use: "toolu-live",
+    raw: transcript(f, [["autodev-sonnet-reviewer", "claude-sonnet-5-5", ["Read", "Grep", "Glob", "Bash"]]]),
+  });
+  assert.equal(bad.status, "FAIL");
+  const none = readonlyEvidence({ target: f.target, tool_use: "toolu-live", raw: transcript(f, [rw]) });
+  assert.equal(none.status, "UNVERIFIED");
+  const sentinel = path.join(f.dir, "sentinel.txt");
+  fs.writeFileSync(sentinel, "written");
+  assert.equal(
+    readonlyEvidence({ target: f.target, tool_use: "toolu-live", raw: transcript(f, [ro, rw]), sentinel }).status,
+    "FAIL",
+  );
+});
