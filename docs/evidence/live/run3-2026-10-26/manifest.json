@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "invocation_id": "c7bc375e-3f3a-4361-90f0-7b56b16eeba8",
+  "claude_binary": "claude",
+  "resume_session": null,
+  "status": "EXITED_UNVERIFIED",
+  "started_at": "2026-10-26T10:53:13.961Z",
+  "raw": "live-sdk-c7bc375e-3f3a-4361-90f0-7b56b16eeba8.jsonl",
+  "stderr": "live-cli-c7bc375e-3f3a-4361-90f0-7b56b16eeba8.stderr.txt",
+  "exit_code": 143,
+  "signal": null,
+  "interrupted": true,
+  "finished_at": "2026-10-26T10:56:55.368Z",
+  "raw_sha256": "c668da48ea0c34dc0c24b29310f91ada2f659056dbf7a7161380a8f95b71e32f",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

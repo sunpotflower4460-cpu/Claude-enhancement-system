@@ -1,0 +1,78 @@
+{
+ "version": 2,
+ "mode": "LIVE_PROBE_OBSERVATIONS",
+ "invocation_id": "c7bc375e-3f3a-4361-90f0-7b56b16eeba8",
+ "checks": [
+  {
+   "id": "two_repositories",
+   "status": "UNVERIFIED",
+   "evidence_refs": [],
+   "reason": "Await actual Claude runtime observation"
+  },
+  {
+   "id": "goal_continuation",
+   "status": "UNVERIFIED",
+   "evidence_refs": [],
+   "reason": "Await actual Claude runtime observation"
+  },
+  {
+   "id": "actual_models",
+   "status": "UNVERIFIED",
+   "evidence_refs": [],
+   "reason": "import-runtime refused: raw SDK record has no forwarded subagent messages (no parent_tool_use_id-linked records), so opus/haiku/sonnet routing for probe agents cannot be tied to them. Agent self-claims not used.",
+   "observed_at": "2026-10-26T10:55:59.394Z"
+  },
+  {
+   "id": "native_readonly_denial",
+   "status": "UNVERIFIED",
+   "evidence_refs": [],
+   "reason": "Reviewer self-reported tools Read/Grep/Glob/StructuredOutput and no write tool (sentinel absent), but no SDK tool-list/denial record captured; self-report is not evidence.",
+   "observed_at": "2026-10-26T10:56:00.606Z"
+  },
+  {
+   "id": "workflow_start_wait",
+   "status": "UNVERIFIED",
+   "evidence_refs": [],
+   "reason": "runtime-probe launched, attached (task walqultjr) and completed, but import-termination failed: terminal task_notification run_id 0mvp52mfl-638d01b3 differs from launch result runId wf_02f0e124-14a, so terminal+drained proof cannot be imported; burst finish blocked.",
+   "observed_at": "2026-10-26T10:56:01.844Z"
+  },
+  {
+   "id": "repair_loop",
+   "status": "UNVERIFIED",
+   "evidence_refs": [],
+   "reason": "Await actual Claude runtime observation"
+  },
+  {
+   "id": "real_verification",
+   "status": "UNVERIFIED",
+   "evidence_refs": [],
+   "reason": "Await actual Claude runtime observation"
+  },
+  {
+   "id": "stop_resume",
+   "status": "UNVERIFIED",
+   "evidence_refs": [],
+   "reason": "Await actual Claude runtime observation"
+  },
+  {
+   "id": "final_gate",
+   "status": "UNVERIFIED",
+   "evidence_refs": [],
+   "reason": "Await actual Claude runtime observation"
+  },
+  {
+   "id": "multi_burst_state",
+   "status": "UNVERIFIED",
+   "evidence_refs": [],
+   "reason": "Not run: probe burst 946d74b3 remains ATTACHED (termination import blocked), so mission controller was not launched; no multi-burst observations.",
+   "observed_at": "2026-10-26T10:56:03.134Z"
+  },
+  {
+   "id": "checkpoint_reclone",
+   "status": "UNVERIFIED",
+   "evidence_refs": [],
+   "reason": "Not run: no drained unfinished boundary reached; no checkpoint saved, no second clone.",
+   "observed_at": "2026-10-26T10:56:03.962Z"
+  }
+ ]
+}
