@@ -1,0 +1,119 @@
+{
+  "summary": "Serialized multi-sprint development with native model roles, recovery and independent completion gate",
+  "agentCount": 1,
+  "logs": [],
+  "result": {
+    "status": "UNVERIFIED",
+    "summary": "Read-only inspect from real CLI output (context.mjs, next.mjs). No sprint contract was written and no writer action ran. All four tasks (R1-R4) are UNVERIFIED with no dependencies and no execution bindings. All failure counts are 0, and the next model for each is claude-haiku-5-5. next.mjs reports WAIT_OR_RECOVER because the run is active and owned by this probe run. The observation_id from context.mjs (1cfd6148...) differs from the one in the request (ebf49699...), so the coordinator should use the fresh value.",
+    "findings": [
+      {
+        "severity": "minor",
+        "message": "The observation_id in the request (ebf496996779...) does not match the current context.mjs value (1cfd614833ddf6c1fe0bd71e0f1d087520d4298be8aef72e14c784ba080d0138). The snapshot uses the fresh value."
+      },
+      {
+        "severity": "minor",
+        "message": "next.mjs returned WAIT_OR_RECOVER (Active/unknown owner) for run live-probe-378ef632-ebfc-45ef-bf9f-c3a5d704aefa and attempt 2505781f-3ed2-46ac-84a8-24850897cd64. This is the current run, so the plan stage has to claim a task before it can proceed."
+      },
+      {
+        "severity": "minor",
+        "message": "All tasks are UNVERIFIED with execution null. No runtime or test evidence exists yet, and none is claimed."
+      }
+    ],
+    "snapshot": {
+      "observation_id": "1cfd614833ddf6c1fe0bd71e0f1d087520d4298be8aef72e14c784ba080d0138",
+      "architecture_ready": false,
+      "completed_since_audit": 0,
+      "tasks": [
+        {
+          "id": "R1",
+          "execution": null
+        },
+        {
+          "id": "R2",
+          "execution": null
+        },
+        {
+          "id": "R3",
+          "execution": null
+        },
+        {
+          "id": "R4",
+          "execution": null
+        }
+      ],
+      "resume": {
+        "action": "WAIT_OR_RECOVER",
+        "reason": "Active/unknown owner",
+        "run_id": "live-probe-378ef632-ebfc-45ef-bf9f-c3a5d704aefa",
+        "attempt_id": "2505781f-3ed2-46ac-84a8-24850897cd64"
+      },
+      "failure_state": {
+        "R1": {
+          "failures": 0,
+          "repair_attempt": 0,
+          "next_model": "claude-haiku-5-5",
+          "next_action": "IMPLEMENT",
+          "blocker": null,
+          "last_strategy": null,
+          "recent": [],
+          "last_event_id": null
+        },
+        "R2": {
+          "failures": 0,
+          "repair_attempt": 0,
+          "next_model": "claude-haiku-5-5",
+          "next_action": "IMPLEMENT",
+          "blocker": null,
+          "last_strategy": null,
+          "recent": [],
+          "last_event_id": null
+        },
+        "R3": {
+          "failures": 0,
+          "repair_attempt": 0,
+          "next_model": "claude-haiku-5-5",
+          "next_action": "IMPLEMENT",
+          "blocker": null,
+          "last_strategy": null,
+          "recent": [],
+          "last_event_id": null
+        },
+        "R4": {
+          "failures": 0,
+          "repair_attempt": 0,
+          "next_model": "claude-haiku-5-5",
+          "next_action": "IMPLEMENT",
+          "blocker": null,
+          "last_strategy": null,
+          "recent": [],
+          "last_event_id": null
+        }
+      }
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "autodev|d8a34768-96ad-4f17-88a5-ffd96ebb038f|77e47cef-2411-4ee6-b259-d175e9a77f44|live-probe-378ef632-ebfc-45ef-bf9f-c3a5d704aefa|mission|2505781f-3ed2-46ac-84a8-24850897cd64|plan",
+      "agentId": "a819d4b205d4a2be0",
+      "agentType": "autodev-sonnet-planner",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1793013875985,
+      "queuedAt": 1793013875959,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "UNVERIFIED",
+      "promptPreview": "Read the /home/user/Claude-enhancement-system/agents role definition and target's preserved mission. Never modify the common repository. Each writer MUST use scripts/operation.mjs start/complete with stable operation_id, and inspect partial diffs before replay. Return non-PASS when real CLI results or runtime evidence are absent. All task/check/assessment state is schema v2. Read-only roles return…",
+      "promptFramed": true,
+      "lastProgressAt": 1793013907034,
+      "tokens": 11752,
+      "toolCalls": 10,
+      "durationMs": 31049,
+      "resultPreview": "{\"status\":\"UNVERIFIED\",\"summary\":\"Read-only inspect from real CLI output (context.mjs, next.mjs). No sprint contract was written and no writer action ran. All four tasks (R1-R4) are UNVERIFIED with no dependencies and no execution bindings. All failure counts are 0, and the next model for each is claude-haiku-5-5. next.mjs reports WAIT_OR_RECOVER because the run is active and owned by this probe r…"
+    }
+  ],
+  "totalTokens": 11752,
+  "totalToolCalls": 10
+}

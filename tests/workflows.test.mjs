@@ -164,3 +164,21 @@ test("E live inspect: free-form planner snapshot is corrected once, constrained 
     /Missing persisted snapshot/,
   );
 });
+
+test("E live inspect: request carries exact CLI command lines (next needs --run, failure needs --action)", async () => {
+  let req;
+  await runController(input, async (prompt) => {
+    req ||= JSON.parse(prompt.split("AUTODEV_REQUEST ")[1]);
+    return ok({
+      snapshot: {
+        observation_id: "obs-1",
+        architecture_ready: true,
+        tasks: [{ id: "R1", status: "BLOCKED", dependencies: [] }],
+      },
+    });
+  });
+  assert.equal(req.action, "inspect");
+  assert.match(req.commands.next, /next\.mjs --target .+ --run /);
+  assert.match(req.commands.failure_summary, /failure\.mjs --action summary --target /);
+  assert.match(req.commands.context, /context\.mjs --target .+ --run /);
+});

@@ -23,6 +23,12 @@ export function nextAction(o) {
         (id) => c.backlog.items.find((x) => x.id === id).status === "PASS",
       ),
     );
+  // Live run 5: the planner called next.mjs without --run and was told "Active/unknown owner".
+  if (s.active && !o.run)
+    return {
+      action: "MISSING_ARGUMENT",
+      reason: "--run RUN is required (pass the run_id from AUTODEV_REQUEST)",
+    };
   if (s.active && o.run !== s.run_id)
     return {
       action: "WAIT_OR_RECOVER",

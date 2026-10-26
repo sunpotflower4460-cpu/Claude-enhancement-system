@@ -1,0 +1,93 @@
+{
+  "version": 2,
+  "mode": "LIVE_PROBE_OBSERVATIONS",
+  "invocation_id": "378ef632-ebfc-45ef-bf9f-c3a5d704aefa",
+  "checks": [
+    {
+      "id": "two_repositories",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "goal_continuation",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "actual_models",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "runtime-4a563603d71abb253ce877c30d35e4da916662209ab794c61ca6739d69a5a6c1.json",
+          "sha256": "fe04febe34ca14bf52ad9a5cd4f13006540250ff450db738610d08bb7ad096c3"
+        },
+        {
+          "path": "runtime-bb238d8f324fc1327a15fde3750b9fb5e2a09704ad87c1ab7370199b35542188.json",
+          "sha256": "03b753a7d9f0d899be888c09caa2f52074ff94ffc36abbe152e038f0cbc94a8d"
+        },
+        {
+          "path": "runtime-0e2ed5c98eb18c2a135fbefee59f20b11dd503b334d1f89bb486b5751c24d20a.json",
+          "sha256": "0335f3a4771d1832ada07bf49c3ddfc8a2ab22b6042aa8772cb6bd71b87a681d"
+        }
+      ],
+      "reason": "import-runtime accepted workflow_agent progress for opus-5-5, haiku-5-5, sonnet-5-5 probe stages from the live SDK stream.",
+      "observed_at": "2026-10-26T11:21:48.730Z"
+    },
+    {
+      "id": "native_readonly_denial",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "readonly-94f74cf9236d7c11.json",
+          "sha256": "0e9abfb0b6a5ff6a7d966410135da3de12f64a5c018db7451688ea907e3c3c57"
+        }
+      ],
+      "reason": "Runtime-recorded (prefix.json toolNames) tool list of autodev-sonnet-reviewer is Read/Grep/Glob/StructuredOutput only; builders have Write/Edit/Bash; forbidden-sentinel.txt absent. Outcome is tool absence, not a permission-prompt denial.",
+      "observed_at": "2026-10-26T11:21:42.746Z"
+    },
+    {
+      "id": "workflow_start_wait",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "repair_loop",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "real_verification",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "stop_resume",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "final_gate",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "multi_burst_state",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "checkpoint_reclone",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    }
+  ]
+}

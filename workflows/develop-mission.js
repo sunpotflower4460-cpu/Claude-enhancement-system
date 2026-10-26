@@ -85,7 +85,7 @@ const validInspect = (r) =>
   typeof r.snapshot.observation_id === "string" &&
   typeof r.snapshot.architecture_ready === "boolean" &&
   Array.isArray(r.snapshot.tasks);
-const base = `Read the ${input.shared}/agents role definition and target's preserved mission. Never modify the common repository. Each writer MUST use scripts/operation.mjs start/complete with stable operation_id, and inspect partial diffs before replay. Return non-PASS when real CLI results or runtime evidence are absent. All task/check/assessment state is schema v2. Read-only roles return their actual status, every finding, current snapshot context and requirement coverage; never delegate or edit. The coordinator persists these verbatim via assessment.mjs; do not stamp an old review with a newer fingerprint. Parent alone confirms runtime drained and invokes final verify after Workflow completion. For action inspect the result.snapshot MUST be built from the real CLI output as an object with exactly these fields: observation_id (string, from context.mjs), architecture_ready (boolean), completed_since_audit (integer, from progress.json), tasks (ARRAY copied from context.mjs tasks, each with id and execution), resume (from next.mjs) and failure_state (from failure.mjs summary); never summarize it as prose or rename these fields. `;
+const base = `Read the ${input.shared}/agents role definition and target's preserved mission. Never modify the common repository. Each writer MUST use scripts/operation.mjs start/complete with stable operation_id, and inspect partial diffs before replay. Return non-PASS when real CLI results or runtime evidence are absent. All task/check/assessment state is schema v2. Read-only roles return their actual status, every finding, current snapshot context and requirement coverage; never delegate or edit. The coordinator persists these verbatim via assessment.mjs; do not stamp an old review with a newer fingerprint. Parent alone confirms runtime drained and invokes final verify after Workflow completion. For action inspect the result.snapshot MUST be built from the real CLI output as an object with exactly these fields: observation_id (string, from context.mjs), architecture_ready (boolean), completed_since_audit (integer, from progress.json), tasks (ARRAY copied from context.mjs tasks, each with id and execution), resume (from next.mjs) and failure_state (from failure.mjs summary); never summarize it as prose or rename these fields. Run exactly the command lines in AUTODEV_REQUEST.commands; never drop a flag (next.mjs needs --run, failure.mjs needs --action summary). `;
 const taskContexts = {};
 let planEpoch = 0,
   inspectionSequence = 0,
@@ -169,9 +169,23 @@ async function call(role, action, task_id = "mission", payload = {}) {
         ]
           .map((x) => encodeURIComponent(x))
           .join("|");
+  // Live run 5: the real planner skimmed coordinator.md and ran next.mjs without --run and
+  // failure.mjs without --action. Hand it exact command lines for the read-only inspection.
+  const cli = (script, flags) =>
+    "node " + input.shared + "/scripts/" + script + ".mjs " + flags;
+  const commands =
+    coordinator && action === "inspect"
+      ? {
+          context: cli("context", "--target " + input.target + " --run " + input.run_id),
+          next: cli("next", "--target " + input.target + " --run " + input.run_id),
+          failure_summary: cli("failure", "--action summary --target " + input.target),
+          progress: "cat " + input.target + "/.autodev/progress.json",
+        }
+      : undefined;
   const request = {
     action,
     role,
+    commands,
     task_id,
     run_id: input.run_id,
     attempt_id: input.attempt_id,

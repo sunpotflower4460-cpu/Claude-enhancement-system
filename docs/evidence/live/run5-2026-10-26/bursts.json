@@ -1,0 +1,160 @@
+{
+  "version": 2,
+  "mission_id": "d8a34768-96ad-4f17-88a5-ffd96ebb038f",
+  "entries": [
+    {
+      "burst_id": "c8a6bf94-6508-4789-a06f-4631212cb459",
+      "session_id": "77e47cef-2411-4ee6-b259-d175e9a77f44",
+      "run_id": "live-probe-378ef632-ebfc-45ef-bf9f-c3a5d704aefa",
+      "task_id": "mission",
+      "attempt_id": "2505781f-3ed2-46ac-84a8-24850897cd64",
+      "claimed_at": "2026-10-26T11:19:19.115Z",
+      "observation_id": "9543787463fbd83eb95cd55201473533034a905c5f480c49ae4ce53899b77940",
+      "script_path": "/home/user/Claude-enhancement-system/workflows/runtime-probe.js",
+      "owner": null,
+      "status": "FINISHED",
+      "launch": {
+        "source": "parent-runtime-observation",
+        "sdk_session_id": "edc58073-4d34-5668-a88d-a39fcad8c675",
+        "sdk_tool_use_id": "toolu_016jKPDRvGotcdf7Sgycrw6d",
+        "sdk_task_id": "wmyde1svt",
+        "sdk_run_id": "0mvp5ze1v-14656a37",
+        "record": "burst-sdk-c0f656b82266bc921d5784558969f5233a2fa0360b55be69986261be5848f143.jsonl",
+        "sha256": "c0f656b82266bc921d5784558969f5233a2fa0360b55be69986261be5848f143"
+      },
+      "termination": {
+        "source": "parent-runtime-observation",
+        "sdk_session_id": "edc58073-4d34-5668-a88d-a39fcad8c675",
+        "sdk_tool_use_id": "toolu_016jKPDRvGotcdf7Sgycrw6d",
+        "sdk_task_id": "wmyde1svt",
+        "sdk_run_id": "0mvp5ze1v-14656a37",
+        "state": "completed",
+        "observed_at": "2026-10-26T11:20:49.356Z",
+        "proof": "burst-proof-35934e7b0d847dd6246be00cf12818460c55f524f0a6aa7f63985c5784b644c4.json",
+        "proof_sha256": "eaa30e2286d1a6e1e172e3ecc187bb3d8ac9e54720867beae316acb0569bd853",
+        "raw_sha256": "c0f656b82266bc921d5784558969f5233a2fa0360b55be69986261be5848f143"
+      }
+    },
+    {
+      "burst_id": "7fa54820-f47e-4fc6-a0ad-5c9a14b48a06",
+      "session_id": "77e47cef-2411-4ee6-b259-d175e9a77f44",
+      "run_id": "live-probe-378ef632-ebfc-45ef-bf9f-c3a5d704aefa",
+      "task_id": "mission",
+      "attempt_id": "2505781f-3ed2-46ac-84a8-24850897cd64",
+      "claimed_at": "2026-10-26T11:22:03.919Z",
+      "observation_id": "004bf160b71614aa8dc8ce891ab96aaadc0e8286a411cc17357846f6c35b641b",
+      "script_path": "/home/user/Claude-enhancement-system/workflows/develop-mission.js",
+      "owner": null,
+      "status": "FINISHED",
+      "launch": {
+        "source": "parent-runtime-observation",
+        "sdk_session_id": "edc58073-4d34-5668-a88d-a39fcad8c675",
+        "sdk_tool_use_id": "toolu_01HSPm3Zs1YjtXEpiAdkg15T",
+        "sdk_task_id": "wfi4x4yl2",
+        "sdk_run_id": "0mvp62xfi-ee6239bc",
+        "record": "burst-sdk-6fd37c31f573261a1cb42462d0269e270270ee0867ecb340d62643f1edf32616.jsonl",
+        "sha256": "6fd37c31f573261a1cb42462d0269e270270ee0867ecb340d62643f1edf32616"
+      },
+      "termination": {
+        "source": "parent-runtime-observation",
+        "sdk_session_id": "edc58073-4d34-5668-a88d-a39fcad8c675",
+        "sdk_tool_use_id": "toolu_01HSPm3Zs1YjtXEpiAdkg15T",
+        "sdk_task_id": "wfi4x4yl2",
+        "sdk_run_id": "0mvp62xfi-ee6239bc",
+        "state": "completed",
+        "observed_at": "2026-10-26T11:22:43.673Z",
+        "proof": "burst-proof-f340584a6d803b313ae51b96e5bee5ac97182d565d8f920b388321eb0672e391.json",
+        "proof_sha256": "135691ba87ba3d1694207a05a86c01bb10b6962c2ebd522cc370cbca331cc928",
+        "raw_sha256": "6fd37c31f573261a1cb42462d0269e270270ee0867ecb340d62643f1edf32616"
+      }
+    },
+    {
+      "burst_id": "cd920987-2632-4105-8273-a13828b78e3f",
+      "session_id": "77e47cef-2411-4ee6-b259-d175e9a77f44",
+      "run_id": "live-probe-378ef632-ebfc-45ef-bf9f-c3a5d704aefa",
+      "task_id": "mission",
+      "attempt_id": "2505781f-3ed2-46ac-84a8-24850897cd64",
+      "claimed_at": "2026-10-26T11:23:14.740Z",
+      "observation_id": "c3f4bd23f1652a3a0bf0d2aacb40e45f590a7f75cff88e9e4ddee9e4b9c7abd2",
+      "script_path": "/home/user/Claude-enhancement-system/workflows/develop-mission.js",
+      "owner": null,
+      "status": "FINISHED",
+      "launch": {
+        "source": "parent-runtime-observation",
+        "sdk_session_id": "edc58073-4d34-5668-a88d-a39fcad8c675",
+        "sdk_tool_use_id": "toolu_01SgSM8jJXfQekoM1Lp8Nmuz",
+        "sdk_task_id": "w3vuc5466",
+        "sdk_run_id": "0mvp64ex2-3ad0467a",
+        "record": "burst-sdk-e8741031d9234caee257e6e75ac48962ca34282367b2d631387872d80275b09b.jsonl",
+        "sha256": "e8741031d9234caee257e6e75ac48962ca34282367b2d631387872d80275b09b"
+      },
+      "termination": {
+        "source": "parent-runtime-observation",
+        "sdk_session_id": "edc58073-4d34-5668-a88d-a39fcad8c675",
+        "sdk_tool_use_id": "toolu_01SgSM8jJXfQekoM1Lp8Nmuz",
+        "sdk_task_id": "w3vuc5466",
+        "sdk_run_id": "0mvp64ex2-3ad0467a",
+        "state": "completed",
+        "observed_at": "2026-10-26T11:24:13.699Z",
+        "proof": "burst-proof-d475d10f350198e4779430ff55873980544d06a5cb17bab4598f171b88d5cacb.json",
+        "proof_sha256": "e7fbbbfce66e1e26fcea505d41f3cc4bdf7fe7c6972fa4224925be2c6ccdda83",
+        "raw_sha256": "e8741031d9234caee257e6e75ac48962ca34282367b2d631387872d80275b09b"
+      }
+    },
+    {
+      "burst_id": "0cec8d68-323c-409e-ac98-5ee7ae3aa675",
+      "session_id": "77e47cef-2411-4ee6-b259-d175e9a77f44",
+      "run_id": "live-probe-378ef632-ebfc-45ef-bf9f-c3a5d704aefa",
+      "task_id": "mission",
+      "attempt_id": "2505781f-3ed2-46ac-84a8-24850897cd64",
+      "claimed_at": "2026-10-26T11:24:29.747Z",
+      "observation_id": "54441b356dbead514402f09421b2608714a82622e4fb63caf3c7e1221fedfb37",
+      "script_path": "/home/user/Claude-enhancement-system/workflows/develop-mission.js",
+      "owner": null,
+      "status": "FINISHED",
+      "launch": {
+        "source": "parent-runtime-observation",
+        "sdk_session_id": "edc58073-4d34-5668-a88d-a39fcad8c675",
+        "sdk_tool_use_id": "toolu_01WPYUJPT4AKNrwWrf1pGDdV",
+        "sdk_task_id": "wwcge0cmn",
+        "sdk_run_id": "0mvp6611q-83eb03f0",
+        "record": "burst-sdk-943aae31c26214c2b9f30ceff73ca59b8ceadda5c9aa82e10c847b8c6e767894.jsonl",
+        "sha256": "943aae31c26214c2b9f30ceff73ca59b8ceadda5c9aa82e10c847b8c6e767894"
+      },
+      "termination": {
+        "source": "parent-runtime-observation",
+        "sdk_session_id": "edc58073-4d34-5668-a88d-a39fcad8c675",
+        "sdk_tool_use_id": "toolu_01WPYUJPT4AKNrwWrf1pGDdV",
+        "sdk_task_id": "wwcge0cmn",
+        "sdk_run_id": "0mvp6611q-83eb03f0",
+        "state": "completed",
+        "observed_at": "2026-10-26T11:25:12.395Z",
+        "proof": "burst-proof-2079c1395664c051793d9f1c293c92251654bf714d2be8658734a42f20cda58e.json",
+        "proof_sha256": "8e89bade3648710c8639fd2dea81b4599fa857c7d672ca8c4b2b27c1d6bd0f3a",
+        "raw_sha256": "943aae31c26214c2b9f30ceff73ca59b8ceadda5c9aa82e10c847b8c6e767894"
+      }
+    },
+    {
+      "burst_id": "3acb1310-f0b5-458c-b352-51e7c6edfe71",
+      "session_id": "77e47cef-2411-4ee6-b259-d175e9a77f44",
+      "run_id": "live-probe-378ef632-ebfc-45ef-bf9f-c3a5d704aefa",
+      "task_id": "mission",
+      "attempt_id": "2505781f-3ed2-46ac-84a8-24850897cd64",
+      "claimed_at": "2026-10-26T11:26:02.969Z",
+      "observation_id": "acc1ae4de14118cc5ad25bb33a5e3ca30779f4a8e5ce3a4f3d012e0b32c8d6db",
+      "script_path": "/home/user/Claude-enhancement-system/workflows/develop-mission.js",
+      "owner": null,
+      "status": "ATTACHED",
+      "launch": {
+        "source": "parent-runtime-observation",
+        "sdk_session_id": "edc58073-4d34-5668-a88d-a39fcad8c675",
+        "sdk_tool_use_id": "toolu_01AYpq86429FaNAsRHhjEnzk",
+        "sdk_task_id": "wfzn8tmuf",
+        "sdk_run_id": "0mvp680ia-6909b918",
+        "record": "burst-sdk-74684f1fa240db3ab431bf6ef97b0ea1ff0d5c3f6eef9c31cf960647bddfd183.jsonl",
+        "sha256": "74684f1fa240db3ab431bf6ef97b0ea1ff0d5c3f6eef9c31cf960647bddfd183"
+      },
+      "termination": null
+    }
+  ]
+}

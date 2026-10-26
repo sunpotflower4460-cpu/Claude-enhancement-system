@@ -111,6 +111,12 @@ export function failureSummary(target, taskId) {
   return taskId ? result[taskId] : result;
 }
 export function failureAction(o) {
+  // Live run 5: the planner called `failure.mjs --target T` without --action and got a
+  // misleading "ownership mismatch". Name the missing argument instead.
+  if (!["summary", "record", "strategy"].includes(o.action))
+    throw Error(
+      "failure.mjs requires --action summary|record|strategy (read-only: --action summary --target TARGET)",
+    );
   if (o.action === "summary")
     return {
       status: "OBSERVED",
