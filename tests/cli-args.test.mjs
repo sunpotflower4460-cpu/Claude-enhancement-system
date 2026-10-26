@@ -18,3 +18,21 @@ test("N2 failure.mjs without --action fails with a usage message; summary stays 
   assert.throws(() => failureAction({ target: f.target }), /requires --action summary\|record\|strategy/);
   assert.equal(failureAction({ target: f.target, action: "summary" }).status, "OBSERVED");
 });
+
+import fs from "node:fs";
+import path from "node:path";
+import { contracts } from "./helpers/fixture.mjs";
+import { architectureReady } from "../scripts/context.mjs";
+test("N3 architecture_ready is computed from contract, non-placeholder architecture and full requirement mapping", (t) => {
+  const f = fixture(t);
+  allPass(f);
+  const c = () => contracts(f.target);
+  // Fixture ships the bootstrap placeholder: not ready until a real design exists.
+  assert.equal(architectureReady(c()), false);
+  fs.writeFileSync(path.join(f.dir, "architecture.md"), "# Architecture\nUNVERIFIED: Opus planning required.\n");
+  assert.equal(architectureReady(c()), false);
+  fs.writeFileSync(path.join(f.dir, "architecture.md"), "# Real design\n");
+  assert.equal(architectureReady(c()), true);
+  fs.rmSync(path.join(f.dir, "architecture.md"));
+  assert.equal(architectureReady(c()), false);
+});
