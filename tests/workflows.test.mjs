@@ -156,6 +156,9 @@ test("E live inspect: free-form planner snapshot is corrected once, constrained 
     "observation_id",
     "tasks",
     "architecture_ready",
+    "product",
+    "contract",
+    "identity",
   ]);
   assert.match(seen[0].prompt, /tasks \(ARRAY copied verbatim from context\.mjs tasks/);
   assert.match(seen[1].prompt, /Previous snapshot lacked/);
@@ -252,4 +255,19 @@ test("E live: next.mjs-shaped nested snapshot.resume routes to REVIEW without a 
   }).catch(() => {});
   assert.ok(calls.includes("review:sonnet-reviewer"), JSON.stringify(calls));
   assert.ok(!calls.includes("implement:haiku-builder"), JSON.stringify(calls));
+});
+
+test("E live: reviewer schema requires its snapshot hashes; persist actions get exact assess commands", async () => {
+  const seen = [];
+  const snap = { observation_id: "o", architecture_ready: true, tasks: [{ id: "R1", status: "UNVERIFIED", dependencies: [], execution: { run_id: "run", attempt_id: "e1" } }] };
+  await runController({ ...input, burst_id: "burst-9", max_sprints: 1 }, async (prompt, opts) => {
+    const req = JSON.parse(prompt.split("AUTODEV_REQUEST ")[1]);
+    seen.push({ req, opts });
+    return ok({ snapshot: snap });
+  }).catch(() => {});
+  const rev = seen.find((x) => x.req.action === "review");
+  assert.deepEqual(rev.opts.schema.properties.snapshot.required, ["product", "contract", "identity"]);
+  const persist = seen.find((x) => x.req.action === "persist-review");
+  assert.match(persist.req.commands.assess, /assess\.mjs --target \/target --kind review --scope task --task R1 --burst burst-9 --result /);
+  assert.match(persist.req.commands.result_file, /^\/target\/\.autodev\/evidence\/assess-result-run-\d+\.json$/);
 });
