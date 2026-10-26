@@ -18,6 +18,8 @@
 
 `/workflow-authoring`で現runtimeのAPIを確認。Workflow argsはJSON object。`agentType`は発見済みの`autodev-ROLE`または`claude-autodev:ROLE`。未確認の`agent({tools:...})`で制限したことにしない。reviewer/auditorはRead/Grep/Globだけのnative定義を使い、実ツール一覧・拒否/不在・sentinel不変を[隔離probe](docs/live-probe.md)で確認する。
 
+実機で判明：native Workflowのagentは転送された`assistant`メッセージではなく、SDKの`system/task_progress.workflow_progress[workflow_agent]`（agentType/model/state/タグ）で報告され、`import-runtime.mjs --burst BURST_ID`が読む。agentのtool一覧はruntimeが書く`prefix.json`で、`readonly-evidence.mjs --target TARGET --raw SDK_JSONL --tool_use WORKFLOW_TOOL_ID`が採取する。launch結果の`runId`(wf_…)はSDKのstream `run_id`と別で、終了証拠はimport-terminationが解決する（[隔離probe](docs/live-probe.md)の運用メモ参照）。
+
 probeの前に手順3のroot leaseを一度だけ取得し、probe自体もburstとしてclaim/実起動/finishを管理する。Opus/Sonnet/Haiku 5.5の実modelはSDK元記録からimport-runtimeで照合する。CLI収集には`--output-format stream-json --verbose --forward-subagent-text`。未知形式・欠損・代替モデルはUNVERIFIED。probe\_\*の診断記録は実装工程のモデル証拠へ流用しない。実測前に`registry_verified/readonly_verified`をtrueにしない。
 
 ## 3. 所有権とnative Workflow起動
@@ -25,6 +27,8 @@ probeの前に手順3のroot leaseを一度だけ取得し、probe自体もburst
 親が一度だけ`state.mjs --action begin --target TARGET --run RUN --task mission --attempt ROOT_ATTEMPT`。終了したattemptを再利用しない。`context.mjs --target TARGET --run RUN`でmission/session/observation/next/failure_stateを取得する。
 
 native Workflowの前に`burst.mjs --action claim --target TARGET --run RUN --task mission --attempt ROOT_ATTEMPT --observation_id CURRENT_HASH --script_path COMMON/workflows/develop-mission.js`。返された`burst_id`と現在のargsにagents/capabilitiesを加え、Workflowツールへ`scriptPath`と**args object**を渡す。NodeでWorkflowを実行して代用しない。
+
+`claude -p`のヘッドレスには承認者がいない。対象の`.claude/settings.json`のallowは未信頼workspaceで無視されるため、必要な範囲だけを`--settings FILE`で起動側から渡す（`git push`と共通repoへの書込はdeny）。SDK元記録は`--output-format stream-json --verbose --forward-subagent-text`の出力を保存したファイル（`$AUTODEV_RUNTIME_LOG`）で、`attach`・`import-*`の`--raw`に使う。実行中は共通repoを更新しない（契約ダイジェストが変わり全証拠が失効する）。
 
 実launchを元SDK記録から`burst.mjs --action attach --target TARGET --id BURST_ID --raw ACTUAL_JSONL --tool_use WORKFLOW_TOOL_ID`で結ぶ。error付きasync_launched、null、欠落、結果未受領は未達。CLAIMED/ATTACHEDが残れば別Workflowを起動しない。ローカルprocessが消えたことだけでnative Workflow終了と判断しない。
 
@@ -43,6 +47,8 @@ Workflowは非同期。結果を待ち、実terminal/drainedをimport-terminatio
 CONTINUE_PARENTは完成ではない。backlog未完了なら親が現在contextを再確認し、/goalが有効な間は新burstをclaimして続ける。同じroot leaseを保持するなら再beginしない。
 
 セッションの節目では、完了したburstのproofで`state.mjs --action pause`（最終完成前）またはrecover（停止/失敗）し、`checkpoint.mjs --action save --target TARGET --publish true`。PUBLISHEDだけがremote保存完了。SAVED_LOCALなら保存先は現在環境だけなので、push失敗を解決してpublishする。checkpointのpublishを対象mainへのmergeと混同しない。再開は新root attemptと新観測から行う。
+
+CLIを強制終了した場合は終了通知もdrainedも残らない。`claude --resume SESSION --max-turns 1 -p "Observation only"`の再開ログに、runtimeが各taskの`status:"stopped"`通知を出す。`import-termination.mjs --raw ORIGINAL --resume_raw RESUMED --tool_use ID`で取り込み（再init・直前の稼働一覧の全task・再開後のtask_startedなしを会計）、`burst finish`→`state recover`。
 
 `/goal`は現sessionを継続し、新sessionを勝手に作らない。同じCLI sessionは標準`claude --resume ID`、新cloneはcheckpoint復元と新しい/goalを用いる。
 
