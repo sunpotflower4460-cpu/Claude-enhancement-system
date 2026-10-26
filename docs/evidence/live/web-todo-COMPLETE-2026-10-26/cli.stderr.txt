@@ -1,0 +1,1 @@
+Background tasks still running 10m after the last turn (subagent "Opus initial architecture and contract"); stopping them. Set CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 to wait indefinitely.

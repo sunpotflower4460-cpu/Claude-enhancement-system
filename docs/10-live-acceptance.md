@@ -1,6 +1,6 @@
 # 実機受け入れ試験 — 2026-10-26
 
-**結論：本物のOpus/Sonnet/Haiku 5.5による自律開発の完走と独立`verify.mjs`の`COMPLETE`（assurance=LIVE）を実機で確認した。V1全体は、下記のUNVERIFIED項目が残るため「実用開始可・追加検証あり」とし、全項目PASSとは主張しない。**
+**結論：本物のOpus/Sonnet/Haiku 5.5による自律開発の完走と独立`verify.mjs`の`COMPLETE`（assurance=LIVE）を、固定fixture（4関数）と通常手順の新規webアプリ（6タスク）の2件で実機確認した。V1全体は、下記のUNVERIFIED項目が残るため「実用開始可・追加検証あり」とし、全項目PASSとは主張しない。**
 
 - 環境：Claude Code 2.1.310（クラウドコンテナ、OAuth認証、`claude -p`のヘッドレス子session）。モデルは`claude-opus-5-5` / `claude-sonnet-5-5` / `claude-haiku-5-5`をruntimeのworkflow_agent進捗から実測。
 - 共通基盤：`Claude-enhancement-system`。PR #1の実装（`feat/claude-autonomous-harness`）は本試験の開始前に`main`へマージ・クローズ済みだった（`merged_at` 2026-10-26T10:31Z）。Draftへ戻せないため、同一内容の作業ブランチ`claude/enhancement-system-acceptance-test-ux80sk`に修正を積んだ。mainへは触れていない。新規PRは作っていない。
@@ -16,9 +16,21 @@
 | burst | 14（probe 1＋開発13）。ユーザー指示なしで`/goal`が継続 |
 | 開発サイクル | R1〜R4を各々 plan→Haiku実装→独立Sonnet review→Sonnet実検証(record.mjs)→task gate。Opus milestone audit複数回、最終Sonnet review PASS、最終Opus audit（NEEDS_FIX 1回→PASS） |
 | 中断・復元 | 下記3節 |
-| ローカルテスト | **204件PASS**（従来177件＋実機差分の回帰27件）。CIは各コミットでLinux/macOS成功（最新は[Actions](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions)） |
+| ローカルテスト | **205件PASS**（従来177件＋実機差分の回帰27件）。CIは各コミットでLinux/macOS成功（最新は[Actions](https://github.com/sunpotflower4460-cpu/Claude-enhancement-system/actions)） |
 
 run 6（`dreambox-6`）は修正を重ねながら同じ工程を通した探索run。run 7は修正を一切加えない清浄な再実行で、これが受け入れ根拠。
+
+### 1.1 通常の開始手順によるweb開発（`web-todo`、実Chromium）
+
+`live-probe`の固定fixtureではなく、空の新規repoに`DESIGN.md`（原要求と完成条件）だけを置き、START.mdと`/goal`1回の通常手順で開始した。
+
+| 項目 | 結果 |
+| --- | --- |
+| 独立`verify.mjs` | **COMPLETE（assurance=LIVE）、6/6 task、23/23 check、issues=[]、終了0**。全子プロセス終了・稼働一覧が空・state end後に私が実行。[出力](evidence/live/web-todo-COMPLETE-2026-10-26/independent-verify.json) |
+| 独立の実Chromium確認 | 私自身が375px/1280pxで追加・空入力無視・空白除去・完了切替・3フィルタ・削除・リロード保持・壊れた保存データ・横スクロールなし・コンソールエラーなしの22項目を実行し全てOK（[script](evidence/live/web-todo-COMPLETE-2026-10-26/independent-web-check.mjs)、[375px](evidence/live/web-todo-COMPLETE-2026-10-26/web-375.png) / [1280px](evidence/live/web-todo-COMPLETE-2026-10-26/web-1280.png)） |
+| 経過 | 初回起動はヘッドレスの10分背景タスク上限でOpus初期設計が途中停止（所見20）→ 環境変数を付けて同じsessionを`--resume` → 子は`repair-plan`を実行せずOpus設計を再実行して27KBの設計を完成 → 6タスクを22 burstで開発 |
+| 使われたモデル（再開後） | Opus architect 3 / Opus auditor 9 / Sonnet planner 138 / reviewer 21 / verifier 14 / Haiku builder 14（workflow_agent進捗） |
+| ゲートの動作 | Opus最終監査が「タッチ対象44x44px」の実品質と、「T1の現在の実装段階にモデル証拠が無い」点（親が直接製品を編集した結果）を指摘してNEEDS_FIX→再検証→PASS。最終`verify`前に親が1度finalizeをやり直した |
 
 ## 2. 実機で見つかった問題と修正（Before / After）
 
@@ -45,7 +57,7 @@ run 6（`dreambox-6`）は修正を重ねながら同じ工程を通した探索
 | 17 | 実装 | R4の編集で製品指紋が変わりR1〜R3の証拠が失効、Opusが正しくNEEDS_FIX | 最終review/auditの**前**に全checkを現製品で再実行 | b1d3f3c |
 | 18 | 実装 | architecture/plan/implementのmodel証拠を取り込む手段がなく`verify`がUNVERIFIED。`operation complete`が`result:null`を許し永久にUNVERIFIED。取込のたびにcapture全体を複製（1.7GB） | `import-runtime --burst`と取込コマンドの配布、`complete`は結果必須（null受領は1回だけ修復可）、保存captureから`stream_event`を除去 | 6561ff0 |
 | 19 | 実装 | 取込がagentの`done`進捗の書込前に走り`Subagent evidence absent`（余計なNEEDS_FIX 1回） | `import-runtime --wait`：一時的な欠落だけ再試行、置換・曖昧は即失敗。**単体試験のみ。実機再検証は未実施** | 6931873 |
-| 20 | 環境 | ヘッドレス`claude -p`は最後のターンから10分を過ぎた背景タスクを止める（標準エラー`Background tasks still running 10m … stopping them`）。web開発のOpus初期設計(`Agent`の背景起動)が途中で止まり、`contract.json`/backlogだけが書かれ`architecture.md`はプレースホルダ | `live-probe`の起動に`CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`、START.md/06-usageに回避（前景実行または同環境変数）と`repair-plan`での回復を明記 | (本commit) |
+| 20 | 環境 | ヘッドレス`claude -p`は最後のターンから10分を過ぎた背景タスクを止める（標準エラー`Background tasks still running 10m … stopping them`）。web開発のOpus初期設計(`Agent`の背景起動)が途中で止まり、`contract.json`/backlogだけが書かれ`architecture.md`はプレースホルダ | `live-probe`の起動に`CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`、START.md/06-usageに回避（前景実行または同環境変数）と`repair-plan`での回復を明記 | 3073c8d |
 
 ## 3. 停止・復元・長期継続（実機）
 
@@ -65,13 +77,13 @@ run 6（`dreambox-6`）は修正を重ねながら同じ工程を通した探索
 | T03 | **PASS** | opus-5-5/sonnet-5-5/haiku-5-5をworkflow_agent進捗で実測、`CURRENT_VALID`、`verify`のrouting_provenanceに反映 |
 | T04 | **UNVERIFIED** | 実Haikuは初回から正しいコードを出し、実レビューが「コード欠陥を検出→修正」する場面は起きなかった。NEEDS_FIXは全て証拠の失効・不足 |
 | T05 | **PASS** | 実機の初回`verify`が`UNVERIFIED`で、失効run_id・null結果・Opus観測欠落を列挙。Opus auditも失効証拠を指摘 |
-| T06 | **UNVERIFIED** | UI対象を実機で未実行（ローカルの実Chromium試験のみ） |
+| T06 | **UNVERIFIED** | 実機のweb開発で実Chromiumの視覚・操作検査は合格したが、「UI失敗なのに完成にしない」拒否の場面は実機で起きていない |
 | T07 | **UNVERIFIED** | 要件削除の注入は実機未実施（Opus auditは「要件が落ちていない」ことを毎回確認） |
 | T08 | **UNVERIFIED** | コード由来の連続失敗が起きずSonnet診断/Opus再計画は未発火。permission分類の失敗は昇格回数に加算されず保留されることのみ確認 |
 | T09 | **PASS** | SIGTERM×2、TaskStop×1から二重実装なしで再開。完了済みimplement receiptは`ALREADY_APPLIED`で再編集されない |
 | T10 | **UNVERIFIED** | 対象に既存`.claude/`が無い（ローカル試験のみ） |
 | T11 | **PASS** | ヘッドレス権限不足を子が`UNVERIFIED/permission`と報告し、偽の成功や証拠の手書きをしなかった（複数run） |
-| T12 | **UNVERIFIED** | 実機はbackend profileの4関数fixtureのみ。web/gameは未実施 |
+| T12 | **PASS（web-app）** | 同じ共通基盤で、backend fixtureに加えweb-app profileの新規プロジェクトを通常手順で完走（`verify` COMPLETE LIVE）。game・既存アプリは未実施 |
 | T13 | **PASS** | evidenceだけの更新で製品指紋は不変、共通repo更新で契約ダイジェストが変わり既存レビュー/証拠が失効 |
 | T14 | **PASS（範囲限定）** | 未追跡の`autodev-probe/app.mjs`編集で製品指紋が変わり証拠が失効。削除・mode変更は実機未確認 |
 | T15 | **UNVERIFIED** | Workflow agentのnull/stallは実機で発生せず（`TypeError`でのWorkflow失敗は失敗burstとして記録され、捨てられなかった） |
@@ -83,7 +95,7 @@ run 6（`dreambox-6`）は修正を重ねながら同じ工程を通した探索
 
 ## 5. 未検証・外部条件
 
-- **UNVERIFIED（実機未実施）**：上表のT04, T06, T07, T08, T10, T12, T15, T16, T17、T01/T14の範囲外。web・game・既存アプリを実Claudeで開発する追試（`--mission`付きの別fixtureが必要）。`import-runtime --wait`の実機再検証。
+- **UNVERIFIED（実機未実施）**：上表のT04, T06, T07, T08, T10, T15, T16, T17、T01/T14の範囲外。game・既存アプリを実Claudeで開発する追試。`import-runtime --wait`の実機再検証。
 - **BLOCKED（明示承認待ち）**：checkpointのGitHub公開（検証用の公開先が許可されていない。probeは元repoへpush禁止）。クラウド親sessionでのagent再発見とcwd束縛の実証（子CLIは隔離cwdで起動）。
 - 設計上の制限：共通repoの変更は契約ダイジェストを変えるため、実行中に共通repoを更新すると全証拠が失効する（意図どおり）。受け入れ`COMPLETE`は共通repo `4cad18f`時点のscript状態で得たもので、より新しいcommitでは再検証が必要。
 - 同じ`/goal`が目標未達のまま繰り返し報告する場合、生きた実行は止める（今回の子はその間も証拠を偽造しなかった）。
@@ -91,7 +103,7 @@ run 6（`dreambox-6`）は修正を重ねながら同じ工程を通した探索
 ## 6. 再現と再開
 
 ```bash
-cd COMMON && npm ci --ignore-scripts && AUTODEV_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium npm test   # 204件
+cd COMMON && npm ci --ignore-scripts && AUTODEV_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium npm test   # 205件
 node scripts/live-probe.mjs --mode prepare --source TEST_REPO --output NEW_DIR
 node scripts/live-probe.mjs --mode run --target NEW_DIR                                              # 本物の/goalを開始
 node scripts/live-probe.mjs --mode run --target NEW_DIR --resume SDK_SESSION_ID                      # 同じsessionの再開
@@ -99,9 +111,9 @@ node scripts/live-probe.mjs --mode run --target NEW_DIR --resume SDK_SESSION_ID 
 
 CLIが死んだ場合：`claude --resume SESSION --settings NEW_DIR/.autodev/probe-permissions.json --max-turns 1 -p "Observation only"`で再開ログを採取し、`import-termination.mjs --raw ORIGINAL --resume_raw RESUMED --tool_use ID`→`burst.mjs --action finish`→`state.mjs --action recover`。
 
-次の自律実行点：(1) web/game fixtureの実機追試、(2) T04/T08/T16の故障注入（意図的に誤ったコードや実装途中のkillを入れた実run）、(3) 許可された公開先でのcheckpoint publishと新session復元。
+次の自律実行点：(1) game・既存アプリの実機追試、(2) T04/T08/T16の故障注入（意図的に誤ったコードや実装途中のkillを入れた実run）、(3) 許可された公開先でのcheckpoint publishと新session復元。
 
 ## 7. 証拠
 
 `docs/evidence/live/`配下。各runに圧縮済みSDK capture（部分streamを除去、元ファイルのsha256付き）、manifest、probe-results、assessment、agentのmeta/prefix/journal、独立verify出力。
-[run3](evidence/live/run3-2026-10-26) / [run4](evidence/live/run4-2026-10-26) / [run5](evidence/live/run5-2026-10-26) / [run6中断・復元](evidence/live/run6-2026-10-26-interrupted) / [run6 R1 PASS](evidence/live/run6e-R1-PASS-2026-10-26) / [run6最終ゲート](evidence/live/run6f-final-gate-first-verify-2026-10-26) / [**run7 COMPLETE**](evidence/live/run7-COMPLETE-2026-10-26)
+[run3](evidence/live/run3-2026-10-26) / [run4](evidence/live/run4-2026-10-26) / [run5](evidence/live/run5-2026-10-26) / [run6中断・復元](evidence/live/run6-2026-10-26-interrupted) / [run6 R1 PASS](evidence/live/run6e-R1-PASS-2026-10-26) / [run6最終ゲート](evidence/live/run6f-final-gate-first-verify-2026-10-26) / [**run7 COMPLETE**](evidence/live/run7-COMPLETE-2026-10-26) / [**web-todo COMPLETE**](evidence/live/web-todo-COMPLETE-2026-10-26)

@@ -1,0 +1,136 @@
+{
+  "version": 2,
+  "items": [
+    {
+      "id": "T1",
+      "requirement_refs": [
+        "R1"
+      ],
+      "status": "PASS",
+      "dependencies": [],
+      "check_refs": [
+        "T1-test",
+        "T1-build",
+        "T1-behavior",
+        "T1-visual"
+      ],
+      "execution": {
+        "run_id": "run2",
+        "attempt_id": "root2:c6254656-645a-42b9-a8b4-6cb240aac3a4",
+        "started_at": "2026-10-26T20:17:21.168Z"
+      }
+    },
+    {
+      "id": "T2",
+      "requirement_refs": [
+        "R2"
+      ],
+      "status": "PASS",
+      "dependencies": [
+        "T1"
+      ],
+      "check_refs": [
+        "T2-test",
+        "T2-behavior",
+        "T2-visual"
+      ],
+      "execution": {
+        "run_id": "run2",
+        "attempt_id": "root2:dde5e602-caab-4b1d-a0c7-a6e1b7515f66",
+        "started_at": "2026-10-26T19:05:46.823Z"
+      }
+    },
+    {
+      "id": "T3",
+      "requirement_refs": [
+        "R3"
+      ],
+      "status": "PASS",
+      "dependencies": [
+        "T2"
+      ],
+      "check_refs": [
+        "T3-test",
+        "T3-behavior",
+        "T3-visual"
+      ],
+      "execution": {
+        "run_id": "run2",
+        "attempt_id": "root2:c6dd7faa-d29a-4101-abad-5d6295788e2d",
+        "started_at": "2026-10-26T19:05:47.140Z"
+      }
+    },
+    {
+      "id": "T4",
+      "requirement_refs": [
+        "R4"
+      ],
+      "status": "PASS",
+      "dependencies": [
+        "T3"
+      ],
+      "check_refs": [
+        "T4-test",
+        "T4-behavior",
+        "T4-visual"
+      ],
+      "execution": {
+        "run_id": "run2",
+        "attempt_id": "root2:997380df-1df6-4c79-9030-4e9d0e3eadab",
+        "started_at": "2026-10-26T19:05:47.610Z"
+      }
+    },
+    {
+      "id": "T5",
+      "requirement_refs": [
+        "R5"
+      ],
+      "status": "PASS",
+      "dependencies": [
+        "T4"
+      ],
+      "check_refs": [
+        "T5-test",
+        "T5-behavior",
+        "T5-visual-375",
+        "T5-visual-1280"
+      ],
+      "execution": {
+        "run_id": "run2",
+        "attempt_id": "root2:ec362f92-c087-4de2-87e1-ce6602b6b316",
+        "started_at": "2026-10-26T19:05:48.063Z"
+      }
+    },
+    {
+      "id": "T6",
+      "requirement_refs": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "status": "PASS",
+      "dependencies": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5"
+      ],
+      "check_refs": [
+        "T6-build",
+        "T6-test",
+        "T6-behavior-375",
+        "T6-behavior-1280",
+        "T6-visual-375",
+        "T6-visual-1280"
+      ],
+      "execution": {
+        "run_id": "run2",
+        "attempt_id": "root2:9d05a522-6a94-43bb-a174-d28e410ed67e",
+        "started_at": "2026-10-26T19:05:48.469Z"
+      }
+    }
+  ]
+}

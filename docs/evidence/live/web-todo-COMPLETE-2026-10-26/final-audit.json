@@ -1,0 +1,113 @@
+{
+  "version": 2,
+  "kind": "audit",
+  "scope": "final",
+  "status": "PASS",
+  "run_id": "run2",
+  "task_id": "mission",
+  "attempt_id": "root2",
+  "session_id": "8c68fb96-a017-4d2b-a70b-a2d7a9bd8888",
+  "task_ids": [
+    "T1",
+    "T2",
+    "T3",
+    "T4",
+    "T5",
+    "T6"
+  ],
+  "product": "45cd47c2f97fcc50404b07f2a9e0f8adcc5399809e727c6616ca3d62e7be5c08",
+  "contract": "161448e6312e8ba128d2fe7e844d7aa4b378466054c430d2cf69a14fcf9203fa",
+  "identity": "4e79fed650bd896d8a243038b500e8f1d9286b30ebe6147b8dfe2a0ae6131271",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "Fixed since the previous final audit: the major finding in /home/user/probes/web-todo/.autodev/evidence/audit.json was that T1 had no implement-stage model record for execution root2:f04273c9. T1 was re-run as execution root2:c6254656-645a-42b9-a8b4-6cb240aac3a4. It now has /home/user/probes/web-todo/.autodev/evidence/runtime-c7660cc7b3c4e97c6d7e408e55038a6df48dfbddb45d4c205bcfb343670a66f2.json (LIVE, implement, autodev-haiku-builder, expected claude-haiku-5-5) and runtime-5b53b70636ca710e63190ca84b47c712087843c74fedf72f639ab3bd27204ff2.json (LIVE, review, autodev-sonnet-reviewer, claude-sonnet-5-5). It also has completed plan, implement and close-task receipts in operations/05aeab11…, 2e785332… and f598f988…. The NEEDS_FIX audit.json stays on record as history. It must not be overwritten silently; it should be superseded by this assessment.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "T1 steps ran out of order. The T1 task review was observed at 20:21:33Z, and T1 close-task (task gate PASS) finished at 20:23:08Z. But the four T1 check records bound to execution c6254656 were made later: T1-test 49fea667… at 20:24:21Z, T1-build 95eb5c61… at 20:24:28Z, T1-behavior be289716… at 20:24:31Z and T1-visual a6f467e4… at 20:24:37Z. The T1 task review cites T1-visual nonce a3eb19f1, which is the earlier recording at the same product 45cd47c2. Its PNGs remain, but its record was replaced. So the T1 gate and task review relied on an earlier same-product recording that was not bound to the current execution. The current state is consistent: all 4 T1 reports are PASS and bound to c6254656, and the final Sonnet review (observed 20:28:47Z) came after them. verify.mjs must recompute T1 from the current records. Harness follow-up: the task gate should require check records bound to the current execution.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The product change that the current evidence covers (10fb2745… to 45cd47c2…, the 44x44 label.toggle-hit) was written outside a root lease and with no operation receipt. The parent launched a direct Haiku Agent outside the Workflow. This is still not recorded in handoff.md or failure.json. All 23 checks were re-recorded and every task re-reviewed at 45cd47c2, so the evidence is current. Only the writer's provenance broke the protocol. Record the deviation; future fixes must go through a Workflow implement stage with an operation receipt.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Review and audit runtime records depend on evidence/live-sdk-session2.jsonl. The parent says it mirrored this file byte-for-byte from /home/user/probes/web-sdk/session2.jsonl (strategy events run2-T*-strategy-1). This read-only role cannot hash or compare the mirror against the original SDK stream. verify.mjs or import-runtime provenance must confirm that the copy matches the original.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "This read-only role cannot compute check-script hashes. Expected: checks/browser-check.mjs cc813a6c… and checks/build-check.mjs 80b37258… (architecture.md section 8). Indirect evidence is consistent: line 362 has PIXEL_TOL = { maxDelta: 16, maxShare: 0.005 }, line 790 has MIN_TARGET = 44, and the 44x44 assertions appear in the current reports (for example T5-test 1f2f2a6d…). verify.mjs or a verifier should confirm both hashes.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "failure_state is stale. failure.mjs still shows next_action IMPLEMENT and next_model claude-haiku-5-5 for T1-T6, although every task is PASS. All recorded failures are in the evidence category (repair_attempt 0), so no wrong escalation happened. The coordinator should append resolution events so the history stays visible but does not look pending. Also, failure event run2|T1|root2%3Af04273c9…|checkpoint-failure|1 is recorded under stage 'review' with model claude-haiku-5-5. That is the coordinator that wrote the event, not the reviewer. Label it clearly so it is not taken for a review done by the wrong model.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "architecture.md sections 8.2 and 8.3 say 'the contract digest covers checks/'. But the contract digest is still 161448e6… after both check amendments. The product fingerprint is what changed. Freshness is not affected; planning should correct the wording.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "There is no Chromium scenario for localStorage being unavailable or throwing. app.js handles it with try/catch around getItem, setItem and JSON.parse. Assumption A5 explicitly puts it outside R4's literal scope. The R4 requirement 'corrupted stored data must not crash the page' is covered by 7 corruption payloads at both viewports. This scope-out stays visible here; it is not a dropped requirement.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The product is not checkpointed in Git. index.html, app.js, style.css and checks/ are untracked on top of the initial design commit 9a7c70d. The fingerprint includes untracked files, so the evidence is valid. Before the final report the parent should commit and/or run checkpoint.mjs --action save --publish true and reach PUBLISHED.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Later stages belong to the parent and are not defects of this audit. The parent must confirm every Workflow and agent is terminal and drained, then run import-termination, burst finish --proof, and state end --proof. Only after that should it run verify.mjs --target /home/user/probes/web-todo and show the JSON and summary. This audit PASS must not be read as mission COMPLETE.",
+      "resolved": false
+    }
+  ],
+  "requirement_refs": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5"
+  ],
+  "runtime_ref": "runtime-594fd9aa861691b9db6b0a0552e3265de49a693dfc32fa89e33fae19d42ab607.json",
+  "executions": [
+    {
+      "task_id": "T1",
+      "run_id": "run2",
+      "attempt_id": "root2:c6254656-645a-42b9-a8b4-6cb240aac3a4"
+    },
+    {
+      "task_id": "T2",
+      "run_id": "run2",
+      "attempt_id": "root2:dde5e602-caab-4b1d-a0c7-a6e1b7515f66"
+    },
+    {
+      "task_id": "T3",
+      "run_id": "run2",
+      "attempt_id": "root2:c6dd7faa-d29a-4101-abad-5d6295788e2d"
+    },
+    {
+      "task_id": "T4",
+      "run_id": "run2",
+      "attempt_id": "root2:997380df-1df6-4c79-9030-4e9d0e3eadab"
+    },
+    {
+      "task_id": "T5",
+      "run_id": "run2",
+      "attempt_id": "root2:ec362f92-c087-4de2-87e1-ce6602b6b316"
+    },
+    {
+      "task_id": "T6",
+      "run_id": "run2",
+      "attempt_id": "root2:9d05a522-6a94-43bb-a174-d28e410ed67e"
+    }
+  ]
+}

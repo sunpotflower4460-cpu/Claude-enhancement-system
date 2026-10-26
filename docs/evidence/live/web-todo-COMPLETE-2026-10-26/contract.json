@@ -1,0 +1,256 @@
+{
+  "version": 2,
+  "checks": [
+    {
+      "id": "T1-test",
+      "task_id": "T1",
+      "requirement_refs": [
+        "R1"
+      ],
+      "kind": "test",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T1-build",
+      "task_id": "T1",
+      "requirement_refs": [
+        "R1"
+      ],
+      "kind": "build",
+      "command": "\"$AUTODEV_NODE\" checks/build-check.mjs",
+      "timeout_ms": 30000
+    },
+    {
+      "id": "T1-behavior",
+      "task_id": "T1",
+      "requirement_refs": [
+        "R1"
+      ],
+      "kind": "behavior",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T1-visual",
+      "task_id": "T1",
+      "requirement_refs": [
+        "R1"
+      ],
+      "kind": "visual",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T2-test",
+      "task_id": "T2",
+      "requirement_refs": [
+        "R2"
+      ],
+      "kind": "test",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T2-behavior",
+      "task_id": "T2",
+      "requirement_refs": [
+        "R2"
+      ],
+      "kind": "behavior",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T2-visual",
+      "task_id": "T2",
+      "requirement_refs": [
+        "R2"
+      ],
+      "kind": "visual",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T3-test",
+      "task_id": "T3",
+      "requirement_refs": [
+        "R3"
+      ],
+      "kind": "test",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T3-behavior",
+      "task_id": "T3",
+      "requirement_refs": [
+        "R3"
+      ],
+      "kind": "behavior",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T3-visual",
+      "task_id": "T3",
+      "requirement_refs": [
+        "R3"
+      ],
+      "kind": "visual",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T4-test",
+      "task_id": "T4",
+      "requirement_refs": [
+        "R4"
+      ],
+      "kind": "test",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 180000
+    },
+    {
+      "id": "T4-behavior",
+      "task_id": "T4",
+      "requirement_refs": [
+        "R4"
+      ],
+      "kind": "behavior",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 180000
+    },
+    {
+      "id": "T4-visual",
+      "task_id": "T4",
+      "requirement_refs": [
+        "R4"
+      ],
+      "kind": "visual",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T5-test",
+      "task_id": "T5",
+      "requirement_refs": [
+        "R5"
+      ],
+      "kind": "test",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 180000
+    },
+    {
+      "id": "T5-behavior",
+      "task_id": "T5",
+      "requirement_refs": [
+        "R5"
+      ],
+      "kind": "behavior",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 180000
+    },
+    {
+      "id": "T5-visual-375",
+      "task_id": "T5",
+      "requirement_refs": [
+        "R5"
+      ],
+      "kind": "visual",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T5-visual-1280",
+      "task_id": "T5",
+      "requirement_refs": [
+        "R5"
+      ],
+      "kind": "visual",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T6-build",
+      "task_id": "T6",
+      "requirement_refs": [
+        "R5"
+      ],
+      "kind": "build",
+      "command": "\"$AUTODEV_NODE\" checks/build-check.mjs",
+      "timeout_ms": 30000
+    },
+    {
+      "id": "T6-test",
+      "task_id": "T6",
+      "requirement_refs": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "test",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 480000
+    },
+    {
+      "id": "T6-behavior-375",
+      "task_id": "T6",
+      "requirement_refs": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "behavior",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T6-behavior-1280",
+      "task_id": "T6",
+      "requirement_refs": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "behavior",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 120000
+    },
+    {
+      "id": "T6-visual-375",
+      "task_id": "T6",
+      "requirement_refs": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "visual",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 300000
+    },
+    {
+      "id": "T6-visual-1280",
+      "task_id": "T6",
+      "requirement_refs": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "visual",
+      "command": "\"$AUTODEV_NODE\" checks/browser-check.mjs",
+      "timeout_ms": 300000
+    }
+  ],
+  "human_review": false
+}

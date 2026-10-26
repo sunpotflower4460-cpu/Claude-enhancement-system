@@ -1,0 +1,184 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #1a1a1a;
+  background: #f4f4f1;
+}
+
+main {
+  width: 100%;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 {
+  margin: 0.5rem 0 1rem;
+  font-size: 1.75rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:focus-visible {
+  outline: 3px solid #0b57d0;
+  outline-offset: 2px;
+}
+
+/* Form row */
+#new-todo-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#new-todo {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  color: #1a1a1a;
+  background: #fff;
+  border: 1px solid #6b6b6b;
+  border-radius: 6px;
+}
+
+#add-btn {
+  flex: 0 0 auto;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: #1f4e9c;
+  border: 1px solid #1f4e9c;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Filter bar */
+#filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#filters [data-filter] {
+  flex: 1 1 4.5rem;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  color: #1a1a1a;
+  background: #fff;
+  border: 1px solid #6b6b6b;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#filters [data-filter][aria-pressed="true"] {
+  color: #fff;
+  background: #1a1a1a;
+  border: 2px solid #000;
+  font-weight: 700;
+}
+
+/* Task list */
+#todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #d4d4cf;
+}
+
+/* 44x44 hit area around the checkbox (architecture section 5). */
+.todo-item .toggle-hit {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.todo-item .toggle {
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: 0;
+  cursor: pointer;
+}
+
+.todo-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-top: 0.5rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.todo-item.done .todo-text {
+  text-decoration: line-through;
+  color: #5b5b5b;
+}
+
+.todo-item .delete {
+  flex: 0 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  font: inherit;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #1a1a1a;
+  background: #fff;
+  border: 1px solid #6b6b6b;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Counter */
+#counter {
+  margin: 1rem 0 0;
+  color: #1a1a1a;
+}
+
+@media (min-width: 48rem) {
+  main {
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 2.25rem;
+  }
+
+  #filters [data-filter] {
+    flex: 0 0 auto;
+  }
+}

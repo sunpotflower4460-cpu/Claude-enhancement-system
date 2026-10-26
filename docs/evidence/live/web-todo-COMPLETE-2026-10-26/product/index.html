@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Todo</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>Todo</h1>
+
+    <form id="new-todo-form" autocomplete="off">
+      <label for="new-todo" class="visually-hidden">New task</label>
+      <input id="new-todo" type="text" autocomplete="off" placeholder="What needs doing?">
+      <button id="add-btn" type="submit">Add</button>
+    </form>
+
+    <nav id="filters" aria-label="Filter tasks">
+      <button type="button" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" data-filter="active" aria-pressed="false">Active</button>
+      <button type="button" data-filter="done" aria-pressed="false">Done</button>
+    </nav>
+
+    <ul id="todo-list"></ul>
+
+    <p id="counter" aria-live="polite">0 items left</p>
+  </main>
+</body>
+</html>

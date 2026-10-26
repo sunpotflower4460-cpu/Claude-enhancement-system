@@ -1,0 +1,36 @@
+import http from "node:http"; import fs from "node:fs"; import path from "node:path";
+import { chromium } from "/home/user/Claude-enhancement-system/node_modules/playwright/index.mjs";
+const root="/home/user/probes/web-todo";
+const srv=http.createServer((q,r)=>{const f=path.join(root,q.url==="/"?"index.html":q.url.split("?")[0]);try{const b=fs.readFileSync(f);r.setHeader("content-type",f.endsWith(".js")?"text/javascript":f.endsWith(".css")?"text/css":"text/html");r.end(b)}catch{r.statusCode=404;r.end()}});
+await new Promise(r=>srv.listen(0,"127.0.0.1",r)); const url="http://127.0.0.1:"+srv.address().port;
+const b=await chromium.launch({headless:true,executablePath:"/opt/pw-browsers/chromium"});
+const res=[]; const ok=(n,c)=>{res.push([c?"OK  ":"FAIL",n]);};
+for (const vp of [{width:375,height:700},{width:1280,height:800}]) {
+  const ctx=await b.newContext({viewport:vp}); const p=await ctx.newPage(); const errs=[]; p.on("pageerror",e=>errs.push(e.message)); p.on("console",m=>{if(m.type()==="error")errs.push(m.text())});
+  await p.goto(url);
+  const input=p.locator("input[type=text], input:not([type])").first();
+  await input.fill("  buy milk  "); await input.press("Enter");
+  await input.fill("walk dog"); await p.getByRole("button",{name:/add/i}).first().click();
+  await input.fill("   "); await input.press("Enter");
+  const items=p.locator("li"); ok(vp.width+": two tasks added, blank ignored", await items.count()===2);
+  ok(vp.width+": trimmed text", (await items.first().innerText()).includes("buy milk") && !(await items.first().innerText()).startsWith(" "));
+  await items.first().locator("input[type=checkbox]").check();
+  ok(vp.width+": toggle done", await items.first().locator("input[type=checkbox]").isChecked());
+  await p.getByRole("button",{name:/^active$/i}).click().catch(()=>p.getByText(/^active$/i).click());
+  ok(vp.width+": Active filter shows 1", await p.locator("li:visible").count()===1);
+  await p.getByRole("button",{name:/^done$/i}).click().catch(()=>p.getByText(/^done$/i).click());
+  ok(vp.width+": Done filter shows 1", await p.locator("li:visible").count()===1);
+  await p.reload();
+  ok(vp.width+": filter+tasks survive reload", await p.locator("li").count()>=1);
+  await p.getByRole("button",{name:/^all$/i}).click().catch(()=>p.getByText(/^all$/i).click());
+  ok(vp.width+": All after reload shows 2", await p.locator("li:visible").count()===2);
+  await p.locator("li").first().getByRole("button",{name:/delete|remove|×|x/i}).click();
+  ok(vp.width+": delete removes one", await p.locator("li:visible").count()===1);
+  await p.evaluate(()=>{for(const k of Object.keys(localStorage)) localStorage.setItem(k,"{not json")}); await p.reload();
+  ok(vp.width+": corrupted storage does not crash", errs.length===0);
+  const sw=await p.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1); ok(vp.width+": no horizontal scroll", sw);
+  ok(vp.width+": no console/page errors", errs.length===0);
+  await p.screenshot({path:`/tmp/claude-0/-home-user/edc58073-4d34-5668-a88d-a39fcad8c675/scratchpad/web-${vp.width}.png`}); await ctx.close();
+}
+await b.close(); srv.close();
+for (const [s,n] of res) console.log(s,n); process.exit(res.some(r=>r[0]==="FAIL")?1:0);

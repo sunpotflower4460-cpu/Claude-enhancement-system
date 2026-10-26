@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "kind": "review",
+  "scope": "final",
+  "status": "PASS",
+  "run_id": "run2",
+  "task_id": "mission",
+  "attempt_id": "root2",
+  "session_id": "8c68fb96-a017-4d2b-a70b-a2d7a9bd8888",
+  "task_ids": [
+    "T1",
+    "T2",
+    "T3",
+    "T4",
+    "T5",
+    "T6"
+  ],
+  "product": "45cd47c2f97fcc50404b07f2a9e0f8adcc5399809e727c6616ca3d62e7be5c08",
+  "contract": "161448e6312e8ba128d2fe7e844d7aa4b378466054c430d2cf69a14fcf9203fa",
+  "identity": "4e79fed650bd896d8a243038b500e8f1d9286b30ebe6147b8dfe2a0ae6131271",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "Review was source- and screenshot-based. I did not open the T6 check report files or the SDK records, and I ran no commands. Browser results come from existing runner and screenshot artifacts under /home/user/probes/web-todo/.autodev/evidence, plus the parent's PASS task states. Console-error absence and reload persistence are not independently re-observed by me. The parent's final verify must confirm them.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "failure_state shows earlier failures for T1 to T6 (T1 has 2, the others 1), all with repair_attempt 0 and no blocker. The tasks are now PASS, but the failure history stays visible. The Opus final audit has not run yet; that is a later stage.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The 375px populated-all screenshot (T6-visual-375-7f4ed384...-populated-all.png) shows the layout is usable. A long unbroken string wraps inside the row and the delete button stays visible. The done item has a strikethrough and the counter reads '2 items left'. I viewed only this one screenshot.",
+      "resolved": false
+    }
+  ],
+  "requirement_refs": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5"
+  ],
+  "runtime_ref": "runtime-4dfd82670fd0106b79980594c3c1e5a58309f24fe83c95da22e10ac244162028.json",
+  "executions": [
+    {
+      "task_id": "T1",
+      "run_id": "run2",
+      "attempt_id": "root2:c6254656-645a-42b9-a8b4-6cb240aac3a4"
+    },
+    {
+      "task_id": "T2",
+      "run_id": "run2",
+      "attempt_id": "root2:dde5e602-caab-4b1d-a0c7-a6e1b7515f66"
+    },
+    {
+      "task_id": "T3",
+      "run_id": "run2",
+      "attempt_id": "root2:c6dd7faa-d29a-4101-abad-5d6295788e2d"
+    },
+    {
+      "task_id": "T4",
+      "run_id": "run2",
+      "attempt_id": "root2:997380df-1df6-4c79-9030-4e9d0e3eadab"
+    },
+    {
+      "task_id": "T5",
+      "run_id": "run2",
+      "attempt_id": "root2:ec362f92-c087-4de2-87e1-ce6602b6b316"
+    },
+    {
+      "task_id": "T6",
+      "run_id": "run2",
+      "attempt_id": "root2:9d05a522-6a94-43bb-a174-d28e410ed67e"
+    }
+  ]
+}

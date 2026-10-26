@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "mission_id": "83f98586-d026-42ee-bd70-41a571620bf9",
+  "original": "Make a Todo list web app I can use on my phone and my laptop. I can add a task by typing it and pressing Enter or a button, tick a task as done, delete a task, and filter the list by All / Active / Done. The list must still be there after I reload the page. Empty tasks must not be added. It must look usable on a 375px wide phone and on a desktop, with no console errors.\n\nCompletion conditions: Every requirement is verified by real checks in a real Chromium (typed input, clicks, reload, both viewports, screenshots), independent Sonnet review and a final Opus audit. A screenshot alone, or a passing build, is not verification. Do not weaken or delete requirements. Plain HTML, CSS and JavaScript only (no build step, no npm packages). Serve index.html as a static file.",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "Add: typing text and pressing Enter or the Add button appends a task; surrounding whitespace is trimmed; an empty or whitespace-only input adds nothing."
+    },
+    {
+      "id": "R2",
+      "text": "Complete/delete: each task has a checkbox that toggles done (visually distinguishable) and a delete button that removes it."
+    },
+    {
+      "id": "R3",
+      "text": "Filter: All / Active / Done controls show the matching tasks; the active filter is visibly marked; the item counter shows the number of active tasks."
+    },
+    {
+      "id": "R4",
+      "text": "Persistence: tasks, done state and the chosen filter survive a page reload (localStorage); corrupted stored data must not crash the page."
+    },
+    {
+      "id": "R5",
+      "text": "Layout: usable at 375x700 and 1280x800 with no horizontal scroll, controls reachable, and zero console errors."
+    }
+  ],
+  "profile": "web-app",
+  "target": {
+    "repository": "github.com/probe-owner/web-todo"
+  },
+  "shared": {
+    "repository": "github.com/sunpotflower4460-cpu/claude-enhancement-system"
+  }
+}

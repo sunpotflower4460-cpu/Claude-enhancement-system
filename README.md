@@ -41,7 +41,7 @@ Opus設計、Sonnet計画・独立レビュー・実検証、Haiku実装、難�
 
 ## 実証と未検証
 
-[検証結果](docs/validation-results.md)にローカル/CI、正常/故障、実ブラウザ、模擬モデルを区別して記録しています。実Opus/Sonnet/Haiku 5.5によるnative Workflow開発、reviewerの読み取り専用制限、/goal継続、実Workflow停止・再開、LOCAL checkpointの再cloneは2026-10-26に実機で確認済みで、独立`verify`が`COMPLETE`（LIVE）になりました（[実機受け入れ](docs/10-live-acceptance.md)）。web/game/既存アプリの実Claude開発、故障注入の一部、checkpointのGitHub公開、クラウド親sessionでのagent再発見は未検証です。必要なruntime記録が取れなければUNVERIFIEDを返します。
+[検証結果](docs/validation-results.md)にローカル/CI、正常/故障、実ブラウザ、模擬モデルを区別して記録しています。実Opus/Sonnet/Haiku 5.5によるnative Workflow開発、reviewerの読み取り専用制限、/goal継続、実Workflow停止・再開、LOCAL checkpointの再cloneは2026-10-26に実機で確認済みで、独立`verify`が`COMPLETE`（LIVE）になりました（[実機受け入れ](docs/10-live-acceptance.md)）。game・既存アプリの実Claude開発（webアプリは通常手順で`COMPLETE`確認済み）、故障注入の一部、checkpointのGitHub公開、クラウド親sessionでのagent再発見は未検証です。必要なruntime記録が取れなければUNVERIFIEDを返します。
 
 ## 設計と運用
 
