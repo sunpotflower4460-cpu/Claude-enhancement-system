@@ -224,3 +224,13 @@ test("E live inspect: condensed tasks without dependencies are corrected once, t
   assert.equal(n, 2);
   await assert.rejects(() => runController(input, async () => condensed), /Missing persisted snapshot/);
 });
+
+test("E live: coordinator prompt defines finding severity so pending later-stage work cannot block PASS (live run 6e)", async () => {
+  let prompt;
+  await runController(input, async (p) => {
+    prompt ||= p;
+    return ok({ snapshot: { observation_id: "o", architecture_ready: true, tasks: [{ id: "R1", status: "BLOCKED", dependencies: [] }] } });
+  });
+  assert.match(prompt, /later stage has not done yet/);
+  assert.match(prompt, /is minor, never major/);
+});
