@@ -1,0 +1,143 @@
+{
+  "version": 2,
+  "mode": "LIVE_PROBE_OBSERVATIONS",
+  "invocation_id": "4f081d7b-34f2-4e53-a36a-d8e2a0342f91",
+  "checks": [
+    {
+      "id": "two_repositories",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "goal_continuation",
+      "status": "UNVERIFIED",
+      "evidence_refs": [],
+      "reason": "Await actual Claude runtime observation"
+    },
+    {
+      "id": "actual_models",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "runtime-010725e708907faaa3d7c97e502a86f8c4f09b02aee9889d315ded9a9bb4d04c.json",
+          "sha256": "db18e7158cbbda09497678e5c36416f25fad623df83afd22bac19477c58ff101"
+        },
+        {
+          "path": "runtime-edbf27593bc308374210ac85fa7950a55c58c164bbda311541b93323858c9495.json",
+          "sha256": "4ac125a1024f45438ac08cc3db53fc6c8b9b3ee1561a742c9ea985050fd592b5"
+        },
+        {
+          "path": "runtime-fbe37ab8b0a2b049f9c146cf01ea76d17e4587532b082960891d8b42d50a8b64.json",
+          "sha256": "0a6184119fdbf23261a170d577cf9854f78cbbc83f5a5be316834229d6d20a5a"
+        }
+      ],
+      "reason": "import-runtime from this invocation's live SDK workflow_agent progress: opus/haiku/sonnet 5.5",
+      "observed_at": "2026-10-26T12:23:59.401Z"
+    },
+    {
+      "id": "native_readonly_denial",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "readonly-c68b32336de6ea8f.json",
+          "sha256": "3b8c7b3dbab57176d3dc60ba0dcc4b9fb2f92a70528f5fd6f56c6c81f5b7c763"
+        }
+      ],
+      "reason": "Runtime-recorded reviewer tool list Read/Grep/Glob/StructuredOutput only; sentinel absent. Tool absence, not an observed denial message.",
+      "observed_at": "2026-10-26T12:24:01.346Z"
+    },
+    {
+      "id": "workflow_start_wait",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "burst-proof-807f216e5b463adf2afd24f3d415bc90dde494eb0bafc94ca67a4d7cbd9fef2b.json",
+          "sha256": "ee1a57cd16bd6a39f13bf081752d0be30996c3957360d85a8632ecf3698ab1ef"
+        },
+        {
+          "path": "burst-proof-ad93970dc047e097d979c0e374e8b4350e9b8563a3521d84387fb6f2584f9575.json",
+          "sha256": "5cb14efb6fc3e9df15b13e2d4d77f952a2b761b919dfee301fe33722a58fa219"
+        }
+      ],
+      "reason": "Every Workflow burst in this invocation was claimed, attached to the real SDK launch (tool_use/task id), waited to a correlated completed terminal with drained snapshot via import-termination, then finished with that proof. Shown here: the two newest proofs; many earlier bursts are in bursts.json.",
+      "observed_at": "2026-10-26T15:21:42.197Z"
+    },
+    {
+      "id": "repair_loop",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "final-verify-4f081d7b.json",
+          "sha256": "1e25253bf1b70d07404effe5040471f3e70f69ee4cb85ceaf114422696644bdc"
+        }
+      ],
+      "reason": "All four initially broken functions (add subtracted; divide/greet/clamp stubs) were repaired by native Haiku builder receipts, each then independently reviewed by Sonnet and verified with real test+loopback-HTTP checks before the next task; failure.json preserves permission-category failures, parent strategies with evidence refs, and two milestone/final audit NEEDS_FIX replans (R1,R4 reset). Caveat: baseline fault detection was by static reading by the probe agents, not a recorded failing run.",
+      "observed_at": "2026-10-26T15:22:22.154Z"
+    },
+    {
+      "id": "real_verification",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "final-verify-4f081d7b.json",
+          "sha256": "1e25253bf1b70d07404effe5040471f3e70f69ee4cb85ceaf114422696644bdc"
+        }
+      ],
+      "reason": "verify.mjs recomputed all 8 contract checks (R1-R4 test+api, real loopback HTTP via the read-only common adapter) as PASS at the current product/contract: 4/4 tasks, 8/8 checks. Overall verify status is UNVERIFIED for other reasons (see final_gate).",
+      "observed_at": "2026-10-26T15:21:43.933Z"
+    },
+    {
+      "id": "stop_resume",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "checkpoint-reclone-4f081d7b.json",
+          "sha256": "2ab602f30887f83a749876725371d80f31ba83183d6ad21d8f92933852bc2b69"
+        }
+      ],
+      "reason": "Real stop/resume: burst finished with drained proof, state pause, LOCAL checkpoint saved, checkpoint restored in a second clone and revalidated (R1-R3 PASS, next R4); then a new root attempt resumed from the paused state and carried R4 through review, verification and close. (Earlier invocations also had a SIGKILL/SIGTERM interruption recovered from SDK records.)",
+      "observed_at": "2026-10-26T15:21:52.746Z"
+    },
+    {
+      "id": "final_gate",
+      "status": "UNVERIFIED",
+      "evidence_refs": [
+        {
+          "path": "final-verify-4f081d7b.json",
+          "sha256": "1e25253bf1b70d07404effe5040471f3e70f69ee4cb85ceaf114422696644bdc"
+        }
+      ],
+      "reason": "Final verify is UNVERIFIED, not COMPLETE. Open issues: R1 close-task operation receipt was completed by the coordinator with result=null; no proved Opus architecture-stage observation at the current contract; and my extra root attempt live-probe-4f081d7b-final-1 (opened to try to reconcile the receipt) made the final review/audit read as stale against run_id.",
+      "observed_at": "2026-10-26T15:21:54.371Z"
+    },
+    {
+      "id": "multi_burst_state",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "burst-proof-807f216e5b463adf2afd24f3d415bc90dde494eb0bafc94ca67a4d7cbd9fef2b.json",
+          "sha256": "ee1a57cd16bd6a39f13bf081752d0be30996c3957360d85a8632ecf3698ab1ef"
+        },
+        {
+          "path": "checkpoint-reclone-4f081d7b.json",
+          "sha256": "2ab602f30887f83a749876725371d80f31ba83183d6ad21d8f92933852bc2b69"
+        }
+      ],
+      "reason": "bursts.json holds 49 mission bursts across all invocations, all FINISHED with terminal+drained proof; many in this invocation were parent-relaunched develop-mission bursts (max_sprints=1), each claimed from a fresh context observation and attached to the real launch. Backlog, failure journal, milestone cadence (milestone_every=2) and operation receipts persisted across them, including a pause, LOCAL checkpoint, second-clone restore and a new root attempt.",
+      "observed_at": "2026-10-26T15:22:42.356Z"
+    },
+    {
+      "id": "checkpoint_reclone",
+      "status": "PASS",
+      "evidence_refs": [
+        {
+          "path": "checkpoint-reclone-4f081d7b.json",
+          "sha256": "2ab602f30887f83a749876725371d80f31ba83183d6ad21d8f92933852bc2b69"
+        }
+      ],
+      "reason": "LOCAL checkpoint saved at drained unfinished boundary (R4 open), second local clone with original fetch URL as identity and own nonexistent pushurl, restore RESTORED and revalidated (same product, R1-R3 PASS, next R4). Remote publication UNVERIFIED, not attempted.",
+      "observed_at": "2026-10-26T13:57:22.406Z"
+    }
+  ]
+}

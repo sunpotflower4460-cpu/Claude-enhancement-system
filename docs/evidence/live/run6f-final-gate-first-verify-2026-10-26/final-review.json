@@ -1,0 +1,75 @@
+{
+  "version": 2,
+  "kind": "review",
+  "scope": "final",
+  "status": "PASS",
+  "run_id": "live-probe-4f081d7b-final-2",
+  "task_id": "mission",
+  "attempt_id": "e2a7c4d9-5b1f-4a36-8c70-3f9d1b6e0a48",
+  "session_id": "a478feb9-f888-4ed2-a60b-723d84524c25",
+  "task_ids": [
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+  ],
+  "product": "e0f0dc6ed66a667580c93d8acb3bba8afb2d6502809ad7f2c7acccf5d1e67b0b",
+  "contract": "cbb4a4f7edccecf035edab26c7d5a902577e1edddc28c60508cf44b40cc1b46d",
+  "identity": "94d26981f5a8df7a241435056fa87c64939d752bf0035312ff961f4efe8ccbf3",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "Requirement coverage (source reading): R1 add(5,3)=8 and add(-1,2)=1 are satisfied by `a+b`. R2 divide(8,2)=4 is satisfied and a zero divisor throws. R3 trims the name and falls back to 'friend', returning 'Hello, NAME'. R4 clamp returns the bounds outside the range and the original value inside. All of this is in /home/user/probes/dreambox-6/autodev-probe/app.mjs. This is from reading the source, not from running it.",
+      "resolved": true
+    },
+    {
+      "severity": "minor",
+      "message": "Runtime evidence: the stored R4-api check record and its report show exit_code 0, two PASS assertions and an HTTP 200 response. The record is bound to product hash e0f0dc6e…, the same hash as the snapshot. I did not open the records for the other seven checks (R1, R2, R3 test and api, and R4-test).",
+      "resolved": true
+    },
+    {
+      "severity": "minor",
+      "message": "The check script, examples/api-check.mjs in the common repo, makes only the minimal assertions the requirements list. The HTTP endpoint serves only add and greet, so divide and clamp are covered by the assertion checks but not over HTTP. I found no sign that the acceptance tests were weakened.",
+      "resolved": true
+    },
+    {
+      "severity": "minor",
+      "message": "R1 and R4 each show one recorded failure (parent-strategy events) in failure_state. Their tasks are now PASS. The R1 and R4 executions started at 14:50, after the R2 and R3 executions at 14:13. This is consistent with the interruption and resume the mission asked for.",
+      "resolved": true
+    },
+    {
+      "severity": "minor",
+      "message": "Later stages are still to do: the independent Opus audit, runtime-drain confirmation by the parent, and final verify.mjs. These are not defects in this review.",
+      "resolved": false
+    }
+  ],
+  "requirement_refs": [
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+  ],
+  "runtime_ref": "runtime-5546ad7123362a2ba5211ed19270cd64b9e30a22e4ab0645db44cf122327dfc3.json",
+  "executions": [
+    {
+      "task_id": "R1",
+      "run_id": "live-probe-4f081d7b-resume-1",
+      "attempt_id": "6b1f3a52-9c47-4d0e-8a21-5e7d93c0b4f8:43aceb8f-1c87-467a-95dc-374b36ee2d2f"
+    },
+    {
+      "task_id": "R2",
+      "run_id": "live-probe-4f081d7b-resume-1",
+      "attempt_id": "6b1f3a52-9c47-4d0e-8a21-5e7d93c0b4f8:69f89615-e437-47fa-917e-54b2cd980ca3"
+    },
+    {
+      "task_id": "R3",
+      "run_id": "live-probe-4f081d7b-resume-1",
+      "attempt_id": "6b1f3a52-9c47-4d0e-8a21-5e7d93c0b4f8:89d7f538-0354-4429-86fa-d1a08db84f32"
+    },
+    {
+      "task_id": "R4",
+      "run_id": "live-probe-4f081d7b-resume-1",
+      "attempt_id": "6b1f3a52-9c47-4d0e-8a21-5e7d93c0b4f8:3d174a0b-8abc-49de-9bd2-03cec6c892e6"
+    }
+  ]
+}

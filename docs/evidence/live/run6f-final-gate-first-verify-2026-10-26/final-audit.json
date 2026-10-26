@@ -1,0 +1,80 @@
+{
+  "version": 2,
+  "kind": "audit",
+  "scope": "final",
+  "status": "NEEDS_FIX",
+  "run_id": "live-probe-4f081d7b-final-2",
+  "task_id": "mission",
+  "attempt_id": "e2a7c4d9-5b1f-4a36-8c70-3f9d1b6e0a48",
+  "session_id": "a478feb9-f888-4ed2-a60b-723d84524c25",
+  "task_ids": [
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+  ],
+  "product": "e0f0dc6ed66a667580c93d8acb3bba8afb2d6502809ad7f2c7acccf5d1e67b0b",
+  "contract": "cbb4a4f7edccecf035edab26c7d5a902577e1edddc28c60508cf44b40cc1b46d",
+  "identity": "94d26981f5a8df7a241435056fa87c64939d752bf0035312ff961f4efe8ccbf3",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "R1's close-task receipt for its current execution is missing its result. /home/user/probes/dreambox-6/.autodev/operations/6fe54f0a5bb643db2cc279cb7c0c42d3087c86e98d69ba37bc2df58b7cd53824.json (operation_id live-probe-4f081d7b-resume-1|R1|6b1f3a52-9c47-4d0e-8a21-5e7d93c0b4f8%3A43aceb8f-1c87-467a-95dc-374b36ee2d2f|close-task|1) has state 'completed' but \"result\": null, and it was last updated at 14:56:36Z. It is the only receipt in operations/ with a null result. The latest verify output (/home/user/probes/dreambox-6/.autodev/evidence/final-verify-4f081d7b.json) lists it as 'UNVERIFIED: unfinished/missing operation result'. The close-task receipt for the earlier R1 execution b7d2bc13 (/home/user/probes/dreambox-6/.autodev/operations/e6194fb9c3cb32f62d7a4517d6bb350ecf4ba2d5eb4938704c3651a56cacce45.json) does carry PASS, but that execution is not current and must not be substituted for 43aceb8f. Fix: the coordinator re-observes the gate and completes this operation through scripts/operation.mjs with a real result. Do not hand-edit it. Until then the final gate cannot be COMPLETE. Affected execution: R1 6b1f3a52-9c47-4d0e-8a21-5e7d93c0b4f8:43aceb8f-1c87-467a-95dc-374b36ee2d2f.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Requirement coverage at product e0f0dc6e / contract cbb4a4f7. Each requirement has a test record and an api record, both bound to its current execution with exit_code 0. R1 add: records 1e8bf4be (test) and ed34fd97 (api). R2 divide with throw on zero: 631347e9 and 056b0eb7. R3 greet with trim and 'friend' default: b2123188 and 0aa6c35e. R4 clamp: 7c8311a1 and 49c5b1c4. The source in /home/user/probes/dreambox-6/autodev-probe/app.mjs matches each requirement. No requirement was removed from the mission, backlog, contract or architecture, and P1-P5 are retained in /home/user/probes/dreambox-6/.autodev/architecture.md.",
+      "resolved": true
+    },
+    {
+      "severity": "minor",
+      "message": "Two failure_state entries are stale. R1 (last_event_id live-probe-4f081d7b-R1-parent-strategy-2) and R4 (live-probe-4f081d7b-R4-parent-strategy-1) each show failures=1 and next_action=IMPLEMENT, although both tasks are PASS. The strategy events in /home/user/probes/dreambox-6/.autodev/failure.json must stay as history. Refresh the current state through the CLI.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Gap G1 is accepted and stays visible. The api check's HTTP handler in /home/user/Claude-enhancement-system/examples/api-check.mjs serves only add and greet. divide and clamp get real HTTP only indirectly, through the shared server round-trip, while their behaviour is asserted in the same process. Gap G2 also stays visible: auth, state changes and HTTP error responses do not apply to these pure functions. Neither gap removes a requirement, and the adapter has not been weakened.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The previous final audit (/home/user/probes/dreambox-6/.autodev/evidence/audit.json) belongs to run live-probe-4f081d7b-resume-1, and verify reports it as a stale run_id. The routing check also reports 'Missing proved model role observation: claude-opus-5-5'. This audit is intended to replace that one once it is persisted under run final-2. Earlier audits must stay visible and must not be restamped.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Later stages that belong to the parent are still pending. The parent must confirm that the native Workflow and all agents are terminal and drained, run burst finish with the termination proof, run state end --proof, then run verify.mjs --target /home/user/probes/dreambox-6 and show its JSON. Until verify.mjs passes, interruption/resume (P4) runtime proof and Claude Code V1 real-machine acceptance remain UNVERIFIED.",
+      "resolved": false
+    }
+  ],
+  "requirement_refs": [
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+  ],
+  "runtime_ref": "runtime-581e742eb1b9661bac0c5072a2f2da8a8347f4fc2518c0576860c2a04769e8ff.json",
+  "executions": [
+    {
+      "task_id": "R1",
+      "run_id": "live-probe-4f081d7b-resume-1",
+      "attempt_id": "6b1f3a52-9c47-4d0e-8a21-5e7d93c0b4f8:43aceb8f-1c87-467a-95dc-374b36ee2d2f"
+    },
+    {
+      "task_id": "R2",
+      "run_id": "live-probe-4f081d7b-resume-1",
+      "attempt_id": "6b1f3a52-9c47-4d0e-8a21-5e7d93c0b4f8:69f89615-e437-47fa-917e-54b2cd980ca3"
+    },
+    {
+      "task_id": "R3",
+      "run_id": "live-probe-4f081d7b-resume-1",
+      "attempt_id": "6b1f3a52-9c47-4d0e-8a21-5e7d93c0b4f8:89d7f538-0354-4429-86fa-d1a08db84f32"
+    },
+    {
+      "task_id": "R4",
+      "run_id": "live-probe-4f081d7b-resume-1",
+      "attempt_id": "6b1f3a52-9c47-4d0e-8a21-5e7d93c0b4f8:3d174a0b-8abc-49de-9bd2-03cec6c892e6"
+    }
+  ]
+}
