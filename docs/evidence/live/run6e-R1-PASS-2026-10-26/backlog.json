@@ -1,0 +1,65 @@
+{
+  "version": 2,
+  "items": [
+    {
+      "id": "R1",
+      "requirement_refs": [
+        "R1"
+      ],
+      "status": "PASS",
+      "dependencies": [],
+      "check_refs": [
+        "R1-test",
+        "R1-api"
+      ],
+      "execution": {
+        "run_id": "live-probe-4f081d7b-34f2-4e53-a36a-d8e2a0342f91",
+        "attempt_id": "f8da433b-7877-4a64-bb0f-64e77ad693af",
+        "started_at": "2026-10-26T12:40:23.419Z"
+      }
+    },
+    {
+      "id": "R2",
+      "requirement_refs": [
+        "R2"
+      ],
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "check_refs": [
+        "R2-test",
+        "R2-api"
+      ],
+      "execution": {
+        "run_id": "live-probe-4f081d7b-34f2-4e53-a36a-d8e2a0342f91",
+        "attempt_id": "0fa54ed6-90d6-414f-9187-e81e2a35c2db",
+        "started_at": "2026-10-26T13:23:56.226Z"
+      }
+    },
+    {
+      "id": "R3",
+      "requirement_refs": [
+        "R3"
+      ],
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "check_refs": [
+        "R3-test",
+        "R3-api"
+      ],
+      "execution": null
+    },
+    {
+      "id": "R4",
+      "requirement_refs": [
+        "R4"
+      ],
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "check_refs": [
+        "R4-test",
+        "R4-api"
+      ],
+      "execution": null
+    }
+  ]
+}

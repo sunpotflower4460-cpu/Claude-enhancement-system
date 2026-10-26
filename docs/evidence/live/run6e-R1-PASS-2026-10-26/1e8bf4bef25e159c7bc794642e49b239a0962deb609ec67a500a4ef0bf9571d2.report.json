@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "run_id": "live-probe-4f081d7b-34f2-4e53-a36a-d8e2a0342f91",
+  "task_id": "R1",
+  "attempt_id": "f8da433b-7877-4a64-bb0f-64e77ad693af",
+  "session_id": "a478feb9-f888-4ed2-a60b-723d84524c25",
+  "kind": "test",
+  "check_id": "R1-test",
+  "nonce": "6f54f0aa-7c06-4644-956d-6337d3ed5e7b",
+  "tool": {
+    "name": "node:assert + HTTP fetch",
+    "version": "v22.22.0"
+  },
+  "assertions": [
+    {
+      "name": "addition preserves arithmetic",
+      "status": "PASS",
+      "expected": "assertions satisfied",
+      "actual": "assertions satisfied"
+    }
+  ],
+  "artifacts": [],
+  "details": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0
+  }
+}

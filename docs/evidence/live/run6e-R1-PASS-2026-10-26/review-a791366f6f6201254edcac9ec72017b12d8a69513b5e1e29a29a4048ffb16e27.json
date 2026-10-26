@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "kind": "review",
+  "scope": "task",
+  "status": "PASS",
+  "run_id": "live-probe-4f081d7b-34f2-4e53-a36a-d8e2a0342f91",
+  "task_id": "R1",
+  "attempt_id": "f8da433b-7877-4a64-bb0f-64e77ad693af",
+  "session_id": "a478feb9-f888-4ed2-a60b-723d84524c25",
+  "task_ids": [
+    "R1"
+  ],
+  "product": "0abf58d135f152a8086453413e2be1c4ed200c15280b575121056e4a02873d6d",
+  "contract": "8200d45492c9b2cbf506c7b69c3d6bfa5a720f59960e6d668c43c61c8f654431",
+  "identity": "94d26981f5a8df7a241435056fa87c64939d752bf0035312ff961f4efe8ccbf3",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "R1 runtime evidence (R1-test, R1-api reports and HTTP artifact) was not observed by this reviewer. Source-only review, so the real check run is still required from the verifier. Reproduction: run the contract commands for R1-test and R1-api.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "R2 divide, R3 greet and R4 clamp in autodev-probe/app.mjs are stubs that return 0, empty string and 0. They would fail their checks. They belong to later tasks and are not an R1 defect.",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "I did not inspect the implement operation receipt (operation_id ...|R1|f8da433b-...|implement|1). The resume state reports changed=true with recovery_kind RETAINED_IMPLEMENTATION. The coordinator should confirm the diff was observed before replay.",
+      "resolved": false
+    }
+  ],
+  "requirement_refs": [
+    "R1"
+  ],
+  "runtime_ref": "runtime-6b8c0147337cc1f58b2757acd41a4496b26a0aa079eded62ce2d34e092c467a1.json",
+  "executions": [
+    {
+      "task_id": "R1",
+      "run_id": "live-probe-4f081d7b-34f2-4e53-a36a-d8e2a0342f91",
+      "attempt_id": "f8da433b-7877-4a64-bb0f-64e77ad693af"
+    }
+  ]
+}

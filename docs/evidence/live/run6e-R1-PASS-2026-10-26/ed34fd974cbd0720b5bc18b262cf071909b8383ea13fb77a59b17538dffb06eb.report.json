@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "run_id": "live-probe-4f081d7b-34f2-4e53-a36a-d8e2a0342f91",
+  "task_id": "R1",
+  "attempt_id": "f8da433b-7877-4a64-bb0f-64e77ad693af",
+  "session_id": "a478feb9-f888-4ed2-a60b-723d84524c25",
+  "kind": "api",
+  "check_id": "R1-api",
+  "nonce": "877e824b-15d1-4a43-81d9-18a7e6ff8670",
+  "tool": {
+    "name": "node:assert + HTTP fetch",
+    "version": "v22.22.0"
+  },
+  "assertions": [
+    {
+      "name": "addition preserves arithmetic",
+      "status": "PASS",
+      "expected": "assertions satisfied",
+      "actual": "assertions satisfied"
+    },
+    {
+      "name": "HTTP JSON response",
+      "status": "PASS",
+      "expected": "assertions satisfied",
+      "actual": "assertions satisfied"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "R1-api-877e824b-15d1-4a43-81d9-18a7e6ff8670.response.json",
+      "sha256": "af563612a65130a03b551018c7b1be0e2527a132384345ae1fe4f12ec91a4557",
+      "media_type": "application/json"
+    }
+  ],
+  "details": {
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://127.0.0.1:33441",
+        "status": 200,
+        "expected_status": 200,
+        "response_sha256": "af563612a65130a03b551018c7b1be0e2527a132384345ae1fe4f12ec91a4557",
+        "response_artifact": "R1-api-877e824b-15d1-4a43-81d9-18a7e6ff8670.response.json"
+      }
+    ]
+  }
+}
