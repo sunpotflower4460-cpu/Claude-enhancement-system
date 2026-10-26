@@ -234,3 +234,22 @@ test("E live: coordinator prompt defines finding severity so pending later-stage
   assert.match(prompt, /later stage has not done yet/);
   assert.match(prompt, /is minor, never major/);
 });
+
+test("E live: next.mjs-shaped nested snapshot.resume routes to REVIEW without a builder call (live run 6e)", async () => {
+  const roles = [];
+  const snap = (resume) => ({
+    observation_id: "o",
+    architecture_ready: true,
+    tasks: [{ id: "R1", status: "UNVERIFIED", dependencies: [], execution: { run_id: "run", attempt_id: "e1" } }],
+    ...(resume ? { resume } : {}),
+  });
+  const nested = { action: "RESUME", resume: { stage: "REVIEW", task_id: "R1", operation_id: "x", observe_required: true, changed: true } };
+  const calls = [];
+  await runController({ ...input, max_sprints: 1 }, async (prompt, opts) => {
+    const req = JSON.parse(prompt.split("AUTODEV_REQUEST ")[1]);
+    calls.push(req.action + ":" + req.role);
+    return ok({ snapshot: snap(nested) });
+  }).catch(() => {});
+  assert.ok(calls.includes("review:sonnet-reviewer"), JSON.stringify(calls));
+  assert.ok(!calls.includes("implement:haiku-builder"), JSON.stringify(calls));
+});
