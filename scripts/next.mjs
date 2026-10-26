@@ -9,6 +9,43 @@ import {
   main,
 } from "./lib/core.mjs";
 import { readonlyResume } from "./lib/interruption.mjs";
+function receipts(c) {
+  const dir = path.join(c.dir, "operations");
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir)
+    .filter((n) => n.endsWith(".json"))
+    .map((n) => {
+      try {
+        return read(path.join(dir, n));
+      } catch {
+        return null;
+      }
+    })
+    .filter((r) => r && r.state === "completed");
+}
+// Operation ids are encodeURIComponent parts joined by "|":
+// root run | task | execution attempt | action | phase.
+function implementedNotReviewed(c, task) {
+  const part = (action) =>
+      "|" +
+      encodeURIComponent(task.id) +
+      "|" +
+      encodeURIComponent(task.execution.attempt_id) +
+      "|" +
+      action +
+      "|",
+    all = receipts(c).filter((r) => r.task_id === task.id);
+  const impl = all.filter(
+      (r) => r.stage === "IMPLEMENT" && r.operation_id?.includes(part("implement")),
+    ),
+    reviewed = all.some(
+      (r) => r.stage === "REVIEW" && r.operation_id?.includes(part("review")),
+    );
+  return !reviewed && impl.length
+    ? impl.sort((a, b) => (a.updated_at || "").localeCompare(b.updated_at || "")).at(-1)
+    : null;
+}
 export function nextAction(o) {
   const c = observationContext(o.target),
     s = validate("current-task", read(path.join(c.dir, "current-task.json"))),
@@ -99,6 +136,34 @@ export function nextAction(o) {
           changed,
         },
       };
+  }
+  // Live run 6: every new root attempt (state begin) clears current-task.sprint_task_id, so a
+  // task already implemented in an earlier burst was offered as a fresh SPRINT and its review
+  // never happened. A selected execution with a completed IMPLEMENT receipt and no completed
+  // REVIEW receipt for that execution resumes at REVIEW instead of re-implementing.
+  const retained = pending.find(
+    (t) =>
+      t.execution &&
+      t.dependencies.every(
+        (id) => c.backlog.items.find((x) => x.id === id).status === "PASS",
+      ) &&
+      implementedNotReviewed(c, t),
+  );
+  if (retained) {
+    const rec = implementedNotReviewed(c, retained);
+    return {
+      action: "RESUME",
+      resume: {
+        stage: "REVIEW",
+        task_id: retained.id,
+        operation_id: rec.operation_id,
+        recovery_kind: "RETAINED_IMPLEMENTATION",
+        observe_required: true,
+        changed: rec.after?.fingerprint
+          ? rec.after.fingerprint !== fingerprint(o.target)
+          : true,
+      },
+    };
   }
   if (ready) return { action: "SPRINT", task_id: ready.id, blocked };
   if (pending.length || blocked.length)

@@ -182,6 +182,11 @@ export function probePermissions(root) {
         "Bash(node " + sh + "/examples/*)",
         "Bash(node scripts/*)",
         "Bash(node ./scripts/*)",
+        // Builders must run the checks they write (live run 6: node -e was refused, so Haiku
+        // returned UNVERIFIED/permission and R1 was deferred). Same reach as the allowed cat*.
+        "Bash(node -e*)",
+        "Bash(node --input-type=module*)",
+        "Bash(node /tmp/claude-0/*/scratchpad/*)",
         "Bash(node --test*)",
         "Bash(node --check*)",
         "Bash(git status*)",

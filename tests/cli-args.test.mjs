@@ -36,3 +36,32 @@ test("N3 architecture_ready is computed from contract, non-placeholder architect
   fs.rmSync(path.join(f.dir, "architecture.md"));
   assert.equal(architectureReady(c()), false);
 });
+
+import { hash, json as writeJson } from "./helpers/fixture.mjs";
+test("N4 a task implemented in an earlier burst resumes at REVIEW, not as a fresh SPRINT (live run 6)", (t) => {
+  const f = fixture(t);
+  state({ target: f.target, action: "begin", run: "root-2", task: "mission", attempt: "att-2" });
+  const b = JSON.parse(fs.readFileSync(path.join(f.dir, "backlog.json"), "utf8"));
+  b.items[0].status = "UNVERIFIED";
+  b.items[0].execution = { run_id: "root-1", attempt_id: "exec-1", started_at: new Date().toISOString() };
+  writeJson(path.join(f.dir, "backlog.json"), b);
+  const id = b.items[0].id,
+    opId = ["root-1", id, "exec-1", "implement", "1"].map(encodeURIComponent).join("|");
+  const receipt = (stage, operation_id) => {
+    fs.mkdirSync(path.join(f.dir, "operations"), { recursive: true });
+    writeJson(path.join(f.dir, "operations", hash(operation_id) + ".json"), {
+      version: 2, operation_id, run_id: "root-1", task_id: id, attempt_id: "att-1", session_id: "s",
+      stage, state: "completed", before: {}, after: {}, result: {}, updated_at: new Date().toISOString(),
+    });
+  };
+  assert.equal(nextAction({ target: f.target, run: "root-2" }).action, "SPRINT");
+  receipt("IMPLEMENT", opId);
+  const r = nextAction({ target: f.target, run: "root-2" });
+  assert.equal(r.action, "RESUME");
+  assert.equal(r.resume.stage, "REVIEW");
+  assert.equal(r.resume.task_id, id);
+  assert.equal(r.resume.recovery_kind, "RETAINED_IMPLEMENTATION");
+  // A completed review of that same execution ends the resume.
+  receipt("REVIEW", ["root-1", id, "exec-1", "review", "1"].map(encodeURIComponent).join("|"));
+  assert.equal(nextAction({ target: f.target, run: "root-2" }).action, "SPRINT");
+});
