@@ -157,7 +157,7 @@ test("E live inspect: free-form planner snapshot is corrected once, constrained 
     "tasks",
     "architecture_ready",
   ]);
-  assert.match(seen[0].prompt, /tasks \(ARRAY copied from context\.mjs/);
+  assert.match(seen[0].prompt, /tasks \(ARRAY copied verbatim from context\.mjs tasks/);
   assert.match(seen[1].prompt, /Previous snapshot lacked/);
   await assert.rejects(
     () => runController(input, async () => freeForm),
@@ -201,4 +201,26 @@ test("E live: every coordinator action (not only inspect) receives exact command
   assert.ok(cp?.commands?.context, "checkpoint-architecture carries commands");
   assert.match(prompts[0], /PASS means the action completed/);
   assert.match(prompts[0], /no cd, no && or ;/);
+});
+
+test("E live inspect: condensed tasks without dependencies are corrected once, then fail closed (live run 6d crash)", async () => {
+  const condensed = ok({
+      snapshot: {
+        observation_id: "obs-1",
+        architecture_ready: true,
+        tasks: [{ id: "R1", status: "UNVERIFIED" }],
+      },
+    }),
+    full = ok({
+      snapshot: {
+        observation_id: "obs-1",
+        architecture_ready: true,
+        tasks: [{ id: "R1", status: "BLOCKED", dependencies: [] }],
+      },
+    });
+  let n = 0;
+  const r = await runController(input, async () => (++n === 1 ? condensed : full));
+  assert.equal(r.status, "BLOCKED");
+  assert.equal(n, 2);
+  await assert.rejects(() => runController(input, async () => condensed), /Missing persisted snapshot/);
 });

@@ -70,22 +70,33 @@ const inspectSchema = {
         completed_since_audit: { type: "integer" },
         tasks: {
           type: "array",
+          // Live run 6d: a condensed task list without `dependencies` crashed eligible().
           items: {
             type: "object",
-            required: ["id"],
-            properties: { id: { type: "string" } },
+            required: ["id", "status", "dependencies"],
+            properties: {
+              id: { type: "string" },
+              status: { type: "string" },
+              dependencies: { type: "array", items: { type: "string" } },
+            },
           },
         },
       },
     },
   },
 };
+// Fatal gate: exactly what the controller dereferences (live run 6d crashed on a task
+// without `dependencies`). Retry trigger: the full documented snapshot shape.
+const usableInspect = (r) =>
+  Array.isArray(r?.snapshot?.tasks) &&
+  r.snapshot.tasks.every(
+    (t) => typeof t?.id === "string" && Array.isArray(t.dependencies),
+  );
 const validInspect = (r) =>
-  r?.snapshot &&
+  usableInspect(r) &&
   typeof r.snapshot.observation_id === "string" &&
-  typeof r.snapshot.architecture_ready === "boolean" &&
-  Array.isArray(r.snapshot.tasks);
-const base = `Read the ${input.shared}/agents role definition and target's preserved mission. Never modify the common repository. Each writer MUST use scripts/operation.mjs start/complete with stable operation_id, and inspect partial diffs before replay. Return non-PASS when real CLI results or runtime evidence are absent. All task/check/assessment state is schema v2. Read-only roles return their actual status, every finding, current snapshot context and requirement coverage; never delegate or edit. The coordinator persists these verbatim via assessment.mjs; do not stamp an old review with a newer fingerprint. Parent alone confirms runtime drained and invokes final verify after Workflow completion. For action inspect the result.snapshot MUST be built from the real CLI output as an object with exactly these fields: observation_id (string, from context.mjs), architecture_ready (boolean, copy context.mjs architecture_ready verbatim; never infer it), completed_since_audit (integer, copy context.mjs completed_since_audit), tasks (ARRAY copied from context.mjs tasks, each with id and execution), resume (from next.mjs) and failure_state (from failure.mjs summary); never summarize it as prose or rename these fields. Run exactly the command lines in AUTODEV_REQUEST.commands, one simple command per Bash call (no cd, no && or ; chains, no variable assignments), and never drop a flag (next.mjs needs --run, failure.mjs needs --action summary). Status semantics for a coordinator action: PASS means the action completed and its CLI output was obtained, even when tasks are still UNVERIFIED; return UNVERIFIED/BLOCKED only if a CLI command failed or evidence is genuinely missing. `;
+  typeof r.snapshot.architecture_ready === "boolean";
+const base = `Read the ${input.shared}/agents role definition and target's preserved mission. Never modify the common repository. Each writer MUST use scripts/operation.mjs start/complete with stable operation_id, and inspect partial diffs before replay. Return non-PASS when real CLI results or runtime evidence are absent. All task/check/assessment state is schema v2. Read-only roles return their actual status, every finding, current snapshot context and requirement coverage; never delegate or edit. The coordinator persists these verbatim via assessment.mjs; do not stamp an old review with a newer fingerprint. Parent alone confirms runtime drained and invokes final verify after Workflow completion. For action inspect the result.snapshot MUST be built from the real CLI output as an object with exactly these fields: observation_id (string, from context.mjs), architecture_ready (boolean, copy context.mjs architecture_ready verbatim; never infer it), completed_since_audit (integer, copy context.mjs completed_since_audit), tasks (ARRAY copied verbatim from context.mjs tasks: every element keeps id, status, dependencies and execution; never condense it), resume (from next.mjs) and failure_state (from failure.mjs summary); never summarize it as prose or rename these fields. Run exactly the command lines in AUTODEV_REQUEST.commands, one simple command per Bash call (no cd, no && or ; chains, no variable assignments), and never drop a flag (next.mjs needs --run, failure.mjs needs --action summary). Status semantics for a coordinator action: PASS means the action completed and its CLI output was obtained, even when tasks are still UNVERIFIED; return UNVERIFIED/BLOCKED only if a CLI command failed or evidence is genuinely missing. `;
 const taskContexts = {};
 let planEpoch = 0,
   inspectionSequence = 0,
@@ -244,12 +255,12 @@ async function coordinate(action, task = "mission", payload = {}) {
   return call("sonnet-planner", action, task, {
     ...payload,
     snapshot_error:
-      "Previous snapshot lacked observation_id/architecture_ready/tasks[]; return the context.mjs tasks array and the documented fields.",
+      "Previous snapshot lacked observation_id/architecture_ready or complete tasks[] (each task needs id, status, dependencies); copy the context.mjs tasks array verbatim.",
   });
 }
 let observed = await coordinate("inspect");
 if (!passed(observed)) return observed;
-if (!observed.snapshot || !Array.isArray(observed.snapshot.tasks))
+if (!usableInspect(observed))
   throw new Error("Missing persisted snapshot");
 if (!observed.snapshot.architecture_ready) {
   const planned = await call("opus-architect", "architecture");
