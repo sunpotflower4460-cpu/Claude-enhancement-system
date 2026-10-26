@@ -83,3 +83,15 @@ node COMMON/scripts/probe-result.mjs --target ISOLATED --invocation CURRENT_INVO
 PASS/FAILは実ファイルとhashを必要とする。これは親の観察を保存するinterfaceで、任意ログの意味内容を自動承認する機能ではない。モデルは専用parser、完成はverifyが独立再計算する。raw/stderr/manifest、probe-results、最終verify JSON、必要な画像/拒否ログ、LOCAL checkpoint branch/commitを一組として回収し、remote publicationはUNVERIFIEDとして、未実行項目は未検証理由と次の採取手順を残す。
 
 ローカル試験が証明するのは隔離準備・故障復旧・状態/証拠処理、模擬モデル継続、実Git/HTTP/Chromium等の範囲。実5.5モデル、cloud2repo、native read-only拒否、本物の/goalとWorkflow停止再開は、この実機試験で初めて確認する。
+
+## 実機で判明した運用上の要点（2026-10-26）
+
+詳細とBefore/Afterは[10-live-acceptance.md](10-live-acceptance.md)。
+
+- **ヘッドレス権限**：`claude -p`には承認者がいない。clone内`.claude/settings.json`のallowは未信頼workspaceで無視されるため、prepareが`.autodev/probe-permissions.json`を作り、runが`--settings`で渡す。`git push`と共通repoへの書込はdenyのまま。ユーザーの信頼設定（`~/.claude.json`）は変更しない。
+- **記録形式**：native Workflowのagentは`system/task_progress.workflow_progress[workflow_agent]`（agentType/model/state/タグ）で報告され、転送された`assistant`メッセージは無い。launch結果の`runId`(wf_…)とSDKイベントの`run_id`は別。agentのtool一覧はruntimeが書く`agent-ID.prefix.json`にある。
+- **CLIを殺した場合**：終了通知もdrainedも残らない。`claude --resume SESSION --settings … --max-turns 1`の再開ログに`status:"stopped"`の通知が出るので、`import-termination.mjs --raw ORIGINAL --resume_raw RESUMED`→`burst finish`→`state recover`→`live-probe --resume`。
+- **実行中に共通repoを更新しない**：契約ダイジェストが変わり、既存のreview/audit/check証拠が失効する。修正は別作業領域に積み、probeを新しく通す。
+- **取込の競合**：agentの`done`進捗の書込前に取り込むと`Subagent evidence absent`。`import-runtime --wait N`を使う。
+- **証拠のサイズ**：保存するSDK captureから`stream_event`を除く（除かないと取込1回で約20MB）。
+- 子の`/goal`が目標未達の報告を繰り返す場合は、生きた実行を止めて原因を直す（子は証拠を偽造せず待機する）。
