@@ -271,3 +271,17 @@ test("E live: reviewer schema requires its snapshot hashes; persist actions get 
   assert.match(persist.req.commands.assess, /assess\.mjs --target \/target --kind review --scope task --task R1 --burst burst-9 --result /);
   assert.match(persist.req.commands.result_file, /^\/target\/\.autodev\/evidence\/assess-result-run-\d+\.json$/);
 });
+
+test("E live: all checks are refreshed at the current product BEFORE final review and audit (live run 6e)", async () => {
+  const order = [];
+  const snap = { observation_id: "o", architecture_ready: true, tasks: [{ id: "R1", status: "PASS", dependencies: [], execution: { run_id: "run", attempt_id: "e1" } }] };
+  await runController({ ...input, max_sprints: 1 }, async (prompt) => {
+    const req = JSON.parse(prompt.split("AUTODEV_REQUEST ")[1]);
+    order.push(req.action + (req.payload?.refresh_all ? "(refresh)" : ""));
+    return ok({ snapshot: snap });
+  }).catch(() => {});
+  const refresh = order.indexOf("final-verification(refresh)"),
+    review = order.indexOf("final-review"),
+    audit = order.indexOf("final-audit");
+  assert.ok(refresh >= 0 && review > refresh && audit > review, JSON.stringify(order));
+});

@@ -421,6 +421,27 @@ for (let sprint = 0; sprint < maxSprints; sprint++) {
         findings: [],
         snapshot: observed.snapshot,
       };
+    // Live run 6e: R4's edit changed the product fingerprint, so R1-R3's check evidence was stale
+    // when the Opus final audit read it (NEEDS_FIX, three tasks re-opened). Refresh every check at
+    // the current product first so the final review and audit judge fresh evidence.
+    const refreshed = await call(
+      "sonnet-verifier",
+      "final-verification",
+      "mission",
+      { refresh_all: true, attempt: "pre-review" },
+    );
+    if (!passed(refreshed)) {
+      if (refreshed.status === "NEEDS_FIX") {
+        const repaired = await coordinate(
+          "replan-final-verification",
+          "mission",
+          { verification: refreshed },
+        );
+        if (!passed(repaired)) return repaired;
+        continue;
+      }
+      return refreshed;
+    }
     const review = await call("sonnet-reviewer", "final-review", "mission", {
       snapshot: observed.snapshot,
     });
