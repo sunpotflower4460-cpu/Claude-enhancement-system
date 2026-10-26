@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { read, hash, validate, artifactPath, alive } from "./core.mjs";
+import { streamRunId } from "./runtime.mjs";
 export function terminationProof(
   dir,
   filename,
@@ -63,7 +64,12 @@ export function terminationProof(
       e.type === "user" &&
       e.session_id === proof.sdk_session_id &&
       e.tool_use_result?.taskId === proof.sdk_task_id &&
-      e.tool_use_result?.runId === proof.sdk_run_id &&
+      streamRunId(es, {
+        session_id: proof.sdk_session_id,
+        tool_use_id: proof.sdk_tool_use_id,
+        task_id: proof.sdk_task_id,
+        launch_run_id: e.tool_use_result?.runId,
+      }) === proof.sdk_run_id &&
       e.message?.content?.some(
         (b) =>
           b.type === "tool_result" && b.tool_use_id === proof.sdk_tool_use_id,

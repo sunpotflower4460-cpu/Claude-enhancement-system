@@ -1,6 +1,46 @@
 import fs from "node:fs";
 import path from "node:path";
 import { artifactPath, read, hash, validate, invocationTag } from "./core.mjs";
+// Live Claude Code reports two run ids for one Workflow launch: the launch result's
+// `runId` (wf_..., the resumable workflow run) and the SDK stream's `run_id` on
+// task_started/task_progress/task_notification. They are unrelated strings, so the
+// stream id must be read from the task_started that carries the same tool_use_id.
+// Absent a task_started (older logs), fall back to the launch result.
+export function streamRunId(events, { session_id, tool_use_id, task_id, launch_run_id }) {
+  const starts = events.filter(
+    (e) =>
+      e.type === "system" &&
+      e.subtype === "task_started" &&
+      e.session_id === session_id &&
+      e.tool_use_id === tool_use_id &&
+      e.task_id === task_id,
+  );
+  if (starts.length > 1) throw Error("Ambiguous SDK task_started for Workflow launch");
+  return starts.length ? starts[0].run_id : launch_run_id;
+}
+// Native Workflow agents are reported by the runtime itself in
+// system/task_progress.workflow_progress[type=workflow_agent] (agentType, model,
+// state, label) rather than as forwarded assistant messages. Normalize them.
+export function workflowAgents(events, window) {
+  const latest = new Map();
+  for (const e of window)
+    if (e.type === "system" && e.subtype === "task_progress")
+      for (const w of e.workflow_progress || [])
+        if (w?.type === "workflow_agent" && w.agentId)
+          latest.set(w.agentId, { w, event: e });
+  return [...latest.values()].map(({ w, event }) => ({
+    uuid: "wfagent:" + event.task_id + ":" + w.agentId,
+    label: w.label,
+    agent_id: w.agentId,
+    agent_type: w.agentType,
+    state: w.state,
+    error: w.state === "error" || w.state === "failed" || !!w.error,
+    timestamp: Number.isFinite(w.startedAt)
+      ? new Date(w.startedAt).toISOString()
+      : undefined,
+    message: { model: w.model },
+  }));
+}
 export function invocationWindow(
   events,
   { sdk_task_id, sdk_run_id, tool_use_id, sdk_session_id },
@@ -33,8 +73,10 @@ export function invocationWindow(
       break;
     }
   }
+  const span = events.slice(start.i + 1, end);
   return {
     start: start.e,
+    agents: workflowAgents(events, span),
     messages: events
       .slice(start.i + 1, end)
       .filter(
@@ -148,9 +190,10 @@ export function runtimeObservation(
       : fs.realpathSync(init.cwd) !== runtimeBinding.root)
   )
     throw Error("SDK session cwd does not match target binding");
-  const { start, messages } = invocationWindow(events, r),
-    message = messages.find((e) => e.uuid === r.message_uuid),
-    tag = invocationTag(c, r, r.stage);
+  const { start, messages, agents } = invocationWindow(events, r),
+    tag = invocationTag(c, r, r.stage),
+    agent = agents.find((a) => a.uuid === r.message_uuid),
+    message = agent || messages.find((e) => e.uuid === r.message_uuid);
   const invocation = events
     .filter((e) => e.type === "assistant" && e.session_id === r.sdk_session_id)
     .flatMap((e) => e.message?.content || [])
@@ -166,14 +209,25 @@ export function runtimeObservation(
     !(
       typeof start.description === "string" && start.description.includes(tag)
     ) &&
-    !invocation
+    !invocation &&
+    !(agent && agent.label === tag)
   )
     throw Error(
       "No raw invocation correlation tag for current mission/run/task/attempt/stage",
     );
   if (!message || message.error || message.aborted || !message.message?.model)
     throw Error("Missing SDK assistant model observation in invocation window");
-  if (
+  if (agent) {
+    // Every runtime-reported agent carrying this exact stage tag must be done
+    // and on the expected model; agents of other stages in the window are not ours.
+    const same = agents.filter((a) => a.label === tag);
+    if (
+      agent.state !== "done" ||
+      !/^(autodev-|claude-autodev:)[a-z-]+$/.test(agent.agent_type || "") ||
+      same.some((a) => a.error || a.state !== "done" || a.message.model !== r.expected_model)
+    )
+      throw Error("Model substituted or runtime error");
+  } else if (
     messages.some(
       (e) => e.error || e.aborted || e.message?.model !== r.expected_model,
     )

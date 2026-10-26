@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { load, read, json, hash, artifactPath, main } from "./lib/core.mjs";
 import { terminationProof } from "./lib/recovery.mjs";
+import { streamRunId } from "./lib/runtime.mjs";
 export function importTermination(o) {
   return mutex(o.target, () => importTerminationUnlocked(o));
 }
@@ -27,7 +28,15 @@ function importTerminationUnlocked(o) {
   if (launches.length !== 1)
     throw Error("Missing/ambiguous actual Workflow launch result");
   const launch = launches[0],
-    r = launch.tool_use_result,
+    r = {
+      ...launch.tool_use_result,
+      runId: streamRunId(es, {
+        session_id: launch.session_id,
+        tool_use_id: o.tool_use,
+        task_id: launch.tool_use_result.taskId,
+        launch_run_id: launch.tool_use_result.runId,
+      }),
+    },
     terminal = es
       .filter(
         (e) =>

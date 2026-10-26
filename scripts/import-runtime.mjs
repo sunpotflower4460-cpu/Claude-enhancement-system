@@ -15,7 +15,9 @@ import {
   runtimeObservation,
   invocationWindow,
   routingProvenance,
+  streamRunId,
 } from "./lib/runtime.mjs";
+import { invocationTag } from "./lib/core.mjs";
 export function importRuntime(o) {
   return mutex(o.target, () => importRuntimeUnlocked(o));
 }
@@ -47,17 +49,22 @@ function importRuntimeUnlocked(o) {
   if (starts.length !== 1)
     throw Error("Specify a uniquely observed SDK tool_use_id");
   const start = starts[0],
-    msg = invocationWindow(events, {
+    window = invocationWindow(events, {
       sdk_task_id: start.task_id,
       sdk_run_id: start.run_id,
       tool_use_id: o.tool_use,
       sdk_session_id: start.session_id,
-    })
-      .messages.filter((e) => e.message?.model)
-      .at(-1);
+    }),
+    // Forwarded subagent messages (Agent tool) or, for native Workflows, the
+    // runtime's own workflow_agent progress record carrying this stage's tag.
+    msg =
+      window.messages.filter((e) => e.message?.model).at(-1) ||
+      window.agents
+        .filter((a) => a.label === invocationTag(c, ctx, o.stage) && a.message.model)
+        .at(-1);
   if (!msg)
     throw Error(
-      "Subagent messages absent; use --forward-subagent-text / forwardSubagentText",
+      "Subagent evidence absent: no forwarded subagent messages and no workflow_agent progress carrying this stage tag (use --forward-subagent-text)",
     );
   const digest = hash(raw),
     record = "sdk-" + digest + ".jsonl",
@@ -78,6 +85,13 @@ function importRuntimeUnlocked(o) {
     sdk_session_id: start.session_id,
     tool_use_id: o.tool_use,
     message_uuid: msg.uuid,
+    ...(msg.agent_type
+      ? {
+          evidence_kind: "workflow-agent-progress",
+          agent_type: msg.agent_type,
+          agent_id: msg.agent_id,
+        }
+      : {}),
     sdk_task_id: start.task_id,
     sdk_run_id: start.run_id,
     observed_at: new Date().toISOString(),

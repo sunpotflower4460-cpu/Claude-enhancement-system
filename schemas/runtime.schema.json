@@ -96,6 +96,9 @@
       "type": "string",
       "minLength": 1
     },
+    "evidence_kind": { "const": "workflow-agent-progress" },
+    "agent_type": { "type": "string", "minLength": 1 },
+    "agent_id": { "type": "string", "minLength": 1 },
     "provenance": {
       "type": "object",
       "additionalProperties": false,

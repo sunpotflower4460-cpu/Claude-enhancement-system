@@ -15,6 +15,7 @@ import {
   isMain,
 } from "./lib/core.mjs";
 import { terminationProof } from "./lib/recovery.mjs";
+import { streamRunId } from "./lib/runtime.mjs";
 const recovery =
   "Do not launch another Workflow. Inspect the actual SDK task list and original launch transcript. If it launched, collect correlated termination plus a drained snapshot, then burst finish. A CLAIMED entry without a known launch remains unknown; absence of a result or local process death does not prove no launch. If no native invocation can be established, preserve the journal and obtain explicit administrative reconciliation before clearing it.";
 function parse(raw) {
@@ -121,7 +122,12 @@ function nativeLaunch(c, e, raw, tool, source) {
     sdk_session_id: event.session_id,
     sdk_tool_use_id: tool,
     sdk_task_id: result.taskId,
-    sdk_run_id: result.runId,
+    sdk_run_id: streamRunId(events, {
+      session_id: event.session_id,
+      tool_use_id: tool,
+      task_id: result.taskId,
+      launch_run_id: result.runId,
+    }),
   };
 }
 function reused(j, e, launch) {
