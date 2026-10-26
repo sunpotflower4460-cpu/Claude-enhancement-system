@@ -11,7 +11,15 @@ export function importTermination(o) {
 function importTerminationUnlocked(o) {
   const c = load(o.target),
     s = read(path.join(c.dir, "current-task.json")),
-    raw = fs.readFileSync(o.raw),
+    // A killed CLI leaves no terminal event; the resumed session reports it. The proof
+    // record is the verbatim concatenation: original capture, newline, resumed capture.
+    raw = o.resume_raw
+      ? Buffer.concat([
+          fs.readFileSync(o.raw),
+          Buffer.from("\n"),
+          fs.readFileSync(o.resume_raw),
+        ])
+      : fs.readFileSync(o.raw),
     es = raw
       .toString()
       .split("\n")
@@ -44,7 +52,8 @@ function importTerminationUnlocked(o) {
           e.subtype === "task_notification" &&
           e.session_id === launch.session_id &&
           e.task_id === r.taskId &&
-          e.run_id === r.runId,
+          (e.run_id === r.runId ||
+            (o.resume_raw && !e.run_id && e.tool_use_id === o.tool_use)),
       )
       .at(-1);
   if (!terminal) throw Error("Workflow terminal notification missing");

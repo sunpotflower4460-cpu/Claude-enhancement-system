@@ -212,3 +212,52 @@ test("L4 read-only roles are proven from runtime-recorded tool lists, not self-r
     "FAIL",
   );
 });
+
+// Shape observed live: after SIGKILL of the CLI the original capture has the launch,
+// task_started and a snapshot listing the Workflow but no terminal event; the resumed
+// session emits `stopped` notices (no run_id) just before its re-init and no snapshot.
+function interrupted(f, { resumeEvents } = {}) {
+  const base = read(path.join(f.dir, "termination.json")),
+    es = fs
+      .readFileSync(artifactPath(f.dir, base.record), "utf8")
+      .split("\n")
+      .filter(Boolean)
+      .map(JSON.parse)
+      .filter((e) => !["task_notification", "background_tasks_changed"].includes(e.subtype)),
+    sid = es[0].session_id;
+  es.push({ type: "system", subtype: "task_started", session_id: sid, task_id: "workflow", run_id: "0stream", tool_use_id: "workflow-tool" });
+  es.push({ type: "system", subtype: "background_tasks_changed", session_id: sid, tasks: [{ task_id: "workflow" }, { task_id: "watcher" }] });
+  const stopped = (task_id, tool) => ({ type: "system", subtype: "task_notification", session_id: sid, task_id, tool_use_id: tool, status: "stopped", summary: "didn't finish before the previous session ended" });
+  const resumed = resumeEvents?.(sid, stopped) ?? [
+    stopped("watcher", "w-tool"),
+    stopped("workflow", "workflow-tool"),
+    { type: "system", subtype: "init", session_id: sid, cwd: es[0].cwd },
+  ];
+  const w = (name, rows) => {
+    const p = path.join(f.dir, "evidence", name + hash(JSON.stringify(rows)).slice(0, 8) + ".jsonl");
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, rows.map((e) => JSON.stringify(e)).join("\n"));
+    return p;
+  };
+  return { raw: w("orig-", es), resume_raw: w("resumed-", resumed) };
+}
+const imp2 = (f, r) => importTermination({ target: f.target, ...r, tool_use: "workflow-tool", mode: "TEST_FIXTURE" });
+
+test("L5 killed CLI: resumed session's stopped notices account for the whole prior task list", (t) => {
+  const f = fixture(t);
+  allPass(f);
+  const r = imp2(f, interrupted(f));
+  assert.equal(r.status, "TERMINATION_OBSERVED");
+  assert.equal(read(r.file).state, "stopped");
+});
+
+test("L6 resumed termination fails closed: unaccounted task, task started after resume, no re-init, wrong tool_use", (t) => {
+  const f = fixture(t);
+  allPass(f);
+  assert.throws(() => imp2(f, interrupted(f, { resumeEvents: (sid, stopped) => [stopped("workflow", "workflow-tool"), { type: "system", subtype: "init", session_id: sid, cwd: "x" }] })), /did not account for task watcher/);
+  assert.throws(() => imp2(f, interrupted(f, { resumeEvents: (sid, stopped) => [stopped("watcher", "w"), stopped("workflow", "workflow-tool"), { type: "system", subtype: "init", session_id: sid, cwd: "x" }, { type: "system", subtype: "task_started", session_id: sid, task_id: "new", run_id: "n" }] })), /started tasks after the resume|after drained/);
+  assert.throws(() => imp2(f, interrupted(f, { resumeEvents: (sid, stopped) => [stopped("watcher", "w"), stopped("workflow", "workflow-tool")] })), /re-init/);
+  assert.throws(() => imp2(f, interrupted(f, { resumeEvents: (sid, stopped) => [stopped("watcher", "w"), stopped("workflow", "OTHER"), { type: "system", subtype: "init", session_id: sid, cwd: "x" }] })), /terminal notification/i);
+  // Without --resume_raw the original alone is still not terminal.
+  assert.throws(() => importTermination({ target: f.target, raw: interrupted(f).raw, tool_use: "workflow-tool", mode: "TEST_FIXTURE" }), /terminal notification/i);
+});

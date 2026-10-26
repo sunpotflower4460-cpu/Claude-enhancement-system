@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "source": "parent-runtime-observation",
+  "run_id": "live-probe-f21e2eee-3442-4142-9a44-407be66cce23",
+  "task_id": "mission",
+  "attempt_id": "4c76d79a-82f3-4b70-a540-7a90b301d208",
+  "state": "stopped",
+  "observed_at": "2026-10-26T11:52:23.316Z",
+  "record": "sdk-termination-dd3dd0696adb38beba4f475c61480f1e3ae8cae9fe0fe949b36a64cff40262b7.jsonl",
+  "sha256": "dd3dd0696adb38beba4f475c61480f1e3ae8cae9fe0fe949b36a64cff40262b7",
+  "sdk_session_id": "edc58073-4d34-5668-a88d-a39fcad8c675",
+  "sdk_task_id": "w8pc2g0sb",
+  "sdk_run_id": "0mvp6n354-f2782ae2",
+  "sdk_tool_use_id": "toolu_01Am7GpBUi237x87PkSf6wPs"
+}

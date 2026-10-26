@@ -83,7 +83,7 @@ export function terminationProof(
     )
   )
     throw Error("No successful Workflow launch correlated to terminal task");
-  const endedIndex = es.findIndex(
+  let endedIndex = es.findIndex(
     (e) =>
       e.type === "system" &&
       e.subtype === "task_notification" &&
@@ -92,16 +92,76 @@ export function terminationProof(
       e.run_id === proof.sdk_run_id &&
       e.status === proof.state,
   );
-  if (endedIndex < 0) throw Error("No matching SDK terminal notification");
   const snapshots = es
-      .map((e, i) => ({ e, i }))
-      .filter(
-        ({ e }) =>
+    .map((e, i) => ({ e, i }))
+    .filter(
+      ({ e }) =>
+        e.type === "system" &&
+        e.subtype === "background_tasks_changed" &&
+        e.session_id === proof.sdk_session_id,
+    );
+  let last = snapshots.at(-1);
+  if (endedIndex < 0) {
+    // Live Claude Code 2.1.310: when the CLI is killed mid-Workflow no terminal
+    // notification or empty snapshot is written. A resumed session instead reports
+    // every previously running task as `stopped` (no run_id, emitted just before its
+    // re-init) and emits no snapshot. Accept that only as complete accounting: a later
+    // re-init of this session, the last pre-stop snapshot listing the Workflow, and
+    // every task in it reported terminal after that snapshot. Else "not drained".
+    const stoppedAt = es.findIndex(
+      (e) =>
+        e.type === "system" &&
+        e.subtype === "task_notification" &&
+        e.session_id === proof.sdk_session_id &&
+        e.task_id === proof.sdk_task_id &&
+        e.tool_use_id === proof.sdk_tool_use_id &&
+        !e.run_id &&
+        e.status === proof.state,
+    );
+    if (stoppedAt < 0) throw Error("No matching SDK terminal notification");
+    const prior = snapshots.filter((x) => x.i < stoppedAt).at(-1),
+      reinit = es.findIndex(
+        (e, i) =>
+          i > (prior?.i ?? Infinity) &&
           e.type === "system" &&
-          e.subtype === "background_tasks_changed" &&
+          e.subtype === "init" &&
           e.session_id === proof.sdk_session_id,
-      ),
-    last = snapshots.at(-1);
+      );
+    if (
+      !prior ||
+      !Array.isArray(prior.e.tasks) ||
+      !prior.e.tasks.some((t) => t.task_id === proof.sdk_task_id) ||
+      reinit < 0
+    )
+      throw Error("Resumed termination lacks prior task list or session re-init");
+    let accounted = stoppedAt;
+    for (const t of prior.e.tasks) {
+      const n = es.findIndex(
+        (e, i) =>
+          i > prior.i &&
+          e.type === "system" &&
+          e.subtype === "task_notification" &&
+          e.session_id === proof.sdk_session_id &&
+          e.task_id === t.task_id &&
+          ["completed", "failed", "stopped"].includes(e.status),
+      );
+      if (n < 0)
+        throw Error("Resumed session did not account for task " + t.task_id);
+      accounted = Math.max(accounted, n);
+    }
+    if (
+      es.some(
+        (e, i) =>
+          i > prior.i &&
+          e.type === "system" &&
+          e.subtype === "task_started" &&
+          e.session_id === proof.sdk_session_id,
+      )
+    )
+      throw Error("Runtime started tasks after the resume");
+    endedIndex = stoppedAt;
+    last = { i: accounted, e: { tasks: [] } };
+  }
   if (
     !last ||
     last.i < endedIndex ||
