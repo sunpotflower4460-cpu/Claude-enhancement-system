@@ -28,7 +28,7 @@ probeの前に手順3のroot leaseを一度だけ取得し、probe自体もburst
 
 native Workflowの前に`burst.mjs --action claim --target TARGET --run RUN --task mission --attempt ROOT_ATTEMPT --observation_id CURRENT_HASH --script_path COMMON/workflows/develop-mission.js`。返された`burst_id`と現在のargsにagents/capabilitiesを加え、Workflowツールへ`scriptPath`と**args object**を渡す。NodeでWorkflowを実行して代用しない。
 
-`claude -p`のヘッドレスには承認者がいない。対象の`.claude/settings.json`のallowは未信頼workspaceで無視されるため、必要な範囲だけを`--settings FILE`で起動側から渡す（`git push`と共通repoへの書込はdeny）。SDK元記録は`--output-format stream-json --verbose --forward-subagent-text`の出力を保存したファイル（`$AUTODEV_RUNTIME_LOG`）で、`attach`・`import-*`の`--raw`に使う。実行中は共通repoを更新しない（契約ダイジェストが変わり全証拠が失効する）。
+`claude -p`のヘッドレスでは、最後のターンから10分を過ぎた背景タスクがruntimeに止められる（標準エラーに`Background tasks still running 10m ... stopping them`）。Opus初期設計は10分を超えるため、環境変数`CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`で起動するか、Agent呼出を前景（`run_in_background:false`）にする。止められると`contract.json`/backlogだけが書かれたまま`architecture.md`がプレースホルダの途中停止になり、手順1の`repair-plan.mjs`で回復する。`claude -p`のヘッドレスには承認者がいない。対象の`.claude/settings.json`のallowは未信頼workspaceで無視されるため、必要な範囲だけを`--settings FILE`で起動側から渡す（`git push`と共通repoへの書込はdeny）。SDK元記録は`--output-format stream-json --verbose --forward-subagent-text`の出力を保存したファイル（`$AUTODEV_RUNTIME_LOG`）で、`attach`・`import-*`の`--raw`に使う。実行中は共通repoを更新しない（契約ダイジェストが変わり全証拠が失効する）。
 
 実launchを元SDK記録から`burst.mjs --action attach --target TARGET --id BURST_ID --raw ACTUAL_JSONL --tool_use WORKFLOW_TOOL_ID`で結ぶ。error付きasync_launched、null、欠落、結果未受領は未達。CLAIMED/ATTACHEDが残れば別Workflowを起動しない。ローカルprocessが消えたことだけでnative Workflow終了と判断しない。
 

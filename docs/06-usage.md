@@ -24,6 +24,7 @@ Haiku実装、独立Sonnetレビュー・実行検証、必要な修正と節目
 ```bash
 set -o pipefail
 AUTODEV_COMMON=/absolute/path/to/Claude-enhancement-system
+export CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0   # ヘッドレスは10分超の背景タスク（Opus初期設計）を止める
 AUTODEV_SDK_DIR=$(mktemp -d "${TMPDIR:-/tmp}/claude-autodev-sdk.XXXXXX")
 export AUTODEV_RUNTIME_LOG="$AUTODEV_SDK_DIR/session.jsonl"
 printf 'SDK record directory: %s\n' "$AUTODEV_SDK_DIR"

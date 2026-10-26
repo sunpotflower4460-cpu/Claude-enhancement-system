@@ -45,6 +45,7 @@ run 6（`dreambox-6`）は修正を重ねながら同じ工程を通した探索
 | 17 | 実装 | R4の編集で製品指紋が変わりR1〜R3の証拠が失効、Opusが正しくNEEDS_FIX | 最終review/auditの**前**に全checkを現製品で再実行 | b1d3f3c |
 | 18 | 実装 | architecture/plan/implementのmodel証拠を取り込む手段がなく`verify`がUNVERIFIED。`operation complete`が`result:null`を許し永久にUNVERIFIED。取込のたびにcapture全体を複製（1.7GB） | `import-runtime --burst`と取込コマンドの配布、`complete`は結果必須（null受領は1回だけ修復可）、保存captureから`stream_event`を除去 | 6561ff0 |
 | 19 | 実装 | 取込がagentの`done`進捗の書込前に走り`Subagent evidence absent`（余計なNEEDS_FIX 1回） | `import-runtime --wait`：一時的な欠落だけ再試行、置換・曖昧は即失敗。**単体試験のみ。実機再検証は未実施** | 6931873 |
+| 20 | 環境 | ヘッドレス`claude -p`は最後のターンから10分を過ぎた背景タスクを止める（標準エラー`Background tasks still running 10m … stopping them`）。web開発のOpus初期設計(`Agent`の背景起動)が途中で止まり、`contract.json`/backlogだけが書かれ`architecture.md`はプレースホルダ | `live-probe`の起動に`CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`、START.md/06-usageに回避（前景実行または同環境変数）と`repair-plan`での回復を明記 | (本commit) |
 
 ## 3. 停止・復元・長期継続（実機）
 

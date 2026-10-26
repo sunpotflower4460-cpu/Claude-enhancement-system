@@ -2,7 +2,7 @@
 
 **ローカルの実装・正常/故障/模擬統合・実Chromiumと、Claude Code実機の受け入れを区別する。V1全体はUNVERIFIED。**
 
-> **2026-10-26 実機受け入れ追記**：Claude Code 2.1.310の実機で、実Opus/Sonnet/Haiku 5.5による4タスク開発が完走し、独立`verify.mjs`が`COMPLETE`（assurance=LIVE）。実機で見つかった19件の差分と修正、T01〜T20の照合、未検証項目は[10-live-acceptance.md](10-live-acceptance.md)。ローカル試験は204件。以下の「V1全体はUNVERIFIED」は、その文書の未検証項目（T04/T06/T07/T08/T10/T12/T15/T16/T17ほか）が残る限り維持する。
+> **2026-10-26 実機受け入れ追記**：Claude Code 2.1.310の実機で、実Opus/Sonnet/Haiku 5.5による4タスク開発が完走し、独立`verify.mjs`が`COMPLETE`（assurance=LIVE）。実機で見つかった20件の差分と修正、T01〜T20の照合、未検証項目は[10-live-acceptance.md](10-live-acceptance.md)。ローカル試験は204件。以下の「V1全体はUNVERIFIED」は、その文書の未検証項目（T04/T06/T07/T08/T10/T12/T15/T16/T17ほか）が残る限り維持する。
 
 ## 最新の長期継続強化
 

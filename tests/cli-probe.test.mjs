@@ -643,3 +643,13 @@ test("G live probe clone ships a scoped headless allowlist: no push, no shared w
   assert.ok(!allow.includes("Bash"), "no blanket Bash allow");
   assert.ok(!allow.includes("Bash(node *)"), "no blanket node allow");
 });
+
+test("H live run launches the CLI without the 10-minute headless background-task ceiling", (t) => {
+  const f = fixture(t);
+  fs.writeFileSync(path.join(f.dir, "probe-prompt.txt"), "/goal TEST FIXTURE mock process transport only");
+  const marker = path.join(f.base, "ceiling.txt");
+  const script = path.join(f.base, "envcli.sh");
+  fs.writeFileSync(script, `#!/bin/sh\necho "$CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS" > "${marker}"\nexit 1\n`, { mode: 0o755 });
+  cli("live-probe", ["--mode", "run", "--target", f.target, "--claude", script]);
+  assert.equal(fs.readFileSync(marker, "utf8").trim(), "0");
+});

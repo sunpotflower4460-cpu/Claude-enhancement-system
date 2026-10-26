@@ -475,6 +475,14 @@ export async function runProbe(o) {
         cwd: c.session.root,
         detached: true,
         stdio: ["ignore", "pipe", "pipe"],
+        // Live web run: headless `claude -p` stops background tasks still running 10 minutes after
+        // the last turn ("Background tasks still running 10m ... stopping them"). A real Opus
+        // initial architecture takes longer, so the planning agent was killed half-written.
+        env: {
+          ...process.env,
+          CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS:
+            process.env.CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS ?? "0",
+        },
       },
     );
     try {
