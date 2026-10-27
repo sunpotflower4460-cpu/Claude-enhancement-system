@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { shared, json, main, isMain, load } from "./lib/core.mjs";
 import { probePermissions } from "./live-probe.mjs";
+import { superviseDir } from "./supervise.mjs";
 
 // Live runs 3-7 and the game/existing-app runs: child agents were repeatedly refused
 // Bash (node -e, Chromium checks, git) by the headless permission gate, so the parent
@@ -32,11 +33,12 @@ export function devPermissions(root, o = {}) {
   return { permissions: { allow, deny } };
 }
 export function writePermissions(o) {
-  const c = load(o.target),
-    out =
-      o.out ||
-      path.join(c.session.root, ".autodev", "permissions.json"),
-    settings = devPermissions(c.session.root, {
+  let root = path.resolve(o.target);
+  try {
+    root = load(o.target).session.root;
+  } catch {}
+  const out = o.out || path.join(superviseDir(root), "permissions.json"),
+    settings = devPermissions(root, {
       allow_publish: o.allow_publish === "true" || o.allow_publish === true,
     });
   fs.mkdirSync(path.dirname(out), { recursive: true });

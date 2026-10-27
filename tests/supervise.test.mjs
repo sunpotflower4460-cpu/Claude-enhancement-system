@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fixture } from "./helpers/fixture.mjs";
-import { supervise } from "../scripts/supervise.mjs";
+import { supervise, superviseDir } from "../scripts/supervise.mjs";
 import { devPermissions, writePermissions } from "../scripts/permissions.mjs";
 
 // A fake `claude`: records argv, prints a stream-json init with a session id, then does what
@@ -72,7 +72,7 @@ test("S3 a silent (hung) run is killed after the stall window and resumed", asyn
 test("S4 re-running supervise after the supervisor itself died continues the stored session", async (t) => {
   const f = fixture(t),
     k = fakes(t, { completeAfter: 2, mode: "exit" });
-  const dir = path.join(f.target, ".autodev", "supervise");
+  const dir = superviseDir(f.target);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, "state.json"), JSON.stringify({ version: 1, target: f.target, session_id: "sess-123", attempts: 1, runs: [], started_at: "x" }));
   fs.writeFileSync(k.calls, "[]\n"); // one earlier run already happened
@@ -104,4 +104,15 @@ test("P1 the generated permission allowlist lets builders run checks but denies 
   assert.ok(!pub.deny.includes("Bash(git push*)"));
   assert.ok(pub.allow.includes("Bash(git push origin autodev/checkpoint/*)"));
   assert.ok(!pub.allow.includes("Bash(git push*)"));
+});
+test("S7 a fresh target (no .autodev yet) is supervised without creating .autodev, so bootstrap still works", async (t) => {
+  const f = fixture(t),
+    k = fakes(t, { completeAfter: 1, mode: "exit" });
+  const bare = fs.mkdtempSync(path.join(fixtureRoot, "fresh-"));
+  const { execFileSync } = await import("node:child_process");
+  execFileSync("git", ["init", "-q", bare]);
+  const r = await supervise({ target: bare, prompt: "/goal x", ...common(k) });
+  assert.equal(r.status, "COMPLETE");
+  assert.ok(!fs.existsSync(path.join(bare, ".autodev")));
+  assert.ok(fs.existsSync(path.join(superviseDir(bare), "permissions.json")));
 });

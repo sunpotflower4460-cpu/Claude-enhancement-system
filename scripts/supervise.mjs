@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { spawn, spawnSync } from "node:child_process";
+import { spawn, spawnSync, execFileSync } from "node:child_process";
 import { shared, json, read, main, isMain, load } from "./lib/core.mjs";
 import { writePermissions } from "./permissions.mjs";
 
@@ -17,7 +17,15 @@ const RECOVERY = (target, raw, n) =>
   `burst finish→state recover→新attempt→nextの再開地点から進めてください。` +
   `完了済みtaskの旧PASSは持ち越さず、現在productに対する検査・独立レビュー・Opus最終監査・state end・独立verifyまで実行してください。` +
   `未達成条件を縮小せず、確認できないものはUNVERIFIEDのままにしてください。`;
-const dir = (root) => path.join(root, ".autodev", "supervise");
+// Kept in the Git dir, not .autodev: bootstrap publishes .autodev by renaming a fresh directory
+// into place, so a pre-created .autodev would break the very first mission, and the files
+// are not product anyway.
+export const superviseDir = (root) =>
+  path.join(
+    execFileSync("git", ["-C", root, "rev-parse", "--absolute-git-dir"], { encoding: "utf8" }).trim(),
+    "autodev-supervise",
+  );
+const dir = superviseDir;
 const progressMark = (root) => {
   // Observable progress = backlog statuses + burst count + product/evidence change markers.
   const d = path.join(root, ".autodev");
@@ -121,9 +129,12 @@ const sessionOf = (logFile) => {
   return null;
 };
 export async function supervise(o) {
-  const c = load(o.target),
-    root = c.session.root,
-    d = dir(root),
+  // A fresh target has no .autodev yet (the model bootstraps it); an existing one is rebound.
+  let root = path.resolve(o.target);
+  try {
+    root = load(o.target).session.root;
+  } catch {}
+  const d = dir(root),
     stateFile = path.join(d, "state.json");
   fs.mkdirSync(d, { recursive: true });
   const num = (v, dflt) => (v === undefined ? dflt : Number(v));
