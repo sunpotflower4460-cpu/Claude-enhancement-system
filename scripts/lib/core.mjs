@@ -284,6 +284,9 @@ export function contracts(root) {
   backlog.items.forEach((t) => visit(t.id));
   const required = {
     backend: ["test", "api"],
+    // Live (supervised slugify run): a CLI/library has no HTTP endpoint, so a backend `api`
+    // check could only pass with a fake server. Its real surface is a subprocess/behaviour check.
+    cli: ["test", "behavior"],
     "web-app": ["test", "build", "behavior", "visual"],
     game: ["test", "build", "behavior", "visual", "play"],
   }[c.mission.profile];

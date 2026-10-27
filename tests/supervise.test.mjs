@@ -3,7 +3,10 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { fixture } from "./helpers/fixture.mjs";
+import { fixture, allPass } from "./helpers/fixture.mjs";
+import { contracts, json } from "./helpers/fixture.mjs";
+import { verify } from "../scripts/verify.mjs";
+const gate = (f) => verify({ target: f.target, fixture: true });
 import { supervise, superviseDir } from "../scripts/supervise.mjs";
 import { devPermissions, writePermissions } from "../scripts/permissions.mjs";
 
@@ -115,4 +118,23 @@ test("S7 a fresh target (no .autodev yet) is supervised without creating .autode
   assert.equal(r.status, "COMPLETE");
   assert.ok(!fs.existsSync(path.join(bare, ".autodev")));
   assert.ok(fs.existsSync(path.join(superviseDir(bare), "permissions.json")));
+});
+
+test("L1 cli profile: a CLI/library completes with test+behavior checks and needs no HTTP api check", (t) => {
+  const f = fixture(t, { profile: "cli" });
+  allPass(f);
+  const c = contracts(f.target);
+  assert.deepEqual([...new Set(c.contract.checks.map((x) => x.kind))].sort(), ["behavior", "test"]);
+  assert.equal(gate(f).status, "TEST_COMPLETE");
+});
+test("L2 cli profile still rejects a contract that drops the real-process behavior check", (t) => {
+  const f = fixture(t, { profile: "cli" });
+  const c = contracts(f.target),
+    keep = c.contract.checks.filter((x) => x.kind !== "behavior");
+  json(path.join(f.dir, "contract.json"), { ...c.contract, checks: keep });
+  json(path.join(f.dir, "backlog.json"), {
+    ...c.backlog,
+    items: c.backlog.items.map((i) => ({ ...i, check_refs: i.check_refs.filter((r) => !r.endsWith("-behavior")) })),
+  });
+  assert.throws(() => contracts(f.target), /Missing profile checks/);
 });

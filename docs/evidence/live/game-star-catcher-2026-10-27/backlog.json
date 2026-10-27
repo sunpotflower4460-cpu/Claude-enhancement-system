@@ -1,0 +1,147 @@
+{
+  "version": 2,
+  "items": [
+    {
+      "id": "T1-scaffold",
+      "requirement_refs": [
+        "R7"
+      ],
+      "status": "PASS",
+      "dependencies": [],
+      "check_refs": [
+        "C-T1-static-test",
+        "C-T1-hook-test",
+        "C-T1-build"
+      ],
+      "execution": {
+        "run_id": "run-game-1",
+        "attempt_id": "root-1",
+        "started_at": "2026-10-26T22:33:31.291Z"
+      }
+    },
+    {
+      "id": "T2-start-screen",
+      "requirement_refs": [
+        "R1"
+      ],
+      "status": "PASS",
+      "dependencies": [
+        "T1-scaffold"
+      ],
+      "check_refs": [
+        "C-T2-start-behavior"
+      ],
+      "execution": {
+        "run_id": "run-game-1",
+        "attempt_id": "root-1",
+        "started_at": "2026-10-26T22:44:44.456Z"
+      }
+    },
+    {
+      "id": "T3-controls",
+      "requirement_refs": [
+        "R2"
+      ],
+      "status": "PASS",
+      "dependencies": [
+        "T2-start-screen"
+      ],
+      "check_refs": [
+        "C-T3-keys-behavior",
+        "C-T3-clamp-behavior",
+        "C-T3-touch-behavior"
+      ],
+      "execution": {
+        "run_id": "run-game-1",
+        "attempt_id": "root-1",
+        "started_at": "2026-10-26T23:04:41.385Z"
+      }
+    },
+    {
+      "id": "T4-rules",
+      "requirement_refs": [
+        "R3"
+      ],
+      "status": "PASS",
+      "dependencies": [
+        "T3-controls"
+      ],
+      "check_refs": [
+        "C-T4-rules-behavior",
+        "C-T4-hud-behavior"
+      ],
+      "execution": {
+        "run_id": "run-game-2",
+        "attempt_id": "root-2",
+        "started_at": "2026-10-26T23:23:17.133Z"
+      }
+    },
+    {
+      "id": "T5-end-states",
+      "requirement_refs": [
+        "R4"
+      ],
+      "status": "PASS",
+      "dependencies": [
+        "T4-rules"
+      ],
+      "check_refs": [
+        "C-T5-win-restart-behavior",
+        "C-T5-lose-restart-behavior"
+      ],
+      "execution": {
+        "run_id": "run-game-3",
+        "attempt_id": "root-3",
+        "started_at": "2026-10-26T23:39:55.343Z"
+      }
+    },
+    {
+      "id": "T6-layout-robustness",
+      "requirement_refs": [
+        "R5"
+      ],
+      "status": "PASS",
+      "dependencies": [
+        "T5-end-states"
+      ],
+      "check_refs": [
+        "C-T6-visual-375",
+        "C-T6-visual-1280",
+        "C-T6-robust-behavior"
+      ],
+      "execution": {
+        "run_id": "run-game-4",
+        "attempt_id": "root-4:343ab8ca-ac07-444b-a74a-572174458afd",
+        "started_at": "2026-10-27T01:40:52.560Z"
+      }
+    },
+    {
+      "id": "T7-real-play-acceptance",
+      "requirement_refs": [
+        "R6"
+      ],
+      "status": "PASS",
+      "dependencies": [
+        "T1-scaffold",
+        "T2-start-screen",
+        "T3-controls",
+        "T4-rules",
+        "T5-end-states",
+        "T6-layout-robustness"
+      ],
+      "check_refs": [
+        "C-T7-play-win-1280",
+        "C-T7-play-win-375",
+        "C-T7-play-gameover-1280",
+        "C-T7-play-gameover-375",
+        "C-T7-visual-screens-375",
+        "C-T7-visual-screens-1280"
+      ],
+      "execution": {
+        "run_id": "run-game-5",
+        "attempt_id": "root-5:fe0c0a09-62c7-425d-b5b6-6aa6737bffa1",
+        "started_at": "2026-10-27T02:24:00.939Z"
+      }
+    }
+  ]
+}

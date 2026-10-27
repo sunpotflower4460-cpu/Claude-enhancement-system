@@ -1,0 +1,514 @@
+{
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "assurance": "LIVE",
+  "routing_history": [
+    "runtime-24911df2431d1158d61bf8493efa0778239bdafab48e346c6791e257b7859679.json",
+    "runtime-08bad066bb8e79c31e3e9232013252ba4a4392fcce33432f4954cd1a543db454.json",
+    "runtime-e319bbb7d87b61fa6365cd914aa20b1bbfc0bafa023478dcc39c72364e26e7f9.json",
+    "runtime-6c23bc77a0ad9cbf665b8ec393306b61636b56adfbe9b9bb508f2c92c9a6d5b9.json",
+    "runtime-24593fd21fcc5b39f0f854328dd0de9b86bcef1fa31fa97cec499696dba67e13.json",
+    "runtime-a19ba6c650efa5e263fcf7591684410693e5aa7392145dd2abf1f9faba5632d0.json",
+    "runtime-3cdb8eb87e3951384cb3fd4d1a099773ee556d0cdec6fa9bfe15cac101aada93.json",
+    "runtime-24f2ea2111eef6bedf279b222f04ec12d07a2148e0892345c9d5bacc3275ee7b.json",
+    "runtime-63947981c81cd4158bd8e90739549d9a51662c2a991a405ba467e6c420bec101.json",
+    "runtime-b36a8229c9a7bbac6b29e362acf294b6055bce7a0d2507a1289a6283d04183cc.json",
+    "runtime-cff1683d7b545249db790f93c3982046e1606c0ca36375e182ef235c439e0e07.json",
+    "runtime-3400ea6d0984e8e38e372898862cb28613e98fca2da2a622676f572c25555301.json",
+    "runtime-86dd94b8bd75611fd0e8778043eb16c432c7d4f10d6f48bb492bc158440b5554.json",
+    "runtime-f5203db9ab0cea0c6df750afc181ec14a9382adf00daa9d206f65f6940c76362.json",
+    "runtime-6c6e4de9ea78f3aa530dd26fe0394509df666100062cc384771699dfa89cfde5.json",
+    "runtime-0292b52a302d31d0e4c893edfc5b99030cd334bd17fbf4b6d90e7e496f3a61f8.json",
+    "runtime-37796410b5d956c6c6d2bf4fe74308cbdae8ef42204a93574b4c02b6e371d8af.json",
+    "runtime-9a229479a04b6d185e63a2d5bdb443831ded6aa68a14a0f87d026c03818dfa7e.json",
+    "runtime-04447064686829f7075a281d8e58ba641e51fe12ca48a2f85e4d03b593df5291.json",
+    "runtime-b9121ba45b292f46753c082f84ce1256ef9187930ef22072ae48acd5aa2ca177.json",
+    "runtime-7e5b470c766b8cb7910f9560469b3a507d4324a05a1215c2276aeab6449acbf0.json",
+    "runtime-dd89186486572ea21637d4a9d9b1d68af26a4457eff0d0543a86ab92b2dfe4a6.json",
+    "runtime-67cdc425dab2f68c326bf2f10c555e713445482e35f990d0fa7e2c7611442ee2.json",
+    "runtime-705a0e3fe1266c6855318be3af4f39b10be3c9faf29e6e4e15b49f3c1886d6af.json",
+    "runtime-19a9f0558f8417f7134fc1919fe23667df22dad83d3166f17ad4656c0a618967.json",
+    "runtime-86b44b3f8702c7e1b38cf82a7aa371e3a09c06eb147728fcc0bf4031544ab3d6.json",
+    "runtime-e43bdf2eec1368e4a98efb84ede02905231c16ecad04f7d60680f279fc3400d6.json",
+    "runtime-f7222c0e02d45a2f49c07c394759d0dd89a9c7712cee3a8731123fe3f6d26c80.json",
+    "runtime-1f7131c14525ec7a2cd9f6ac7cd64fc14f64945a4d4395080f27bde1a6a11b9f.json",
+    "runtime-d7f5fa5b5bbe8bd8c4c186f61b48cc99474a458e641fd55147829c39ab99c4bd.json",
+    "runtime-a4995d0204f2e4745377791051d1ab2dd4612b795adcae1ae7147ab698219271.json",
+    "runtime-0968d89d04ca4e98420b0bdff671baae56bf91e86daaa7eea59ba78a2cb9e046.json",
+    "runtime-b6bbbaf6d49aa091f0f87eae189d4a9bde52d8c7746ed8840bc81a9292c46cf6.json",
+    "runtime-321a07633157c1d5c1a8508d7c9f386820fa50fd04584437d3130705e8647143.json",
+    "runtime-abaf0d38f1a6ad7fe4b13ff3f93741bfc721de52374b1c6532e7c999a737de60.json",
+    "runtime-e49b1f633c12b9989336e531bbbcbe4652cd4dd63877e3533c587b534a2d083f.json",
+    "runtime-39b184e382013ef34eb7bf62594d1a50fe57f506c06268b51861d4dbb3500e92.json",
+    "runtime-7effd942b4cf003aa525fd723ba3417d6ef1ad65e0c41d6a13dbb36dcd101aa1.json",
+    "runtime-e4e108b3a8c9a6bca39d109f31c0d0512c40b872cff1d197e44adc3cbbd798f8.json",
+    "runtime-2b64c0d61b2a9164fa44500262788b856dcb397db86d4b9d80fc9697d50db3e0.json",
+    "runtime-f88dbe0ec38179551f1f0b1ae7a7efc7407381167ece4cb6178f354d3259c812.json",
+    "runtime-830de76e1b2352297e53a84073af9b0865e42649d8f738c66b7cf655a7ff52cd.json"
+  ],
+  "routing_provenance": [
+    {
+      "name": "runtime-24911df2431d1158d61bf8493efa0778239bdafab48e346c6791e257b7859679.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-08bad066bb8e79c31e3e9232013252ba4a4392fcce33432f4954cd1a543db454.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "architecture",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-e319bbb7d87b61fa6365cd914aa20b1bbfc0bafa023478dcc39c72364e26e7f9.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-6c23bc77a0ad9cbf665b8ec393306b61636b56adfbe9b9bb508f2c92c9a6d5b9.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "implement",
+      "task_id": "T1-scaffold"
+    },
+    {
+      "name": "runtime-24593fd21fcc5b39f0f854328dd0de9b86bcef1fa31fa97cec499696dba67e13.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-a19ba6c650efa5e263fcf7591684410693e5aa7392145dd2abf1f9faba5632d0.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-3cdb8eb87e3951384cb3fd4d1a099773ee556d0cdec6fa9bfe15cac101aada93.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "implement",
+      "task_id": "T2-start-screen"
+    },
+    {
+      "name": "runtime-24f2ea2111eef6bedf279b222f04ec12d07a2148e0892345c9d5bacc3275ee7b.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-63947981c81cd4158bd8e90739549d9a51662c2a991a405ba467e6c420bec101.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-b36a8229c9a7bbac6b29e362acf294b6055bce7a0d2507a1289a6283d04183cc.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "implement",
+      "task_id": "T3-controls"
+    },
+    {
+      "name": "runtime-cff1683d7b545249db790f93c3982046e1606c0ca36375e182ef235c439e0e07.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-3400ea6d0984e8e38e372898862cb28613e98fca2da2a622676f572c25555301.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-86dd94b8bd75611fd0e8778043eb16c432c7d4f10d6f48bb492bc158440b5554.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-f5203db9ab0cea0c6df750afc181ec14a9382adf00daa9d206f65f6940c76362.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "implement",
+      "task_id": "T4-rules"
+    },
+    {
+      "name": "runtime-6c6e4de9ea78f3aa530dd26fe0394509df666100062cc384771699dfa89cfde5.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-0292b52a302d31d0e4c893edfc5b99030cd334bd17fbf4b6d90e7e496f3a61f8.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-37796410b5d956c6c6d2bf4fe74308cbdae8ef42204a93574b4c02b6e371d8af.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-9a229479a04b6d185e63a2d5bdb443831ded6aa68a14a0f87d026c03818dfa7e.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "implement",
+      "task_id": "T5-end-states"
+    },
+    {
+      "name": "runtime-04447064686829f7075a281d8e58ba641e51fe12ca48a2f85e4d03b593df5291.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-b9121ba45b292f46753c082f84ce1256ef9187930ef22072ae48acd5aa2ca177.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-7e5b470c766b8cb7910f9560469b3a507d4324a05a1215c2276aeab6449acbf0.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Historical implementation execution no longer selected"
+    },
+    {
+      "name": "runtime-dd89186486572ea21637d4a9d9b1d68af26a4457eff0d0543a86ab92b2dfe4a6.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-67cdc425dab2f68c326bf2f10c555e713445482e35f990d0fa7e2c7611442ee2.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-705a0e3fe1266c6855318be3af4f39b10be3c9faf29e6e4e15b49f3c1886d6af.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-19a9f0558f8417f7134fc1919fe23667df22dad83d3166f17ad4656c0a618967.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Historical implementation execution no longer selected"
+    },
+    {
+      "name": "runtime-86b44b3f8702c7e1b38cf82a7aa371e3a09c06eb147728fcc0bf4031544ab3d6.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-e43bdf2eec1368e4a98efb84ede02905231c16ecad04f7d60680f279fc3400d6.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-f7222c0e02d45a2f49c07c394759d0dd89a9c7712cee3a8731123fe3f6d26c80.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-1f7131c14525ec7a2cd9f6ac7cd64fc14f64945a4d4395080f27bde1a6a11b9f.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-d7f5fa5b5bbe8bd8c4c186f61b48cc99474a458e641fd55147829c39ab99c4bd.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Historical implementation execution no longer selected"
+    },
+    {
+      "name": "runtime-a4995d0204f2e4745377791051d1ab2dd4612b795adcae1ae7147ab698219271.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-0968d89d04ca4e98420b0bdff671baae56bf91e86daaa7eea59ba78a2cb9e046.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-b6bbbaf6d49aa091f0f87eae189d4a9bde52d8c7746ed8840bc81a9292c46cf6.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-321a07633157c1d5c1a8508d7c9f386820fa50fd04584437d3130705e8647143.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-abaf0d38f1a6ad7fe4b13ff3f93741bfc721de52374b1c6532e7c999a737de60.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "implement",
+      "task_id": "T6-layout-robustness"
+    },
+    {
+      "name": "runtime-e49b1f633c12b9989336e531bbbcbe4652cd4dd63877e3533c587b534a2d083f.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-39b184e382013ef34eb7bf62594d1a50fe57f506c06268b51861d4dbb3500e92.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-7effd942b4cf003aa525fd723ba3417d6ef1ad65e0c41d6a13dbb36dcd101aa1.json",
+      "assurance": "HISTORICAL_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-e4e108b3a8c9a6bca39d109f31c0d0512c40b872cff1d197e44adc3cbbd798f8.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Historical implementation execution no longer selected"
+    },
+    {
+      "name": "runtime-2b64c0d61b2a9164fa44500262788b856dcb397db86d4b9d80fc9697d50db3e0.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-f88dbe0ec38179551f1f0b1ae7a7efc7407381167ece4cb6178f354d3259c812.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-830de76e1b2352297e53a84073af9b0865e42649d8f738c66b7cf655a7ff52cd.json",
+      "assurance": "UNVERIFIED",
+      "reason": "Missing/stale historical role provenance"
+    },
+    {
+      "name": "runtime-ac77520d441f60de689734df54a38dd3bbd13cb6e0880b10c3ce007a12ccfc80.json",
+      "assurance": "CURRENT_VALID",
+      "stage": "review",
+      "task_id": "T7-real-play-acceptance"
+    },
+    {
+      "name": "runtime-ed98dd348cdd7e054e610bd658f1f9f74c8f90edc86e7dd2b8a9fcca6f782092.json",
+      "assurance": "CURRENT_VALID",
+      "stage": "plan",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-efa8d0e015d6c993af9fa25f0facfe7cfd8ea8a86c574059619bfb373d846bad.json",
+      "assurance": "CURRENT_VALID",
+      "stage": "implement",
+      "task_id": "T7-real-play-acceptance"
+    },
+    {
+      "name": "runtime-b9cbe4b0fa24816ba26de7d4c671589adf9ab7e72c152edd829a4f5e1a26fe75.json",
+      "assurance": "CURRENT_VALID",
+      "stage": "review",
+      "task_id": "mission"
+    },
+    {
+      "name": "runtime-8efa17ac6961d3d657412040ce6d4f59c369b64ab96c86db578b722c2f272410.json",
+      "assurance": "CURRENT_VALID",
+      "stage": "audit",
+      "task_id": "mission"
+    }
+  ],
+  "product": "62c6b1b226edacb042b805360003a9c2e856ab00b9a97afd62dadd8dcf244e4b",
+  "contract": "fda0aab7f3f924f3ef7994097726777bba653442f5949e52e6c7aa9ba40dee94",
+  "tasks": [
+    {
+      "id": "T1-scaffold",
+      "declared": "PASS",
+      "status": "PASS",
+      "checks": [
+        "C-T1-static-test",
+        "C-T1-hook-test",
+        "C-T1-build"
+      ]
+    },
+    {
+      "id": "T2-start-screen",
+      "declared": "PASS",
+      "status": "PASS",
+      "checks": [
+        "C-T2-start-behavior"
+      ]
+    },
+    {
+      "id": "T3-controls",
+      "declared": "PASS",
+      "status": "PASS",
+      "checks": [
+        "C-T3-keys-behavior",
+        "C-T3-clamp-behavior",
+        "C-T3-touch-behavior"
+      ]
+    },
+    {
+      "id": "T4-rules",
+      "declared": "PASS",
+      "status": "PASS",
+      "checks": [
+        "C-T4-rules-behavior",
+        "C-T4-hud-behavior"
+      ]
+    },
+    {
+      "id": "T5-end-states",
+      "declared": "PASS",
+      "status": "PASS",
+      "checks": [
+        "C-T5-win-restart-behavior",
+        "C-T5-lose-restart-behavior"
+      ]
+    },
+    {
+      "id": "T6-layout-robustness",
+      "declared": "PASS",
+      "status": "PASS",
+      "checks": [
+        "C-T6-visual-375",
+        "C-T6-visual-1280",
+        "C-T6-robust-behavior"
+      ]
+    },
+    {
+      "id": "T7-real-play-acceptance",
+      "declared": "PASS",
+      "status": "PASS",
+      "checks": [
+        "C-T7-play-win-1280",
+        "C-T7-play-win-375",
+        "C-T7-play-gameover-1280",
+        "C-T7-play-gameover-375",
+        "C-T7-visual-screens-375",
+        "C-T7-visual-screens-1280"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "status": "PASS"
+    },
+    {
+      "id": "R2",
+      "status": "PASS"
+    },
+    {
+      "id": "R3",
+      "status": "PASS"
+    },
+    {
+      "id": "R4",
+      "status": "PASS"
+    },
+    {
+      "id": "R5",
+      "status": "PASS"
+    },
+    {
+      "id": "R6",
+      "status": "PASS"
+    },
+    {
+      "id": "R7",
+      "status": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C-T1-static-test",
+      "status": "PASS",
+      "reason": "Executed test assertions"
+    },
+    {
+      "id": "C-T1-hook-test",
+      "status": "PASS",
+      "reason": "Executed test assertions"
+    },
+    {
+      "id": "C-T1-build",
+      "status": "PASS",
+      "reason": "Executed build assertions"
+    },
+    {
+      "id": "C-T2-start-behavior",
+      "status": "PASS",
+      "reason": "Executed behavior assertions"
+    },
+    {
+      "id": "C-T3-keys-behavior",
+      "status": "PASS",
+      "reason": "Executed behavior assertions"
+    },
+    {
+      "id": "C-T3-clamp-behavior",
+      "status": "PASS",
+      "reason": "Executed behavior assertions"
+    },
+    {
+      "id": "C-T3-touch-behavior",
+      "status": "PASS",
+      "reason": "Executed behavior assertions"
+    },
+    {
+      "id": "C-T4-rules-behavior",
+      "status": "PASS",
+      "reason": "Executed behavior assertions"
+    },
+    {
+      "id": "C-T4-hud-behavior",
+      "status": "PASS",
+      "reason": "Executed behavior assertions"
+    },
+    {
+      "id": "C-T5-win-restart-behavior",
+      "status": "PASS",
+      "reason": "Executed behavior assertions"
+    },
+    {
+      "id": "C-T5-lose-restart-behavior",
+      "status": "PASS",
+      "reason": "Executed behavior assertions"
+    },
+    {
+      "id": "C-T6-visual-375",
+      "status": "PASS",
+      "reason": "Executed visual assertions"
+    },
+    {
+      "id": "C-T6-visual-1280",
+      "status": "PASS",
+      "reason": "Executed visual assertions"
+    },
+    {
+      "id": "C-T6-robust-behavior",
+      "status": "PASS",
+      "reason": "Executed behavior assertions"
+    },
+    {
+      "id": "C-T7-play-win-1280",
+      "status": "PASS",
+      "reason": "Executed play assertions"
+    },
+    {
+      "id": "C-T7-play-win-375",
+      "status": "PASS",
+      "reason": "Executed play assertions"
+    },
+    {
+      "id": "C-T7-play-gameover-1280",
+      "status": "PASS",
+      "reason": "Executed play assertions"
+    },
+    {
+      "id": "C-T7-play-gameover-375",
+      "status": "PASS",
+      "reason": "Executed play assertions"
+    },
+    {
+      "id": "C-T7-visual-screens-375",
+      "status": "PASS",
+      "reason": "Executed visual assertions"
+    },
+    {
+      "id": "C-T7-visual-screens-1280",
+      "status": "PASS",
+      "reason": "Executed visual assertions"
+    }
+  ],
+  "issues": []
+}
+READY_FOR_HUMAN_REVIEW: 7/7 tasks, 20/20 checks

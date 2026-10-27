@@ -34,7 +34,7 @@ START.md
 agents/{opus-architect,opus-auditor,sonnet-planner,sonnet-reviewer,sonnet-verifier,haiku-builder}.md
 skills/{start-development,implement,review,verify,final-audit}/SKILL.md
 workflows/{develop-sprint,review-and-fix,milestone-audit}.js
-profiles/{web-app,game,backend}.md
+profiles/{web-app,game,backend,cli}.md
 scripts/{bootstrap,doctor,verify}.mjs
 schemas/{mission,backlog,evidence}.schema.json
 tests/{unit,integration,fixtures,smoke}/
@@ -108,5 +108,6 @@ docs/
 - `web-app`: 機能・画面遷移・ブラウザ操作・コンソール・レスポンシブ。
 - `game`: 実際の起動・プレイ入力・進行・ルール・見た目・性能・破綻のない操作。
 - `backend`: API・スキーマ・状態遷移・テスト・エラー・後方互換。
+- `cli`: HTTPを持たないCLI・ライブラリ。実行したassert（test）と実subprocessの引数・標準入出力・終了コード・stderr（behavior）。`api`検査を偽サーバーで満たさない。
 
 存在しない検証環境やツールは自動生成した「合格」で代替しない。`UNVERIFIED`とその理由を記録する。

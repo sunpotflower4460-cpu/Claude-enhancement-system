@@ -69,7 +69,7 @@ node COMMON/scripts/supervise.mjs --target TARGET                          # sup
 ## コマンドの流れ
 
 ```bash
-node COMMON/scripts/bootstrap.mjs --target TARGET --mission INPUT_JSON --profile backend
+node COMMON/scripts/bootstrap.mjs --target TARGET --mission INPUT_JSON --profile backend   # backend | web-app | game | cli（HTTPを持たないCLI/ライブラリ）
 node COMMON/scripts/doctor.mjs --target TARGET
 node COMMON/scripts/state.mjs --target TARGET --action begin --run RUN --task mission --attempt ATTEMPT
 node COMMON/scripts/context.mjs --target TARGET --run RUN

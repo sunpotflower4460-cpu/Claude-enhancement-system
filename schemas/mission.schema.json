@@ -44,7 +44,7 @@
       "uniqueItems": true
     },
     "profile": {
-      "enum": ["backend", "web-app", "game"]
+      "enum": ["backend", "web-app", "game", "cli"]
     },
     "target": {
       "type": "object",

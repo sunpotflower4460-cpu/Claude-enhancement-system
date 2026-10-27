@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Star Catcher</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main id="app">
+      <div id="hud" aria-live="polite">
+        <span id="score">Score: 0</span>
+        <span id="lives">Lives: 3</span>
+      </div>
+      <div id="stage">
+        <canvas id="game" width="400" height="600" aria-label="Playfield"></canvas>
+        <div id="screen" class="screen">
+          <h1 id="screen-title">Star Catcher</h1>
+          <button id="start-btn" type="button">Start</button>
+          <button id="restart-btn" type="button" hidden>Restart</button>
+        </div>
+      </div>
+    </main>
+    <script src="game.js"></script>
+  </body>
+</html>

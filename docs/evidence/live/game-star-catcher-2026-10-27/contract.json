@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "human_review": true,
+  "checks": [
+    {"id": "C-T1-static-test", "task_id": "T1-scaffold", "requirement_refs": ["R7"], "kind": "test", "command": "\"$AUTODEV_NODE\" tests/checks/static.check.mjs", "timeout_ms": 60000},
+    {"id": "C-T1-hook-test", "task_id": "T1-scaffold", "requirement_refs": ["R7"], "kind": "test", "command": "\"$AUTODEV_NODE\" tests/checks/hook.check.mjs", "timeout_ms": 120000},
+    {"id": "C-T1-build", "task_id": "T1-scaffold", "requirement_refs": ["R7"], "kind": "build", "command": "\"$AUTODEV_NODE\" tests/checks/build.check.mjs", "timeout_ms": 60000},
+    {"id": "C-T2-start-behavior", "task_id": "T2-start-screen", "requirement_refs": ["R1"], "kind": "behavior", "command": "\"$AUTODEV_NODE\" tests/checks/start.check.mjs", "timeout_ms": 120000},
+    {"id": "C-T3-keys-behavior", "task_id": "T3-controls", "requirement_refs": ["R2"], "kind": "behavior", "command": "\"$AUTODEV_NODE\" tests/checks/keys.check.mjs", "timeout_ms": 120000},
+    {"id": "C-T3-clamp-behavior", "task_id": "T3-controls", "requirement_refs": ["R2"], "kind": "behavior", "command": "\"$AUTODEV_NODE\" tests/checks/clamp.check.mjs", "timeout_ms": 120000},
+    {"id": "C-T3-touch-behavior", "task_id": "T3-controls", "requirement_refs": ["R2"], "kind": "behavior", "command": "\"$AUTODEV_NODE\" tests/checks/touch.check.mjs", "timeout_ms": 120000},
+    {"id": "C-T4-rules-behavior", "task_id": "T4-rules", "requirement_refs": ["R3"], "kind": "behavior", "command": "\"$AUTODEV_NODE\" tests/checks/rules.check.mjs", "timeout_ms": 180000},
+    {"id": "C-T4-hud-behavior", "task_id": "T4-rules", "requirement_refs": ["R3"], "kind": "behavior", "command": "\"$AUTODEV_NODE\" tests/checks/hud.check.mjs", "timeout_ms": 180000},
+    {"id": "C-T5-win-restart-behavior", "task_id": "T5-end-states", "requirement_refs": ["R4"], "kind": "behavior", "command": "\"$AUTODEV_NODE\" tests/checks/win-restart.check.mjs", "timeout_ms": 300000},
+    {"id": "C-T5-lose-restart-behavior", "task_id": "T5-end-states", "requirement_refs": ["R4"], "kind": "behavior", "command": "\"$AUTODEV_NODE\" tests/checks/lose-restart.check.mjs", "timeout_ms": 300000},
+    {"id": "C-T6-visual-375", "task_id": "T6-layout-robustness", "requirement_refs": ["R5"], "kind": "visual", "command": "\"$AUTODEV_NODE\" tests/checks/layout.check.mjs 375 700", "timeout_ms": 120000},
+    {"id": "C-T6-visual-1280", "task_id": "T6-layout-robustness", "requirement_refs": ["R5"], "kind": "visual", "command": "\"$AUTODEV_NODE\" tests/checks/layout.check.mjs 1280 800", "timeout_ms": 120000},
+    {"id": "C-T6-robust-behavior", "task_id": "T6-layout-robustness", "requirement_refs": ["R5"], "kind": "behavior", "command": "\"$AUTODEV_NODE\" tests/checks/robust.check.mjs", "timeout_ms": 300000},
+    {"id": "C-T7-play-win-1280", "task_id": "T7-real-play-acceptance", "requirement_refs": ["R6"], "kind": "play", "command": "\"$AUTODEV_NODE\" tests/checks/play.check.mjs win 1280 800 keys", "timeout_ms": 300000},
+    {"id": "C-T7-play-win-375", "task_id": "T7-real-play-acceptance", "requirement_refs": ["R6"], "kind": "play", "command": "\"$AUTODEV_NODE\" tests/checks/play.check.mjs win 375 700 touch", "timeout_ms": 300000},
+    {"id": "C-T7-play-gameover-1280", "task_id": "T7-real-play-acceptance", "requirement_refs": ["R6"], "kind": "play", "command": "\"$AUTODEV_NODE\" tests/checks/play.check.mjs lose 1280 800 keys", "timeout_ms": 300000},
+    {"id": "C-T7-play-gameover-375", "task_id": "T7-real-play-acceptance", "requirement_refs": ["R6"], "kind": "play", "command": "\"$AUTODEV_NODE\" tests/checks/play.check.mjs lose 375 700 touch", "timeout_ms": 300000},
+    {"id": "C-T7-visual-screens-375", "task_id": "T7-real-play-acceptance", "requirement_refs": ["R6"], "kind": "visual", "command": "\"$AUTODEV_NODE\" tests/checks/screens.check.mjs 375 700", "timeout_ms": 600000},
+    {"id": "C-T7-visual-screens-1280", "task_id": "T7-real-play-acceptance", "requirement_refs": ["R6"], "kind": "visual", "command": "\"$AUTODEV_NODE\" tests/checks/screens.check.mjs 1280 800", "timeout_ms": 600000}
+  ]
+}

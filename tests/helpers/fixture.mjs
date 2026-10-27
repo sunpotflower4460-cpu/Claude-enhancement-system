@@ -73,6 +73,7 @@ export function fixture(t, { profile = "backend", count = 1 } = {}) {
   const dir = path.join(target, ".autodev"),
     kinds = {
       backend: ["test", "api"],
+      cli: ["test", "behavior"],
       "web-app": ["test", "build", "behavior", "visual"],
       game: ["test", "build", "behavior", "visual", "play"],
     }[profile];
