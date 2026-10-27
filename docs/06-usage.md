@@ -45,6 +45,27 @@ printf 'claude=%s tee=%s\n' "${AUTODEV_PIPE_STATUS[0]}" "${AUTODEV_PIPE_STATUS[1
 
 同じ保存済みsessionを使える場合は`claude --resume ACTUAL_SESSION_ID --model claude-sonnet-5-5 --plugin-dir COMMON --add-dir COMMON`。構造化証拠を収集する再開では上の保存手順を新directoryで実行し、Claudeの引数へ`--resume ACTUAL_SESSION_ID`を追加する。古いactive root/burstが残るなら実停止証拠から先に回復し、過去の観測を現起動の証拠へ付け替えない。公式仕様では未達のactive goalがresume時に復元されるが、達成済み/clear済みgoalは復元されない。`/goal`で現状態を確認し、必要なら同じ原要求の条件を再設定する。新cloneに古いClaude sessionが存在するとは仮定しない。
 
+## 権限の事前付与と自動復帰（推奨の起動方法）
+
+自律`/goal`を依頼した時点で、子agentが使う検査コマンドの実行は許可済みとして扱う。実機のヘッドレス実行は未信頼workspaceのprojectの`settings.json`を無視し、`node -e`・Chromium検査・gitなどがagentごとに拒否されて親が検査を代行していた。そこで許可リストを事前に生成し`--settings`で渡す。
+
+```bash
+node COMMON/scripts/permissions.mjs --target TARGET                    # .autodev/permissions.json を生成（pushは常に拒否、共通repoの編集も拒否）
+node COMMON/scripts/permissions.mjs --target TARGET --allow_publish true  # checkpointの autodev/checkpoint/* へのpushだけ追加で許可
+```
+
+死んだ/無言になったCLIは`supervise.mjs`が同じsessionを`--resume`で自動再開する。初回だけ`--prompt`に/goal文を渡し、以後は保存したsession idから再開する。
+
+```bash
+node COMMON/scripts/supervise.mjs --target TARGET --prompt "/goal ..."     # 初回（許可リストも自動生成）
+node COMMON/scripts/supervise.mjs --target TARGET                          # supervisor自体が死んだ後の再実行（同じsessionを継続）
+```
+
+- 毎回の終了後に独立`verify.mjs`を実行し、`COMPLETE`なら停止。そうでなければバックオフ後に標準の復旧指示（実terminal取り込み→burst finish→state recover→新attempt→next）で再開する。
+- 出力が`--stall_minutes`（既定25分）止まったCLIはプロセスグループごと止めて再開。`--max_restarts`（既定12）と、backlog/burst/operationが変化しない再起動が`--no_progress_limit`（既定3）回続いた場合は`RESTART_BUDGET_EXHAUSTED`/`NO_PROGRESS`で停止し、理由を`.autodev/supervise/report.json`に残す（無限ループにしない）。
+- supervisorは状態を自分では書き換えない。復旧は再開したモデルが通常のscripts経由で行い、完成は独立verifyだけが決める。
+- コンテナごと再起動した場合は、同じコマンドをもう一度実行する（`.autodev/supervise/state.json`のsessionを継続）。
+
 ## コマンドの流れ
 
 ```bash

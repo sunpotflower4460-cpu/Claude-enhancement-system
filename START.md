@@ -50,6 +50,8 @@ CONTINUE_PARENTは完成ではない。backlog未完了なら親が現在context
 
 CLIを強制終了した場合は終了通知もdrainedも残らない。`claude --resume SESSION --max-turns 1 -p "Observation only"`の再開ログに、runtimeが各taskの`status:"stopped"`通知を出す。`import-termination.mjs --raw ORIGINAL --resume_raw RESUMED --tool_use ID`で取り込み（再init・直前の稼働一覧の全task・再開後のtask_startedなしを会計）、`burst finish`→`state recover`。
 
+ローカルCLIの長期実行は`node COMMON/scripts/supervise.mjs --target TARGET --prompt "/goal ..."`で起動できる。検査コマンドの許可は`permissions.mjs`が事前生成して`--settings`で渡し、CLIが死ぬか無言になれば同じsessionを自動で`--resume`し、独立verifyがCOMPLETEになるまで繰り返す（予算超過や進展なしは理由付きで停止）。
+
 `/goal`は現sessionを継続し、新sessionを勝手に作らない。同じCLI sessionは標準`claude --resume ID`、新cloneはcheckpoint復元と新しい/goalを用いる。
 
 ## 6. 独立した最終判定

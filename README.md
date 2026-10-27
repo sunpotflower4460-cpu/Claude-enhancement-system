@@ -28,6 +28,8 @@ Node.js 22以上、Git、Linux/macOS（検証したOS・CIの結果は検証結�
 
 ## 開始と再開
 
+ローカルCLIでは`scripts/permissions.mjs`（検査コマンドを子agentにも事前許可）と`scripts/supervise.mjs`（死んだ/無言のCLIを同じsessionで自動`--resume`、独立verifyがCOMPLETEになるまで）で、権限待ちと手動再開をなくせます。詳細は[docs/06-usage.md](docs/06-usage.md)。
+
 クラウドで対象と共通の2repoを選び、次の一指示を送ります。
 
 ```text
